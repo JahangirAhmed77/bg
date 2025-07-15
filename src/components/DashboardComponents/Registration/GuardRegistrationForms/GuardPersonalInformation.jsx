@@ -237,7 +237,7 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                 </label>
                 <div className="flex">
                   <div className="flex items-center px-3 bg-gray-50 border border-r-0 border-gray-200 rounded-l-md">
-                    <img src="/api/placeholder/20/14" alt="PK" className="w-5 h-3 mr-1" />
+                    <img src="https://img.freepik.com/premium-vector/pakistan-circle-flag-logo-icon-computer-vector-illustration-design_1143296-2001.jpg?semt=ais_hybrid&w=740" alt="PK" className="w-5 h-3 mr-1 object-cover" />
                     <span className="text-sm">+92</span>
                     <ChevronDown className="ml-1 h-3 w-3" />
                   </div>

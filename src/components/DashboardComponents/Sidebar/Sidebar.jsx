@@ -1,9 +1,13 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, LayoutDashboard, FileText, Users, MapPin, Clock, DollarSign, Calculator } from 'lucide-react';
+import { useCurrentUser } from '@/lib/hooks';
+import { ChevronDown, ChevronRight, LayoutDashboard, FileText, Users, MapPin, Clock, DollarSign, Calculator, User } from 'lucide-react';
 
 const Sidebar = () => {
+    
+   
+
     const [expandedSections, setExpandedSections] = useState({
         setup: true,
         registration: false,
@@ -23,6 +27,7 @@ const Sidebar = () => {
     return (
         <div className="w-64 h-screen bg-gray-50 border-r border-gray-200 overflow-y-auto">
             <div className="p-4">
+               
                 {/* Dashboards Section */}
                 <div className="mb-6">
                     <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
@@ -37,13 +42,12 @@ const Sidebar = () => {
                     </Link>
                 </div>
 
-                {/* Pages Section */}
                 <div>
                     <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                         Pages
                     </h3>
 
-                    {/* Setup */}
+              
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('setup')}
@@ -83,7 +87,7 @@ const Sidebar = () => {
                         )}
                     </div>
 
-                    {/* Registration */}
+                 
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('registration')}
@@ -129,7 +133,7 @@ const Sidebar = () => {
                         )}
                     </div>
 
-                    {/* Deployment */}
+              
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('deployment')}
