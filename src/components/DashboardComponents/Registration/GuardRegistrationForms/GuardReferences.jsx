@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { ChevronDown, Upload, X, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, Plus, Trash2 } from 'lucide-react';
 
 const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
     // Initialize with one reference from initialData or empty
@@ -15,12 +15,11 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                 id: 1,
                 fullName: '',
                 fatherName: '',
-                cnicNo: '',
-                contactNo: '',
+                cnicNumber: '',
+                contactNumber: '',
                 relationship: '',
                 currentAddress: '',
-                permanentAddress: '',
-                uploadedFile: null
+                permanentAddress: ''
             }
         ];
     });
@@ -47,12 +46,12 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
         references.forEach((_, index) => {
             schema[`reference_${index}_fullName`] = Yup.string().required('Full Name is required');
             schema[`reference_${index}_fatherName`] = Yup.string().required("Father's Name is required");
-            schema[`reference_${index}_cnicNo`] = Yup.string()
+            schema[`reference_${index}_cnicNumber`] = Yup.string()
                 .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
-                .required('CNIC No. is required');
-            schema[`reference_${index}_contactNo`] = Yup.string()
+                .required('CNIC Number is required');
+            schema[`reference_${index}_contactNumber`] = Yup.string()
                 .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid contact number')
-                .required('Contact No. is required');
+                .required('Contact Number is required');
             schema[`reference_${index}_relationship`] = Yup.string().required('Relationship is required');
             schema[`reference_${index}_currentAddress`] = Yup.string().required('Current Address is required');
             schema[`reference_${index}_permanentAddress`] = Yup.string().required('Permanent Address is required');
@@ -66,8 +65,8 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
         references.forEach((reference, index) => {
             values[`reference_${index}_fullName`] = reference.fullName || '';
             values[`reference_${index}_fatherName`] = reference.fatherName || '';
-            values[`reference_${index}_cnicNo`] = reference.cnicNo || '';
-            values[`reference_${index}_contactNo`] = reference.contactNo || '';
+            values[`reference_${index}_cnicNumber`] = reference.cnicNumber || '';
+            values[`reference_${index}_contactNumber`] = reference.contactNumber || '';
             values[`reference_${index}_relationship`] = reference.relationship || '';
             values[`reference_${index}_currentAddress`] = reference.currentAddress || '';
             values[`reference_${index}_permanentAddress`] = reference.permanentAddress || '';
@@ -80,12 +79,11 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
             id: Date.now(), // Simple ID generation
             fullName: '',
             fatherName: '',
-            cnicNo: '',
-            contactNo: '',
+            cnicNumber: '',
+            contactNumber: '',
             relationship: '',
             currentAddress: '',
-            permanentAddress: '',
-            uploadedFile: null
+            permanentAddress: ''
         };
         setReferences(prev => [...prev, newReference]);
     };
@@ -96,55 +94,16 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
         }
     };
 
-    const handleFileUpload = (referenceIndex, event) => {
-        const file = event.target.files[0];
-        if (file) {
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Please upload only JPG, PNG, or PDF files');
-                return;
-            }
-
-            // Validate file size (max 5MB)
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                alert('File size must be less than 5MB');
-                return;
-            }
-
-            setReferences(prev =>
-                prev.map((ref, index) =>
-                    index === referenceIndex
-                        ? { ...ref, uploadedFile: file }
-                        : ref
-                )
-            );
-        }
-    };
-
-    const removeFile = (referenceIndex) => {
-        setReferences(prev =>
-            prev.map((ref, index) =>
-                index === referenceIndex
-                    ? { ...ref, uploadedFile: null }
-                    : ref
-            )
-        );
-    };
-
     const handleSubmit = (values) => {
         // Convert form values back to references array format
         const formattedReferences = references.map((reference, index) => ({
-            id: reference.id,
             fullName: values[`reference_${index}_fullName`],
             fatherName: values[`reference_${index}_fatherName`],
-            cnicNo: values[`reference_${index}_cnicNo`],
-            contactNo: values[`reference_${index}_contactNo`],
+            cnicNumber: values[`reference_${index}_cnicNumber`],
+            contactNumber: values[`reference_${index}_contactNumber`],
             relationship: values[`reference_${index}_relationship`],
             currentAddress: values[`reference_${index}_currentAddress`],
-            permanentAddress: values[`reference_${index}_permanentAddress`],
-            uploadedFile: reference.uploadedFile
+            permanentAddress: values[`reference_${index}_permanentAddress`]
         }));
 
         const formData = {
@@ -205,32 +164,32 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                         <ErrorMessage name={`reference_${referenceIndex}_fatherName`} component="div" className="text-red-500 text-sm mt-1" />
                     </div>
 
-                    {/* CNIC No. */}
+                    {/* CNIC Number */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            CNIC No.
+                            CNIC Number
                         </label>
                         <Field
                             type="text"
-                            name={`reference_${referenceIndex}_cnicNo`}
-                            placeholder="Enter CNIC No."
+                            name={`reference_${referenceIndex}_cnicNumber`}
+                            placeholder="Enter CNIC Number"
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
-                        <ErrorMessage name={`reference_${referenceIndex}_cnicNo`} component="div" className="text-red-500 text-sm mt-1" />
+                        <ErrorMessage name={`reference_${referenceIndex}_cnicNumber`} component="div" className="text-red-500 text-sm mt-1" />
                     </div>
 
-                    {/* Contact No. */}
+                    {/* Contact Number */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Contact No.
+                            Contact Number
                         </label>
                         <Field
                             type="text"
-                            name={`reference_${referenceIndex}_contactNo`}
-                            placeholder="Enter Contact No."
+                            name={`reference_${referenceIndex}_contactNumber`}
+                            placeholder="Enter Contact Number"
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
-                        <ErrorMessage name={`reference_${referenceIndex}_contactNo`} component="div" className="text-red-500 text-sm mt-1" />
+                        <ErrorMessage name={`reference_${referenceIndex}_contactNumber`} component="div" className="text-red-500 text-sm mt-1" />
                     </div>
 
                     {/* Relationship */}
@@ -283,48 +242,6 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <ErrorMessage name={`reference_${referenceIndex}_permanentAddress`} component="div" className="text-red-500 text-sm mt-1" />
-                </div>
-
-                {/* Upload CNIC */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload CNIC
-                    </label>
-                    {reference.uploadedFile ? (
-                        <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-md">
-                            <div className="flex items-center">
-                                <Upload className="h-4 w-4 text-blue-600 mr-2" />
-                                <span className="text-sm text-blue-800">{reference.uploadedFile.name}</span>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => removeFile(referenceIndex)}
-                                className="text-red-600 hover:text-red-800"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="relative">
-                            <input
-                                type="file"
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                onChange={(e) => handleFileUpload(referenceIndex, e)}
-                                className="hidden"
-                                id={`cnic-upload-${referenceIndex}`}
-                            />
-                            <label
-                                htmlFor={`cnic-upload-${referenceIndex}`}
-                                className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors"
-                            >
-                                <Upload className="h-4 w-4 mr-2" />
-                                Upload CNIC
-                            </label>
-                        </div>
-                    )}
-                    <div className="text-xs text-gray-500 mt-1">
-                        Accepted formats: JPG, PNG, PDF (Max 5MB)
-                    </div>
                 </div>
             </div>
         );
@@ -383,10 +300,10 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                                     </h3>
                                     <div className="mt-2 text-sm text-amber-700">
                                         <ul className="list-disc pl-5 space-y-1">
-                                            <li>All references must provide valid CNIC documents</li>
+                                            <li>All references must provide valid contact information</li>
                                             <li>References should be financially stable and known to the applicant</li>
                                             <li>Ensure all contact information is current and accurate</li>
-                                            <li>CNIC copies should be clear and readable</li>
+                                            <li>CNIC numbers should be accurate and verifiable</li>
                                             <li>You can add multiple references as needed</li>
                                         </ul>
                                     </div>

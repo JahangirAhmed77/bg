@@ -8,33 +8,45 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
         bankName: Yup.string().required('Bank Name is required'),
         bankCode: Yup.string().required('Bank Code is required'),
-        accountNo: Yup.string()
+        accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
             .min(8, 'Account number must be at least 8 digits')
-            .required('Account No. is required'),
-        iban: Yup.string()
+            .required('Account Number is required'),
+        IBAN: Yup.string()
             .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
             .min(15, 'IBAN must be at least 15 characters')
             .max(34, 'IBAN must not exceed 34 characters')
             .required('IBAN is required'),
         branchCode: Yup.string().required('Branch Code is required'),
-        branchName: Yup.string().required('Branch Name is required')
+        branch: Yup.string().required('Branch is required')
     });
 
     const initialValues = {
-        bankName: initialData.bankName || '',
-        bankCode: initialData.bankCode || '',
-        accountNo: initialData.accountNo || '',
-        iban: initialData.iban || '',
-        branchCode: initialData.branchCode || '',
-        branchName: initialData.branchName || '',
+        bankName: initialData.bankAccount?.bankName || '',
+        bankCode: initialData.bankAccount?.bankCode || '',
+        accountNumber: initialData.bankAccount?.accountNumber || '',
+        IBAN: initialData.bankAccount?.IBAN || '',
+        branchCode: initialData.bankAccount?.branchCode || '',
+        branch: initialData.bankAccount?.branch || '',
         ...initialData
     };
 
     const handleSubmit = (values) => {
-        console.log('Bank Account Information:', values);
+        // Structure data according to API format
+        const formattedData = {
+            bankAccount: {
+                bankName: values.bankName,
+                bankCode: values.bankCode,
+                accountNumber: values.accountNumber,
+                IBAN: values.IBAN.toUpperCase(),
+                branchCode: values.branchCode,
+                branch: values.branch
+            }
+        };
+
+        console.log('Bank Account Information:', formattedData);
         if (onNext) {
-            onNext(values);
+            onNext(formattedData);
         }
     };
 
@@ -124,18 +136,18 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                                 <ErrorMessage name="bankCode" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Account No. */}
+                            {/* Account Number */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Account No.
+                                    Account Number
                                 </label>
                                 <Field
                                     type="text"
-                                    name="accountNo"
-                                    placeholder="Enter Account No."
+                                    name="accountNumber"
+                                    placeholder="Enter Account Number"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
-                                <ErrorMessage name="accountNo" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="accountNumber" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* IBAN */}
@@ -145,20 +157,20 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                                 </label>
                                 <Field
                                     type="text"
-                                    name="iban"
+                                    name="IBAN"
                                     placeholder="Enter IBAN"
                                     style={{ textTransform: 'uppercase' }}
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     onChange={(e) => {
                                         // Auto-uppercase IBAN input
                                         const value = e.target.value.toUpperCase();
-                                        setFieldValue('iban', value);
+                                        setFieldValue('IBAN', value);
                                     }}
                                 />
                                 <div className="text-xs text-gray-500 mt-1">
                                     Format: PK36SCBL0000001123456702
                                 </div>
-                                <ErrorMessage name="iban" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="IBAN" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* Branch Code */}
@@ -175,18 +187,18 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                                 <ErrorMessage name="branchCode" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Branch Name */}
+                            {/* Branch */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Branch Name
+                                    Branch
                                 </label>
                                 <Field
                                     type="text"
-                                    name="branchName"
+                                    name="branch"
                                     placeholder="Enter Branch Name"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
-                                <ErrorMessage name="branchName" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="branch" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
                         </div>
 

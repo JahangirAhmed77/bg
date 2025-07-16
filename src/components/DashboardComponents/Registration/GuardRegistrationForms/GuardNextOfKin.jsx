@@ -6,25 +6,23 @@ import { ChevronDown } from 'lucide-react';
 
 const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   const validationSchema = Yup.object({
-    fullName: Yup.string().required('Full Name is required'),
-    fatherName: Yup.string().required('Father Name is required'),
-    relation: Yup.string().required('Relation is required'),
-    cnicNo: Yup.string()
+    kinName: Yup.string().required('Full Name is required'),
+    kinFatherName: Yup.string().required('Father Name is required'),
+    kinRelation: Yup.string().required('Relation is required'),
+    kinCNIC: Yup.string()
       .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
       .required('CNIC No. is required'),
-    countryCode: Yup.string().required('Country code is required'),
-    phoneNumber: Yup.string()
-      .matches(/^[0-9]{10,11}$/, 'Phone number must be 10-11 digits')
-      .required('Phone number is required')
+    kinContactNumber: Yup.string()
+      .matches(/^(\+92|0)?[0-9]{10}$/, 'Contact Number format should be valid')
+      .required('Contact Number is required')
   });
 
   const initialValues = {
-    fullName: initialData.fullName || '',
-    fatherName: initialData.fatherName || '',
-    relation: initialData.relation || '',
-    cnicNo: initialData.cnicNo || '',
-    countryCode: initialData.countryCode || '+92',
-    phoneNumber: initialData.phoneNumber || '',
+    kinName: initialData.kinName || '',
+    kinFatherName: initialData.kinFatherName || '',
+    kinRelation: initialData.kinRelation || '',
+    kinCNIC: initialData.kinCNIC || '',
+    kinContactNumber: initialData.kinContactNumber || '',
     ...initialData
   };
 
@@ -48,20 +46,6 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
     'Cousin',
     'Friend',
     'Other'
-  ];
-
-  const countries = [
-    { code: '+92', name: 'Pakistan', flag: '🇵🇰' },
-    { code: '+1', name: 'United States', flag: '🇺🇸' },
-    { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
-    { code: '+91', name: 'India', flag: '🇮🇳' },
-    { code: '+86', name: 'China', flag: '🇨🇳' },
-    { code: '+49', name: 'Germany', flag: '🇩🇪' },
-    { code: '+33', name: 'France', flag: '🇫🇷' },
-    { code: '+81', name: 'Japan', flag: '🇯🇵' },
-    { code: '+82', name: 'South Korea', flag: '🇰🇷' },
-    { code: '+971', name: 'UAE', flag: '🇦🇪' },
-    { code: '+966', name: 'Saudi Arabia', flag: '🇸🇦' }
   ];
 
   return (
@@ -92,11 +76,11 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                 </label>
                 <Field
                   type="text"
-                  name="fullName"
+                  name="kinName"
                   placeholder="Enter Full Name"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <ErrorMessage name="fullName" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="kinName" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Father Name */}
@@ -106,11 +90,11 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                 </label>
                 <Field
                   type="text"
-                  name="fatherName"
+                  name="kinFatherName"
                   placeholder="Enter Father Name"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <ErrorMessage name="fatherName" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="kinFatherName" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Relation */}
@@ -121,7 +105,7 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                 <div className="relative">
                   <Field
                     as="select"
-                    name="relation"
+                    name="kinRelation"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                   >
                     <option value="">Select</option>
@@ -133,7 +117,7 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                   </Field>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
-                <ErrorMessage name="relation" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="kinRelation" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* CNIC No. */}
@@ -143,53 +127,25 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                 </label>
                 <Field
                   type="text"
-                  name="cnicNo"
+                  name="kinCNIC"
                   placeholder="Enter CNIC No."
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <ErrorMessage name="cnicNo" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="kinCNIC" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              {/* Phone Number with Country Code */}
-              <div className="md:col-span-2">
+              {/* Contact Number */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  Contact Number
                 </label>
-                <div className="flex space-x-2">
-                  {/* Country Code Selector */}
-                  <div className="relative flex-shrink-0">
-                    <Field
-                      as="select"
-                      name="countryCode"
-                      className="w-32 px-3 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none text-sm"
-                    >
-                      {countries.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.flag} {country.code}
-                        </option>
-                      ))}
-                    </Field>
-                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                  </div>
-
-                  {/* Phone Number Input */}
-                  <div className="flex-1">
-                    <Field
-                      type="tel"
-                      name="phoneNumber"
-                      placeholder="Enter Phone Number"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  <div className="w-32">
-                    <ErrorMessage name="countryCode" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-                  <div className="flex-1">
-                    <ErrorMessage name="phoneNumber" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-                </div>
+                <Field
+                  type="text"
+                  name="kinContactNumber"
+                  placeholder="Enter Contact Number"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <ErrorMessage name="kinContactNumber" component="div" className="text-red-500 text-sm mt-1" />
               </div>
             </div>
 

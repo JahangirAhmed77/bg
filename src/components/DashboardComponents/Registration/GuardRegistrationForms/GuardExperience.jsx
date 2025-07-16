@@ -6,60 +6,71 @@ import { ChevronDown, Plus, Minus } from 'lucide-react';
 
 const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        exServiceMen: Yup.string().required('Ex-Ex Service Men is required'),
-        armyNo: Yup.string().when('exServiceMen', {
+        isExServiceMen: Yup.string().required('Ex-Service Men is required'),
+        rankName: Yup.string().required('Rank Name is required'),
+        armyNumber: Yup.string().when('isExServiceMen', {
             is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Army No. is required'),
+            then: (schema) => schema.required('Army Number is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        rank: Yup.string().when('exServiceMen', {
+        unit: Yup.string().when('isExServiceMen', {
             is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Rank is required'),
+            then: (schema) => schema.required('Unit is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        unitCorpsService: Yup.string().when('exServiceMen', {
+        exServiceDischargeNumber: Yup.string().when('isExServiceMen', {
             is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Unit Corps Service is required'),
+            then: (schema) => schema.required('Ex-Service Discharge Number is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        totalServiceYears: Yup.number().min(0, 'Years must be 0 or greater'),
-        totalServiceMonths: Yup.number().min(0, 'Months must be 0 or greater').max(11, 'Months must be less than 12'),
-        branch: Yup.string().when('exServiceMen', {
+        branch: Yup.string().when('isExServiceMen', {
             is: (value) => value === 'Yes',
             then: (schema) => schema.required('Branch is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        exServicemanDischargeBookNo: Yup.string().when('exServiceMen', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Ex-Serviceman Discharge Book No. is required'),
-            otherwise: (schema) => schema.notRequired()
-        }),
-        anyCitation: Yup.string(),
-        recentCivilEmployment: Yup.string(),
-        placeOfDuty: Yup.string(),
-        totalYearsInSecurity: Yup.number().min(0, 'Years must be 0 or greater').required('Total Years in Security is required')
+        serviceYears: Yup.number().min(0, 'Years must be 0 or greater'),
+        serviceMonths: Yup.number().min(0, 'Months must be 0 or greater').max(11, 'Months must be less than 12'),
+        securityYears: Yup.number().min(0, 'Years must be 0 or greater').required('Security Years is required'),
+        place: Yup.string(),
+        recentCivilEmployment: Yup.string()
     });
 
     const initialValues = {
-        exServiceMen: initialData.exServiceMen || '',
-        armyNo: initialData.armyNo || '',
-        rank: initialData.rank || '',
-        unitCorpsService: initialData.unitCorpsService || '',
-        totalServiceYears: initialData.totalServiceYears || 0,
-        totalServiceMonths: initialData.totalServiceMonths || 0,
-        branch: initialData.branch || '',
-        exServicemanDischargeBookNo: initialData.exServicemanDischargeBookNo || '',
-        anyCitation: initialData.anyCitation || '',
-        recentCivilEmployment: initialData.recentCivilEmployment || '',
-        placeOfDuty: initialData.placeOfDuty || '',
-        totalYearsInSecurity: initialData.totalYearsInSecurity || 0,
+        isExServiceMen: initialData.guardExperience?.[0]?.isExServiceMen ? 'Yes' : 'No',
+        rankName: initialData.guardExperience?.[0]?.rankName || '',
+        armyNumber: initialData.guardExperience?.[0]?.armyNumber || '',
+        unit: initialData.guardExperience?.[0]?.unit || '',
+        exServiceDischargeNumber: initialData.guardExperience?.[0]?.exServiceDischargeNumber || '',
+        branch: initialData.guardExperience?.[0]?.branch || '',
+        serviceYears: initialData.guardExperience?.[0]?.serviceYears || 0,
+        serviceMonths: initialData.guardExperience?.[0]?.serviceMonths || 0,
+        securityYears: initialData.guardExperience?.[0]?.securityYears || 0,
+        place: initialData.guardExperience?.[0]?.place || '',
+        recentCivilEmployment: initialData.guardExperience?.[0]?.recentCivilEmployment || '',
         ...initialData
     };
 
     const handleSubmit = (values) => {
-        console.log('Experience Information:', values);
+        // Structure data according to API format
+        const formattedData = {
+            guardExperience: [{
+                isExServiceMen: values.isExServiceMen === 'Yes',
+                rankName: values.rankName,
+                armyNumber: values.armyNumber,
+                unit: values.unit,
+                exServiceDischargeNumber: values.exServiceDischargeNumber,
+                branch: values.branch,
+                serviceYears: parseInt(values.serviceYears) || 0,
+                serviceMonths: parseInt(values.serviceMonths) || 0,
+                securityYears: parseInt(values.securityYears) || 0,
+                place: values.place,
+                recentCivilEmployment: values.recentCivilEmployment
+            }]
+        };
+
+        console.log('Experience Information:', formattedData);
         if (onNext) {
-            onNext(values);
+            onNext(formattedData);
         }
     };
 
@@ -68,14 +79,35 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
         'No'
     ];
 
-    const ranks = [
+    const rankNames = [
+        'Private',
+        'Lance Corporal',
+        'Corporal',
+        'Sergeant',
+        'Staff Sergeant',
+        'Warrant Officer',
+        'Second Lieutenant',
+        'Lieutenant',
         'Captain',
         'Major',
+        'Lieutenant Colonel',
         'Colonel',
-        'Lieutenant',
-        'Sergeant',
-        'Corporal',
-        'Private',
+        'Brigadier',
+        'Major General',
+        'Lieutenant General',
+        'General',
+        'Security Guard',
+        'Head Guard',
+        'Supervisor',
+        'Other'
+    ];
+
+    const branches = [
+        'Army',
+        'Navy',
+        'Air Force',
+        'Police',
+        'Rangers',
         'Other'
     ];
 
@@ -144,15 +176,15 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Ex-Ex Service Men */}
+                            {/* Ex-Service Men */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Ex-Ex Service Men
+                                    Ex-Service Men
                                 </label>
                                 <div className="relative">
                                     <Field
                                         as="select"
-                                        name="exServiceMen"
+                                        name="isExServiceMen"
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                     >
                                         <option value="">Select</option>
@@ -164,38 +196,22 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                     </Field>
                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                 </div>
-                                <ErrorMessage name="exServiceMen" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="isExServiceMen" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Army No. */}
+                            {/* Rank Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Army No.
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="armyNo"
-                                    placeholder="Enter Army No."
-                                    disabled={values.exServiceMen !== 'Yes'}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                <ErrorMessage name="armyNo" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
-
-                            {/* Rank */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Rank
+                                    Rank Name
                                 </label>
                                 <div className="relative">
                                     <Field
                                         as="select"
-                                        name="rank"
-                                        disabled={values.exServiceMen !== 'Yes'}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                        name="rankName"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                     >
                                         <option value="">Select</option>
-                                        {ranks.map((rank) => (
+                                        {rankNames.map((rank) => (
                                             <option key={rank} value={rank}>
                                                 {rank}
                                             </option>
@@ -203,53 +219,68 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                     </Field>
                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                 </div>
-                                <ErrorMessage name="rank" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="rankName" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Unit Corps Service */}
+                            {/* Army Number */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Unit Corps Service
+                                    Army Number
                                 </label>
                                 <Field
                                     type="text"
-                                    name="unitCorpsService"
-                                    placeholder="Enter Unit Corps Service"
-                                    disabled={values.exServiceMen !== 'Yes'}
+                                    name="armyNumber"
+                                    placeholder="Enter Army Number"
+                                    disabled={values.isExServiceMen !== 'Yes'}
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
-                                <ErrorMessage name="unitCorpsService" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="armyNumber" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Total Service - Years */}
+                            {/* Unit */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Total Service
+                                    Unit
+                                </label>
+                                <Field
+                                    type="text"
+                                    name="unit"
+                                    placeholder="Enter Unit"
+                                    disabled={values.isExServiceMen !== 'Yes'}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
+                                <ErrorMessage name="unit" component="div" className="text-red-500 text-sm mt-1" />
+                            </div>
+
+                            {/* Service Period - Years and Months */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Service Period
                                 </label>
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
                                         <NumberInput
-                                            name="totalServiceYears"
-                                            value={values.totalServiceYears}
+                                            name="serviceYears"
+                                            value={values.serviceYears}
                                             setFieldValue={setFieldValue}
-                                            disabled={values.exServiceMen !== 'Yes'}
+                                            disabled={values.isExServiceMen !== 'Yes'}
                                             label="Years"
                                         />
                                         <div className="text-xs text-gray-500 mt-1 text-center">Years</div>
                                     </div>
                                     <div className="flex-1">
                                         <NumberInput
-                                            name="totalServiceMonths"
-                                            value={values.totalServiceMonths}
+                                            name="serviceMonths"
+                                            value={values.serviceMonths}
                                             setFieldValue={setFieldValue}
-                                            disabled={values.exServiceMen !== 'Yes'}
+                                            disabled={values.isExServiceMen !== 'Yes'}
                                             label="Months"
                                         />
                                         <div className="text-xs text-gray-500 mt-1 text-center">Months</div>
                                     </div>
                                 </div>
-                                <ErrorMessage name="totalServiceYears" component="div" className="text-red-500 text-sm mt-1" />
-                                <ErrorMessage name="totalServiceMonths" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="serviceYears" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="serviceMonths" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* Branch */}
@@ -257,44 +288,39 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Branch
                                 </label>
-                                <Field
-                                    type="text"
-                                    name="branch"
-                                    placeholder="Enter Branch"
-                                    disabled={values.exServiceMen !== 'Yes'}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
+                                <div className="relative">
+                                    <Field
+                                        as="select"
+                                        name="branch"
+                                        disabled={values.isExServiceMen !== 'Yes'}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <option value="">Select</option>
+                                        {branches.map((branch) => (
+                                            <option key={branch} value={branch}>
+                                                {branch}
+                                            </option>
+                                        ))}
+                                    </Field>
+                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                </div>
                                 <ErrorMessage name="branch" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
                         </div>
 
-                        {/* Ex-Serviceman Discharge Book No. */}
+                        {/* Ex-Service Discharge Number */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Ex-Serviceman Discharge Book No.
+                                Ex-Service Discharge Number
                             </label>
                             <Field
                                 type="text"
-                                name="exServicemanDischargeBookNo"
-                                placeholder="Enter Ex-Serviceman Discharge Book No."
-                                disabled={values.exServiceMen !== 'Yes'}
+                                name="exServiceDischargeNumber"
+                                placeholder="Enter Ex-Service Discharge Number"
+                                disabled={values.isExServiceMen !== 'Yes'}
                                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                             />
-                            <ErrorMessage name="exServicemanDischargeBookNo" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-                        {/* Any Citation / Additional at your service */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Any Citation / Additional at your service
-                            </label>
-                            <Field
-                                as="textarea"
-                                name="anyCitation"
-                                rows="3"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                            />
-                            <ErrorMessage name="anyCitation" component="div" className="text-red-500 text-sm mt-1" />
+                            <ErrorMessage name="exServiceDischargeNumber" component="div" className="text-red-500 text-sm mt-1" />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -319,25 +345,25 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                 </label>
                                 <Field
                                     type="text"
-                                    name="placeOfDuty"
+                                    name="place"
                                     placeholder="Enter Place of Duty"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
-                                <ErrorMessage name="placeOfDuty" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="place" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Total Years in Security */}
+                            {/* Security Years */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Total Years in Security
+                                    Security Years
                                 </label>
                                 <NumberInput
-                                    name="totalYearsInSecurity"
-                                    value={values.totalYearsInSecurity}
+                                    name="securityYears"
+                                    value={values.securityYears}
                                     setFieldValue={setFieldValue}
                                     label="Years"
                                 />
-                                <ErrorMessage name="totalYearsInSecurity" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="securityYears" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
                         </div>
 

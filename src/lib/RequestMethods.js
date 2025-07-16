@@ -15,7 +15,7 @@ export const userRequest = axios.create({
 // Get token from Redux state
 const getTokenFromState = () => {
     const state = store.getState();
-    return state.user.data.token;
+    return state.user.currentUser.data.token;
 };
 
 // Request interceptor - Add token to headers

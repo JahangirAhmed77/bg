@@ -3,7 +3,7 @@ import React from 'react';
 import { useCurrentUser } from '@/lib/hooks';
 
 const DashboardPage = () => {
-    // Access Redux state
+
     const { currentUser, isLoading, error, user } = useCurrentUser();
 
     return (

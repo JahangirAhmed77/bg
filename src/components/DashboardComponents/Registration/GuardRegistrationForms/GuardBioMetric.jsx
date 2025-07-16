@@ -3,16 +3,18 @@ import React, { useState } from 'react';
 
 const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) => {
     const [formData, setFormData] = useState({
-        rightHandThumb: initialData.rightHandThumb || null,
-        rightHandForeFinger: initialData.rightHandForeFinger || null,
-        rightHandMiddleFinger: initialData.rightHandMiddleFinger || null,
-        rightHandLittleFinger: initialData.rightHandLittleFinger || null,
-        rightHandFourFingers: initialData.rightHandFourFingers || null,
-        leftHandThumb: initialData.leftHandThumb || null,
-        leftHandForeFinger: initialData.leftHandForeFinger || null,
-        leftHandMiddleFinger: initialData.leftHandMiddleFinger || null,
-        leftHandLittleFinger: initialData.leftHandLittleFinger || null,
-        leftHandFourFingers: initialData.leftHandFourFingers || null,
+        rightThumb: initialData.biometric?.rightThumb || null,
+        rightForeFinger: initialData.biometric?.rightForeFinger || null,
+        rightMiddleFinger: initialData.biometric?.rightMiddleFinger || null,
+        rightRingFinger: initialData.biometric?.rightRingFinger || null,
+        rightLittleFinger: initialData.biometric?.rightLittleFinger || null,
+        rightFourFinger: initialData.biometric?.rightFourFinger || null,
+        leftThumb: initialData.biometric?.leftThumb || null,
+        leftForeFinger: initialData.biometric?.leftForeFinger || null,
+        leftMiddleFinger: initialData.biometric?.leftMiddleFinger || null,
+        leftRingFinger: initialData.biometric?.leftRingFinger || null,
+        leftLittleFinger: initialData.biometric?.leftLittleFinger || null,
+        leftFourFinger: initialData.biometric?.leftFourFinger || null,
         ...initialData
     });
 
@@ -38,8 +40,26 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
     };
 
     const handleContinue = () => {
+        // Structure data according to API format with placeholders
+        const formattedData = {
+            biometric: {
+                rightThumb: formData.rightThumb ? 'uploaded_file_placeholder' : '',
+                rightMiddleFinger: formData.rightMiddleFinger ? 'uploaded_file_placeholder' : '',
+                rightLittleFinger: formData.rightLittleFinger ? 'uploaded_file_placeholder' : '',
+                leftThumb: formData.leftThumb ? 'uploaded_file_placeholder' : '',
+                leftMiddleFinger: formData.leftMiddleFinger ? 'uploaded_file_placeholder' : '',
+                leftLittleFinger: formData.leftLittleFinger ? 'uploaded_file_placeholder' : '',
+                rightForeFinger: formData.rightForeFinger ? 'uploaded_file_placeholder' : '',
+                rightRingFinger: formData.rightRingFinger ? 'uploaded_file_placeholder' : '',
+                rightFourFinger: formData.rightFourFinger ? 'uploaded_file_placeholder' : '',
+                leftFourFinger: formData.leftFourFinger ? 'uploaded_file_placeholder' : '',
+                leftRingFinger: formData.leftRingFinger ? 'uploaded_file_placeholder' : '',
+                leftForeFinger: formData.leftForeFinger ? 'uploaded_file_placeholder' : ''
+            }
+        };
+
         if (onComplete) {
-            onComplete(formData);
+            onComplete(formattedData);
         }
     };
 
@@ -92,13 +112,14 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
                 <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Right Hand Bio-Metric</h3>
                     <div className="grid grid-cols-2 gap-4">
-                        {renderFileInput('rightHandThumb', 'Right Hand Thumb')}
-                        {renderFileInput('rightHandForeFinger', 'Right Hand Fore Finger')}
-                        {renderFileInput('rightHandMiddleFinger', 'Right Hand Middle Finger')}
-                        {renderFileInput('rightHandLittleFinger', 'Right Hand Little Finger')}
+                        {renderFileInput('rightThumb', 'Right Thumb')}
+                        {renderFileInput('rightForeFinger', 'Right Fore Finger')}
+                        {renderFileInput('rightMiddleFinger', 'Right Middle Finger')}
+                        {renderFileInput('rightRingFinger', 'Right Ring Finger')}
+                        {renderFileInput('rightLittleFinger', 'Right Little Finger')}
 
                         <div className="col-span-2">
-                            {renderFileInput('rightHandFourFingers', 'Four Fingers')}
+                            {renderFileInput('rightFourFinger', 'Right Four Fingers')}
                         </div>
                     </div>
                 </div>
@@ -107,13 +128,34 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
                 <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Left Hand Bio-Metric</h3>
                     <div className="grid grid-cols-2 gap-4">
-                        {renderFileInput('leftHandThumb', 'Left Hand Thumb')}
-                        {renderFileInput('leftHandForeFinger', 'Left Hand Fore Finger')}
-                        {renderFileInput('leftHandMiddleFinger', 'Left Hand Middle Finger')}
-                        {renderFileInput('leftHandLittleFinger', 'Left Hand Ring Finger')}
+                        {renderFileInput('leftThumb', 'Left Thumb')}
+                        {renderFileInput('leftForeFinger', 'Left Fore Finger')}
+                        {renderFileInput('leftMiddleFinger', 'Left Middle Finger')}
+                        {renderFileInput('leftRingFinger', 'Left Ring Finger')}
+                        {renderFileInput('leftLittleFinger', 'Left Little Finger')}
 
                         <div className="col-span-2">
-                            {renderFileInput('leftHandFourFingers', 'Four Fingers')}
+                            {renderFileInput('leftFourFinger', 'Left Four Fingers')}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Information Box */}
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-blue-800">
+                                Biometric Guidelines
+                            </h3>
+                            <div className="mt-2 text-sm text-blue-700">
+                                <ul className="list-disc pl-5 space-y-1">
+                                    <li>Upload clear fingerprint images or biometric templates</li>
+                                    <li>Ensure fingerprints are captured properly without smudging</li>
+                                    <li>Supported formats: JPG, PNG, BMP, TIFF, Template files</li>
+                                    <li>Individual finger captures are preferred for accuracy</li>
+                                    <li>Four-finger captures can be used as alternatives</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -133,7 +175,7 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
                     onClick={handleContinue}
                     className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    Continue
+                    Complete Registration
                 </button>
             </div>
         </div>

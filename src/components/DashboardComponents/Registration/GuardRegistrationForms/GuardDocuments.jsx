@@ -6,65 +6,73 @@ import { Plus, X, Check } from 'lucide-react';
 
 const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
     const documentFields = [
-        { name: 'picturePassport', label: 'Picture (passport MRIS)', required: true },
-        { name: 'drivingLicenseFront', label: 'Driving License Front', required: false },
+        { name: 'picture', label: 'Picture (passport size)', required: true },
         { name: 'cnicFront', label: 'CNIC Front', required: true },
-        { name: 'drivingLicenseBack', label: 'Driving License Back', required: false },
         { name: 'cnicBack', label: 'CNIC Back', required: true },
-        { name: 'policeVerification', label: 'Police Verification', required: true },
-        { name: 'dischargeBook', label: 'Discharge Book', required: false },
+        { name: 'licenseFront', label: 'License Front', required: false },
+        { name: 'licenseBack', label: 'License Back', required: false },
+        { name: 'policeVerification', label: 'Police Verification', required: false },
         { name: 'specialBranchVerification', label: 'Special Branch Verification', required: false },
-        { name: 'medicalHealthCertificate', label: 'Medical/ Health Certificate', required: true },
-        { name: 'matricMarkup', label: 'Matric Markup', required: true },
-        { name: 'mentalDocuments', label: 'Mental Documents', required: false },
-        { name: 'matricMarkupRef1', label: 'Matric Markup Reference 1', required: false },
-        { name: 'sscDriving', label: 'SSC Driving', required: false },
-        { name: 'matricMarkupRef2', label: 'Matric Markup Reference 2', required: false },
-        { name: 'educationCertificate', label: 'Education Certificate', required: true },
-        { name: 'afmaTrainingCertificate', label: 'AFMA Training/Firing Certificate', required: false },
-        { name: 'othersMisc1', label: 'Others Misc. 1', required: false },
-        { name: 'othersMisc2', label: 'Others Misc. 2', required: false }
+        { name: 'dischargeBook', label: 'Discharge Book', required: false },
+        { name: 'NadraVeriSys', label: 'Nadra VeriSys', required: false },
+        { name: 'NadraVeriSysRef1', label: 'Nadra VeriSys Ref 1', required: false },
+        { name: 'NadraVeriSysRef2', label: 'Nadra VeriSys Ref 2', required: false },
+        { name: 'healthCertificate', label: 'Health Certificate', required: false },
+        { name: 'medicalDocument', label: 'Medical Document', required: false },
+        { name: 'DDCDriving', label: 'DDC Driving', required: false },
+        { name: 'educationCertificate', label: 'Education Certificate', required: false },
+        { name: 'APSAATrainingCertificate', label: 'APSAA Training Certificate', required: false },
+        { name: 'misc1', label: 'Misc Document 1', required: false },
+        { name: 'misc2', label: 'Misc Document 2', required: false }
     ];
 
     const [uploadedFiles, setUploadedFiles] = useState(() => {
         const initialFiles = {};
         documentFields.forEach(field => {
-            initialFiles[field.name] = initialData.uploadedFiles?.[field.name] || null;
+            initialFiles[field.name] = initialData.guardDocuments?.[field.name] || null;
         });
         return initialFiles;
     });
 
-    const validationSchema = Yup.object({
-        orangeCnicSubmitted: Yup.string().required('Please specify if Orange CNIC is submitted'),
-    });
+    const validationSchema = Yup.object({});
 
     const initialValues = {
-        orangeCnicSubmitted: initialData.orangeCnicSubmitted || '',
         ...documentFields.reduce((acc, field) => {
-            acc[field.name] = initialData[field.name] || '';
+            acc[field.name] = initialData.guardDocuments?.[field.name] || '';
             return acc;
-        }, {})
+        }, {}),
+        originalCNICSubmitted: initialData.guardDocuments?.originalCNICSubmitted || false
     };
 
     const handleSubmit = (values) => {
-        // Check if all required files are uploaded
-        const missingRequired = documentFields
-            .filter(field => field.required && !uploadedFiles[field.name])
-            .map(field => field.label);
-
-        if (missingRequired.length > 0) {
-            alert(`Please upload the following required documents: ${missingRequired.join(', ')}`);
-            return;
-        }
-
-        const formData = {
-            ...values,
-            uploadedFiles
+        // Structure data according to API format with placeholders
+        const formattedData = {
+            guardDocuments: {
+                picture: uploadedFiles.picture ? 'uploaded_file_placeholder' : '',
+                cnicFront: uploadedFiles.cnicFront ? 'uploaded_file_placeholder' : '',
+                cnicBack: uploadedFiles.cnicBack ? 'uploaded_file_placeholder' : '',
+                licenseFront: uploadedFiles.licenseFront ? 'uploaded_file_placeholder' : '',
+                licenseBack: uploadedFiles.licenseBack ? 'uploaded_file_placeholder' : '',
+                policeVerification: uploadedFiles.policeVerification ? 'uploaded_file_placeholder' : '',
+                specialBranchVerification: uploadedFiles.specialBranchVerification ? 'uploaded_file_placeholder' : '',
+                dischargeBook: uploadedFiles.dischargeBook ? 'uploaded_file_placeholder' : '',
+                NadraVeriSys: uploadedFiles.NadraVeriSys ? 'uploaded_file_placeholder' : '',
+                NadraVeriSysRef1: uploadedFiles.NadraVeriSysRef1 ? 'uploaded_file_placeholder' : '',
+                NadraVeriSysRef2: uploadedFiles.NadraVeriSysRef2 ? 'uploaded_file_placeholder' : '',
+                healthCertificate: uploadedFiles.healthCertificate ? 'uploaded_file_placeholder' : '',
+                medicalDocument: uploadedFiles.medicalDocument ? 'uploaded_file_placeholder' : '',
+                DDCDriving: uploadedFiles.DDCDriving ? 'uploaded_file_placeholder' : '',
+                educationCertificate: uploadedFiles.educationCertificate ? 'uploaded_file_placeholder' : '',
+                APSAATrainingCertificate: uploadedFiles.APSAATrainingCertificate ? 'uploaded_file_placeholder' : '',
+                misc1: uploadedFiles.misc1 ? 'uploaded_file_placeholder' : '',
+                misc2: uploadedFiles.misc2 ? 'uploaded_file_placeholder' : '',
+                originalCNICSubmitted: values.originalCNICSubmitted
+            }
         };
 
-        console.log('Guard Documents Information:', formData);
+        console.log('Guard Documents Information:', formattedData);
         if (onNext) {
-            onNext(formData);
+            onNext(formattedData);
         }
     };
 
@@ -110,7 +118,7 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
                         <input
                             type="text"
                             value={file ? file.name : ''}
-                            placeholder={field.label}
+                            placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
                             readOnly
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                         />
@@ -153,7 +161,7 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Upload Employee Documents/ Bio-Metric</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Upload Employee Documents</h2>
                     <div className="text-sm text-gray-500">Step 7 of 8</div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -169,40 +177,43 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-6">
                         {/* Document Upload Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {documentFields.map((field) => (
                                 <DocumentUploadField key={field.name} field={field} />
                             ))}
                         </div>
 
-                        {/* Orange CNIC Section */}
-                        <div className="mt-8 pt-6 border-t border-gray-200">
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
-                                    Orange CNIC Submitted
-                                </label>
-                                <div className="flex space-x-6">
-                                    <label className="flex items-center">
-                                        <Field
-                                            type="radio"
-                                            name="orangeCnicSubmitted"
-                                            value="yes"
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        />
-                                        <span className="ml-2 text-sm text-gray-700">Yes</span>
-                                    </label>
-                                    <label className="flex items-center">
-                                        <Field
-                                            type="radio"
-                                            name="orangeCnicSubmitted"
-                                            value="no"
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        />
-                                        <span className="ml-2 text-sm text-gray-700">No</span>
-                                    </label>
+                        {/* Information Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                            <div className="flex">
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-blue-800">
+                                        Document Upload Guidelines
+                                    </h3>
+                                    <div className="mt-2 text-sm text-blue-700">
+                                        <ul className="list-disc pl-5 space-y-1">
+                                            <li>Upload clear, high-quality images or PDF files</li>
+                                            <li>Picture should be passport size with clear face visibility</li>
+                                            <li>CNIC documents must be readable and valid</li>
+                                            <li>License documents are optional but recommended if available</li>
+                                            <li>Maximum file size: 10MB per document</li>
+                                            <li>Supported formats: JPG, PNG, PDF</li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <ErrorMessage name="orangeCnicSubmitted" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
+                        </div>
+
+                        {/* Original CNIC Submitted Checkbox */}
+                        <div className="flex items-center space-x-2">
+                            <Field
+                                type="checkbox"
+                                name="originalCNICSubmitted"
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor="originalCNICSubmitted" className="text-sm font-medium text-gray-700">
+                                Original CNIC Submitted
+                            </label>
                         </div>
 
                         {/* Buttons */}
