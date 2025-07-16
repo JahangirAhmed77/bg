@@ -58,6 +58,8 @@ const GuardsRegistrationPage = () => {
         }
     };
 
+
+
     const handleComplete = () => {
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
@@ -77,29 +79,24 @@ const GuardsRegistrationPage = () => {
     };
 
     return (
-        <div className="bg-white min-h-screen">
-            {/* Breadcrumb */}
-            <div className="px-8 py-4 border-b border-gray-200 bg-gray-50">
-                <nav className="flex" aria-label="Breadcrumb">
-                    <ol className="flex items-center space-x-2">
-                        {getBreadcrumbs().map((breadcrumb, index) => (
-                            <li key={index} className="flex items-center">
-                                {index > 0 && (
-                                    <ChevronRight className="h-4 w-4 text-gray-400 mx-2" />
-                                )}
-                                <span className={`text-sm ${index === getBreadcrumbs().length - 1
-                                        ? 'text-gray-900 font-medium'
-                                        : 'text-gray-500'
-                                    }`}>
-                                    {breadcrumb.label}
-                                </span>
-                            </li>
-                        ))}
-                    </ol>
-                </nav>
+        <div className="min-h-screen bg-formBGBlue">
+            {/* Header */}
+            <div className='px-4 pt-4'>
+                <aside className="bg-white border-b rounded-xl border-gray-200 ">
+                    <div className="px-6 py-4">
+                            <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <span>Dashboard</span>
+                            <span>&gt;</span>
+                            <span>Registration</span>
+                            <span>&gt;</span>
+                            <span className="text-gray-900 font-medium">Guards Registration</span>
+                        </div>
+                    </div>
+                </aside>
             </div>
 
-            <div className="flex h-screen">
+            {/* Main Content */}
+            <div className="flex h-[calc(100vh-73px)] p-4 gap-5">
                 {/* Sidebar */}
                 <GuardsSidebar
                     currentStep={currentStep}
@@ -108,7 +105,7 @@ const GuardsRegistrationPage = () => {
                 />
 
                 {/* Main Content */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto rounded-xl">
                     {CurrentStepComponent && (
                         <CurrentStepComponent
                             onNext={handleNext}

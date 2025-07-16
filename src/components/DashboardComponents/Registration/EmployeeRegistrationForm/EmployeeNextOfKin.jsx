@@ -4,7 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown } from 'lucide-react';
 
-const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
+const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   const validationSchema = Yup.object({
     fullName: Yup.string().required('Full Name is required'),
     fatherName: Yup.string().required('Father Name is required'),
@@ -29,7 +29,7 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   };
 
   const handleSubmit = (values) => {
-    console.log('Next of Kin Information:', values);
+    console.log('Employee Next of Kin Information:', values);
     if (onNext) {
       onNext(values);
     }
@@ -70,10 +70,10 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Next of Kin/ Emergency Contact</h2>
-          <div className="text-sm text-gray-500">Step 2 of 8</div>
+          <div className="text-sm text-gray-500">Step 2 of 7</div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '28.6%' }}></div>
         </div>
       </div>
 
@@ -217,4 +217,4 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   );
 };
 
-export default GuardNextOfKin;
+export default EmployeeNextOfKin;

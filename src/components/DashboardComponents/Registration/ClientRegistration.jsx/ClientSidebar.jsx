@@ -1,16 +1,10 @@
 'use client';
 import React from 'react';
 
-const GuardsSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
+const ClientSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
     const steps = [
-        { id: 'personal-info', label: 'Personal Information', step: 1 },
-        { id: 'next-of-kin', label: 'Next of Kin/ Emergency Contact', step: 2 },
-        { id: 'academics', label: 'Academics & Licenses', step: 3 },
-        { id: 'experience', label: 'Experience', step: 4 },
-        { id: 'bank-account', label: 'Add Bank Account', step: 5 },
-        { id: 'references', label: 'References / Guarantors', step: 6 },
-        { id: 'documents', label: 'Upload Employee Documents/ Bio-Metric', step: 7 },
-        { id: 'bio-metric', label: 'Bio-Metric', step: 8 }
+        { id: 'company-info', label: 'Company Information', step: 1 },
+        { id: 'primary-contact', label: 'Primary Contact', step: 2 }
     ];
 
     const handleStepClick = (stepId) => {
@@ -34,7 +28,7 @@ const GuardsSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
                                     ? 'bg-themeYellow text-black shadow-md'
                                     : isCompleted
                                         ? 'bg-green-50 text-green-800 border border-green-200'
-                                        : ' bg-[#cfd3d4] text-gray-700 hover:bg-gray-200'
+                                        : ' bg-sidebarGray text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 <div className="flex items-center justify-between w-full">
@@ -56,4 +50,4 @@ const GuardsSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
     );
 };
 
-export default GuardsSidebar; 
+export default ClientSidebar; 

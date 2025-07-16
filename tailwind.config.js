@@ -9,7 +9,10 @@ module.exports = {
         sans: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
       },
       colors: {
-        themeYellow: '#ffc20e'
+        themeYellow: '#ffc20e',
+        formBGBlue: '#e3edf9',
+        sidebarGray: '#cfd3d4',
+        themeBlue: '#5570f1'
       }
     },
   },
