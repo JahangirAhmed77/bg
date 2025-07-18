@@ -194,46 +194,58 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
         const file = uploadedFiles[field.name];
         const isRequired = field.required;
 
+        // Show file.name if file is an object with a name property, otherwise show the string value
+        let fileDisplayName = '';
+        if (file) {
+            if (typeof file === 'object' && file.name) {
+                fileDisplayName = file.name;
+            } else {
+                fileDisplayName = file;
+            }
+        }
+
         return (
             <div className="flex items-center space-x-3">
                 <div className="flex-1">
+                    <input
+                        type="text"
+                        value={fileDisplayName}
+                        placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
+                        readOnly
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    />
+                </div>
+                <div className="flex items-center space-x-2">
                     <div className="relative">
                         <input
-                            type="text"
-                            value={file ? file.name : ''}
-                            placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
-                            readOnly
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(e) => handleFileUpload(field.name, e)}
+                            className="hidden"
+                            id={`upload-${field.name}`}
                         />
-                        {file && (
-                            <button
-                                type="button"
-                                onClick={() => removeFile(field.name)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
-                        )}
+                        <label
+                            htmlFor={`upload-${field.name}`}
+                            className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-md cursor-pointer transition-colors border border-blue-200"
+                            title={file ? "Replace file" : "Upload file"}
+                        >
+                            {file ? (
+                                <Check className="h-5 w-5 text-green-600" />
+                            ) : (
+                                <Plus className="h-5 w-5 text-blue-600" />
+                            )}
+                        </label>
                     </div>
-                </div>
-                <div className="relative">
-                    <input
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        onChange={(e) => handleFileUpload(field.name, e)}
-                        className="hidden"
-                        id={`upload-${field.name}`}
-                    />
-                    <label
-                        htmlFor={`upload-${field.name}`}
-                        className="flex items-center justify-center w-12 h-12 bg-blue-100 hover:bg-blue-200 rounded-md cursor-pointer transition-colors"
-                    >
-                        {file ? (
-                            <Check className="h-5 w-5 text-green-600" />
-                        ) : (
-                            <Plus className="h-5 w-5 text-blue-600" />
-                        )}
-                    </label>
+                    {file && (
+                        <button
+                            type="button"
+                            onClick={() => removeFile(field.name)}
+                            className="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 rounded-md transition-colors border border-red-200"
+                            title="Remove file"
+                        >
+                            <X className="h-5 w-5 text-red-600" />
+                        </button>
+                    )}
                 </div>
             </div>
         );
@@ -323,4 +335,4 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
     );
 };
 
-export default GuardDocuments; 
+export default GuardDocuments;

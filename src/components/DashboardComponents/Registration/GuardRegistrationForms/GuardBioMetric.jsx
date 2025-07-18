@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { publicRequest, userRequest } from '@/lib/RequestMethods';
+import { userRequest } from '@/lib/RequestMethods';
 import axios from 'axios';
 
 const GuardBioMetric = ({ onNext, onPrevious, onComplete, onSave, initialData = {} }) => {
