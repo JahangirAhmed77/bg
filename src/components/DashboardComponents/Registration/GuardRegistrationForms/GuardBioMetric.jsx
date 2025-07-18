@@ -2,8 +2,12 @@
 import React, { useState } from 'react';
 import { userRequest } from '@/lib/RequestMethods';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const GuardBioMetric = ({ onNext, onPrevious, onComplete, onSave, initialData = {} }) => {
+
+    const [scanAvailable, setScanAvailable] = useState(false)
+
     const biometricFields = [
         { name: 'rightThumb', label: 'Right Thumb' },
         { name: 'rightForeFinger', label: 'Right Fore Finger' },
@@ -199,8 +203,8 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, onSave, initialData = 
                         type="button"
                         onClick={() => handleCapture(field)}
                         className={`px-4 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${file
-                                ? 'bg-green-100 hover:bg-green-200 text-green-600'
-                                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                            ? 'bg-green-100 hover:bg-green-200 text-green-600'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
                             }`}
                     >
                         {file ? '✓' : '📁'}
@@ -212,16 +216,32 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, onSave, initialData = 
 
     return (
         <div className="flex-1 bg-white p-8">
+
+           
+
+
             {/* Header */}
             <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <aside className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Bio-Metric</h2>
                     <div className="text-sm text-gray-500">Step 8 of 8</div>
-                </div>
+                </aside>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '100%' }}></div>
+                    <article className="bg-blue-600 h-2 rounded-full" style={{ width: '100%' }}></article>
                 </div>
             </div>
+
+            <aside className='flex justify-end'>
+                <button
+                    type="button"
+                    onClick={() => toast.error('Scan not available. Please use document upload.')}
+                    className="px-5 py-2 rounded-xl border border-blue-600 text-blue-600 font-medium bg-transparent hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+                >
+                    Scan Fingerprints
+                </button>
+
+            </aside>
+
 
             {/* Form Content */}
             <div className="space-y-8">
