@@ -59,6 +59,16 @@ const GuardsRegistrationPage = () => {
         }
     };
 
+    // Handle auto-save for documents without navigation
+    const handleAutoSave = (data) => {
+        // Save the data to formData state without moving to next step
+        setFormData(prev => ({
+            ...prev,
+            [currentStep]: data
+        }));
+        console.log('Auto-saved:', currentStep, data);
+    };
+
     const handleComplete = async () => {
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
@@ -241,22 +251,22 @@ const GuardsRegistrationPage = () => {
 
 
         try {
-           
-         
-       
+
+
+
             const res = await userRequest.post('/guards', apiPayload);
 
             if (res) {
                 console.log('Registration successful:', res.data);
                 toast.success('Guard Registration Successful');
-         
+
                 setFormData({});
                 setCompletedSteps([]);
                 setCurrentStep('personal-info');
             }
         } catch (error) {
             console.error('Registration failed:', error);
-            toast.error("Guard Registration Failed:")
+            toast.error("Failed", error.response.data)
         }
     };
 
@@ -279,7 +289,7 @@ const GuardsRegistrationPage = () => {
                 </aside>
             </div>
 
-    
+
             <div className="flex h-[calc(100vh-73px)] p-4 gap-5">
                 {/* Sidebar */}
                 <GuardsSidebar
@@ -288,13 +298,14 @@ const GuardsRegistrationPage = () => {
                     completedSteps={completedSteps}
                 />
 
-             
+
                 <div className="flex-1 overflow-y-auto rounded-xl">
                     {CurrentStepComponent && (
                         <CurrentStepComponent
                             onNext={handleNext}
                             onPrevious={handlePrevious}
                             onComplete={handleComplete}
+                            onSave={handleAutoSave}
                             initialData={formData[currentStep] || {}}
                         />
                     )}

@@ -171,15 +171,7 @@ const Login = () => {
         <section className="min-h-screen flex">
             {/* Left Side - Hero Section with Banner Image */}
             <div className="flex-1 relative overflow-hidden flex flex-col bg-white">
-                {/* Text Content - Above Image */}
-                <div className="z-10 flex items-center justify-start px-4 py-16 pl-12">
-                    <aside className="text-gray-600 max-w-lg ">
-                        <h1 className="text-4xl mb-6 leading-tight font-[500]">
-                            Unlock your<br />
-                            Project <span className="text-gray-600"><span className='text-black'>performance</span></span>
-                        </h1>
-                    </aside>
-                </div>
+               
 
                 {/* Banner Background Image - Full Image Visible */}
                 <div

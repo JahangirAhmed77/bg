@@ -3,8 +3,12 @@ import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Plus, X, Check } from 'lucide-react';
+import { publicRequest, userRequest } from '@/lib/RequestMethods';
+import axios from 'axios';
 
-const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
+const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
+
+
     const documentFields = [
         { name: 'picture', label: 'Picture (passport size)', required: true },
         { name: 'cnicFront', label: 'CNIC Front', required: true },
@@ -34,6 +38,47 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
         return initialFiles;
     });
 
+    console.log(uploadedFiles)
+
+    // Helper function to format guard documents data
+    const formatGuardDocumentsData = (files, originalCNICSubmitted = initialData.guardDocuments?.originalCNICSubmitted || false, usePlaceholder = false) => {
+        console.log('=== formatGuardDocumentsData DEBUG ===');
+        console.log('files received:', files);
+        console.log('usePlaceholder:', usePlaceholder);
+        console.log('files.picture:', files.picture);
+        console.log('files.cnicFront:', files.cnicFront);
+
+        const result = {
+            guardDocuments: {
+                picture: files.picture ? (usePlaceholder ? 'uploaded_file_placeholder' : files.picture) : '',
+                cnicFront: files.cnicFront ? (usePlaceholder ? 'uploaded_file_placeholder' : files.cnicFront) : '',
+                cnicBack: files.cnicBack ? (usePlaceholder ? 'uploaded_file_placeholder' : files.cnicBack) : '',
+                licenseFront: files.licenseFront ? (usePlaceholder ? 'uploaded_file_placeholder' : files.licenseFront) : '',
+                licenseBack: files.licenseBack ? (usePlaceholder ? 'uploaded_file_placeholder' : files.licenseBack) : '',
+                policeVerification: files.policeVerification ? (usePlaceholder ? 'uploaded_file_placeholder' : files.policeVerification) : '',
+                specialBranchVerification: files.specialBranchVerification ? (usePlaceholder ? 'uploaded_file_placeholder' : files.specialBranchVerification) : '',
+                dischargeBook: files.dischargeBook ? (usePlaceholder ? 'uploaded_file_placeholder' : files.dischargeBook) : '',
+                NadraVeriSys: files.NadraVeriSys ? (usePlaceholder ? 'uploaded_file_placeholder' : files.NadraVeriSys) : '',
+                NadraVeriSysRef1: files.NadraVeriSysRef1 ? (usePlaceholder ? 'uploaded_file_placeholder' : files.NadraVeriSysRef1) : '',
+                NadraVeriSysRef2: files.NadraVeriSysRef2 ? (usePlaceholder ? 'uploaded_file_placeholder' : files.NadraVeriSysRef2) : '',
+                healthCertificate: files.healthCertificate ? (usePlaceholder ? 'uploaded_file_placeholder' : files.healthCertificate) : '',
+                medicalDocument: files.medicalDocument ? (usePlaceholder ? 'uploaded_file_placeholder' : files.medicalDocument) : '',
+                DDCDriving: files.DDCDriving ? (usePlaceholder ? 'uploaded_file_placeholder' : files.DDCDriving) : '',
+                educationCertificate: files.educationCertificate ? (usePlaceholder ? 'uploaded_file_placeholder' : files.educationCertificate) : '',
+                APSAATrainingCertificate: files.APSAATrainingCertificate ? (usePlaceholder ? 'uploaded_file_placeholder' : files.APSAATrainingCertificate) : '',
+                misc1: files.misc1 ? (usePlaceholder ? 'uploaded_file_placeholder' : files.misc1) : '',
+                misc2: files.misc2 ? (usePlaceholder ? 'uploaded_file_placeholder' : files.misc2) : '',
+                originalCNICSubmitted: originalCNICSubmitted
+            }
+        };
+
+        console.log('result.guardDocuments.picture:', result.guardDocuments.picture);
+        console.log('result.guardDocuments.cnicFront:', result.guardDocuments.cnicFront);
+        console.log('=== END formatGuardDocumentsData DEBUG ===');
+
+        return result;
+    };
+
     const validationSchema = Yup.object({});
 
     const initialValues = {
@@ -45,38 +90,22 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
     };
 
     const handleSubmit = (values) => {
-        // Structure data according to API format with placeholders
-        const formattedData = {
-            guardDocuments: {
-                picture: uploadedFiles.picture ? 'uploaded_file_placeholder' : '',
-                cnicFront: uploadedFiles.cnicFront ? 'uploaded_file_placeholder' : '',
-                cnicBack: uploadedFiles.cnicBack ? 'uploaded_file_placeholder' : '',
-                licenseFront: uploadedFiles.licenseFront ? 'uploaded_file_placeholder' : '',
-                licenseBack: uploadedFiles.licenseBack ? 'uploaded_file_placeholder' : '',
-                policeVerification: uploadedFiles.policeVerification ? 'uploaded_file_placeholder' : '',
-                specialBranchVerification: uploadedFiles.specialBranchVerification ? 'uploaded_file_placeholder' : '',
-                dischargeBook: uploadedFiles.dischargeBook ? 'uploaded_file_placeholder' : '',
-                NadraVeriSys: uploadedFiles.NadraVeriSys ? 'uploaded_file_placeholder' : '',
-                NadraVeriSysRef1: uploadedFiles.NadraVeriSysRef1 ? 'uploaded_file_placeholder' : '',
-                NadraVeriSysRef2: uploadedFiles.NadraVeriSysRef2 ? 'uploaded_file_placeholder' : '',
-                healthCertificate: uploadedFiles.healthCertificate ? 'uploaded_file_placeholder' : '',
-                medicalDocument: uploadedFiles.medicalDocument ? 'uploaded_file_placeholder' : '',
-                DDCDriving: uploadedFiles.DDCDriving ? 'uploaded_file_placeholder' : '',
-                educationCertificate: uploadedFiles.educationCertificate ? 'uploaded_file_placeholder' : '',
-                APSAATrainingCertificate: uploadedFiles.APSAATrainingCertificate ? 'uploaded_file_placeholder' : '',
-                misc1: uploadedFiles.misc1 ? 'uploaded_file_placeholder' : '',
-                misc2: uploadedFiles.misc2 ? 'uploaded_file_placeholder' : '',
-                originalCNICSubmitted: values.originalCNICSubmitted
-            }
-        };
+        console.log('=== DEBUG handleSubmit ===');
+        console.log('uploadedFiles:', uploadedFiles);
+        console.log('values.originalCNICSubmitted:', values.originalCNICSubmitted);
 
-        console.log('Guard Documents Information:', formattedData);
+        // Structure data according to API format using helper function with actual keys
+        const formattedData = formatGuardDocumentsData(uploadedFiles, values.originalCNICSubmitted, false);
+
+        console.log('Final formattedData:', formattedData);
+        console.log('=== END DEBUG ===');
+
         if (onNext) {
             onNext(formattedData);
         }
     };
 
-    const handleFileUpload = (fieldName, event) => {
+    const handleFileUpload = async (fieldName, event) => {
         const file = event.target.files[0];
         if (file) {
             // Validate file type
@@ -93,18 +122,72 @@ const GuardDocuments = ({ onNext, onPrevious, initialData = {} }) => {
                 return;
             }
 
-            setUploadedFiles(prev => ({
-                ...prev,
-                [fieldName]: file
-            }));
+            //We will first upload the filename and filetype only then api would make slot and return the upload url, but during this time store the key in the uploaded file, in that url we will PUT the request so that we can
+
+            const getUploadKeyPayload =
+            {
+
+                fileName: file.name,
+                fileType: file.type
+
+            }
+            console.log(getUploadKeyPayload);
+
+            const res = await userRequest.post("/file/url", getUploadKeyPayload);
+
+            const { key, uploadUrl } = res.data.data;
+            console.log("Key: ", key);
+            console.log("Upload Key: ", uploadUrl);
+
+            const uploadFileResponse = await axios.put(uploadUrl, file, {
+                headers: {
+                    "Content-Type": file.type,
+                },
+            });
+
+            if (uploadFileResponse.status == 200) {
+                console.log(file.name, "Uploaded")
+            }
+
+            // Update the uploaded files state
+            const updatedFiles = {
+                ...uploadedFiles,
+                [fieldName]: key
+            };
+
+            setUploadedFiles(updatedFiles);
+
+            // Auto-save the data immediately after file upload
+            // This ensures persistence even without clicking continue
+            const formattedData = formatGuardDocumentsData(updatedFiles);
+
+            // Auto-save to parent component for persistence (without navigation)
+            if (onSave) {
+                onSave(formattedData);
+            }
+
+            // setUploadedFiles(prev => ({
+            //     ...prev,
+            //     [fieldName]: file
+            // }));
         }
     };
 
     const removeFile = (fieldName) => {
-        setUploadedFiles(prev => ({
-            ...prev,
+        const updatedFiles = {
+            ...uploadedFiles,
             [fieldName]: null
-        }));
+        };
+
+        setUploadedFiles(updatedFiles);
+
+        // Auto-save the data after file removal
+        const formattedData = formatGuardDocumentsData(updatedFiles);
+
+        // Auto-save to parent component for persistence (without navigation)
+        if (onSave) {
+            onSave(formattedData);
+        }
     };
 
     const DocumentUploadField = ({ field }) => {

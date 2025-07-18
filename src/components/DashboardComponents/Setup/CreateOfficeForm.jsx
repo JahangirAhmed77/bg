@@ -3,6 +3,10 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown } from 'lucide-react';
+import { userRequest } from '@/lib/RequestMethods';
+import toast from 'react-hot-toast';
+import { PAKISTAN_CITIES } from '@/constants/PakistanCities';
+import Autosuggest from 'react-autosuggest';
 
 const CreateOfficeForm = () => {
     const validationSchema = Yup.object({
@@ -27,9 +31,22 @@ const CreateOfficeForm = () => {
         addressLine2: ''
     };
 
-    const handleSubmit = (values, { setSubmitting, resetForm }) => {
-        console.log('Form submitted:', values);
-        // Handle form submission here
+    const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+
+        const addOfficePayload = {
+
+            email: values.email,
+            province: values.province,
+            city: values.city,
+            address: values.addressLine1,
+            addressOpt: values.addressLine2 || "",
+            contactNumber: values.contactNo
+        }
+
+        await userRequest.post("/organizations/add-office", addOfficePayload);
+
+        toast.success("Office Created Successfully")
+
         setTimeout(() => {
             setSubmitting(false);
             resetForm();
@@ -41,145 +58,191 @@ const CreateOfficeForm = () => {
         'Khyber Pakhtunkhwa',
         'Punjab',
         'Sindh',
-        'Azad Kashmir',
-        'Gilgit-Baltistan',
-        'Islamabad Capital Territory'
+        'Azad Jammu and Kashmir',
+        'Capital Territory',
+        'Gilgit-Baltistan'
     ];
 
+    // Helper for city suggestions
+    const getSuggestions = (value) => {
+        const inputValue = value.trim().toLowerCase();
+        if (!inputValue) return [];
+        return PAKISTAN_CITIES.filter(city =>
+            city.toLowerCase().includes(inputValue)
+        ).slice(0, 5);
+    };
+
+    const getSuggestionValue = suggestion => suggestion;
+    const renderSuggestion = suggestion => <div>{suggestion}</div>;
+
     return (
-        <div className="bg-white min-h-screen">
-            {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200">
-                <h1 className="text-2xl font-semibold text-gray-900">Create Office</h1>
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Today</span>
-                    <ChevronDown className="h-4 w-4 text-gray-600" />
-                </div>
+        <div className="min-h-screen bg-formBGBlue flex flex-col items-center justify-center w-full">
+            {/* Breadcrumb */}
+            <div className="w-full max-w-5xl px-4 pt-4">
+                <aside className="bg-white border-b rounded-xl border-gray-200">
+                    <div className="px-6 py-4">
+                        <article className="flex items-center space-x-2 text-sm text-gray-600">
+                            <span>Dashboard</span>
+                            <span>&gt;</span>
+                            <span className="text-gray-900 font-medium">Create office</span>
+                        </article>
+                    </div>
+                </aside>
             </div>
 
-            {/* Form */}
-            <div className="px-8 py-8">
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    onSubmit={handleSubmit}
-                >
-                    {({ isSubmitting, values, setFieldValue }) => (
-                        <Form className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Select Province */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Select Province *
-                                    </label>
-                                    <div className="relative">
-                                        <Field
-                                            as="select"
-                                            name="province"
-                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                                        >
-                                            <option value="">Select</option>
-                                            {provinces.map((province) => (
-                                                <option key={province} value={province}>
-                                                    {province}
-                                                </option>
-                                            ))}
-                                        </Field>
-                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            {/* Form Card */}
+            <div className="w-full max-w-5xl bg-white rounded-xl shadow-md mt-8 p-8">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-6 border-b border-gray-200">
+                    <h1 className="text-2xl font-semibold text-gray-900">Create Office</h1>
+                    <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600">Today</span>
+                        <ChevronDown className="h-4 w-4 text-gray-600" />
+                    </div>
+                </div>
+                {/* Form */}
+                <div className="pt-8">
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmit}
+                    >
+                        {({ isSubmitting, values, setFieldValue }) => (
+                            <Form className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Select Province */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Select Province *
+                                        </label>
+                                        <div className="relative">
+                                            <Field
+                                                as="select"
+                                                name="province"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                            >
+                                                <option value="">Select</option>
+                                                {provinces.map((province) => (
+                                                    <option key={province} value={province}>
+                                                        {province}
+                                                    </option>
+                                                ))}
+                                            </Field>
+                                            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                        </div>
+                                        <ErrorMessage name="province" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
-                                    <ErrorMessage name="province" component="div" className="text-red-500 text-sm mt-1" />
+
+                                    {/* Enter City */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Enter City *
+                                        </label>
+                                        <Autosuggest
+                                            suggestions={getSuggestions(values.city)}
+                                            onSuggestionsFetchRequested={({ value }) => {
+                                                /* handled by getSuggestions inline */
+                                            }}
+                                            onSuggestionsClearRequested={() => {
+                                                /* no-op, handled by getSuggestions */
+                                            }}
+                                            getSuggestionValue={getSuggestionValue}
+                                            renderSuggestion={renderSuggestion}
+                                            inputProps={{
+                                                name: 'city',
+                                                value: values.city,
+                                                onChange: (e, { newValue }) => setFieldValue('city', newValue),
+                                                className: 'w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                                                placeholder: 'Enter city',
+                                            }}
+                                            theme={{
+                                                container: '',
+                                                input: '',
+                                                suggestionsContainer: 'absolute z-10 bg-white border border-gray-200 rounded-md mt-1 w-full',
+                                                suggestion: 'px-4 py-2 cursor-pointer',
+                                                suggestionHighlighted: 'bg-blue-100',
+                                            }}
+                                        />
+                                        <ErrorMessage name="city" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+
+                                    {/* Contact No */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Contact No. *
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="contactNo"
+                                            placeholder="Enter Contact No."
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <ErrorMessage name="contactNo" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+
+                                    {/* Email ID */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Email ID *
+                                        </label>
+                                        <Field
+                                            type="email"
+                                            name="email"
+                                            placeholder="Enter Email ID"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
                                 </div>
 
-                                {/* Enter City */}
+                                {/* Address Line 1 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Enter City *
+                                        Address Line 1 *
                                     </label>
                                     <Field
                                         type="text"
-                                        name="city"
-                                        placeholder="Enter"
+                                        name="addressLine1"
+                                        placeholder=""
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
-                                    <ErrorMessage name="city" component="div" className="text-red-500 text-sm mt-1" />
+                                    <ErrorMessage name="addressLine1" component="div" className="text-red-500 text-sm mt-1" />
                                 </div>
 
-                                {/* Contact No */}
+                                {/* Address Line 2 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Contact No. *
+                                        Address Line 2(Optional)
                                     </label>
                                     <Field
                                         type="text"
-                                        name="contactNo"
-                                        placeholder="Enter Contact No."
+                                        name="addressLine2"
+                                        placeholder=""
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
-                                    <ErrorMessage name="contactNo" component="div" className="text-red-500 text-sm mt-1" />
+                                    <ErrorMessage name="addressLine2" component="div" className="text-red-500 text-sm mt-1" />
                                 </div>
 
-                                {/* Email ID */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Email ID *
-                                    </label>
-                                    <Field
-                                        type="email"
-                                        name="email"
-                                        placeholder="Enter Email ID"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                    <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+                                {/* Buttons */}
+                                <div className="flex justify-center space-x-4 pt-8">
+                                    <button
+                                        type="button"
+                                        className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                                    >
+                                        {isSubmitting ? 'Creating...' : 'Create'}
+                                    </button>
                                 </div>
-                            </div>
-
-                            {/* Address Line 1 */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Address Line 1 *
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="addressLine1"
-                                    placeholder=""
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <ErrorMessage name="addressLine1" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
-
-                            {/* Address Line 2 */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Address Line 2(Optional)
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="addressLine2"
-                                    placeholder=""
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <ErrorMessage name="addressLine2" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
-
-                            {/* Buttons */}
-                            <div className="flex justify-center space-x-4 pt-8">
-                                <button
-                                    type="button"
-                                    className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
-                                >
-                                    {isSubmitting ? 'Saving...' : 'Save'}
-                                </button>
-                            </div>
-                        </Form>
-                    )}
-                </Formik>
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
             </div>
         </div>
     );

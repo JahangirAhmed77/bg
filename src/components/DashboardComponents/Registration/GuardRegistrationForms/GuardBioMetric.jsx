@@ -1,28 +1,141 @@
 'use client';
 import React, { useState } from 'react';
+import { publicRequest, userRequest } from '@/lib/RequestMethods';
+import axios from 'axios';
 
-const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) => {
-    const [formData, setFormData] = useState({
-        rightThumb: initialData.biometric?.rightThumb || null,
-        rightForeFinger: initialData.biometric?.rightForeFinger || null,
-        rightMiddleFinger: initialData.biometric?.rightMiddleFinger || null,
-        rightRingFinger: initialData.biometric?.rightRingFinger || null,
-        rightLittleFinger: initialData.biometric?.rightLittleFinger || null,
-        rightFourFinger: initialData.biometric?.rightFourFinger || null,
-        leftThumb: initialData.biometric?.leftThumb || null,
-        leftForeFinger: initialData.biometric?.leftForeFinger || null,
-        leftMiddleFinger: initialData.biometric?.leftMiddleFinger || null,
-        leftRingFinger: initialData.biometric?.leftRingFinger || null,
-        leftLittleFinger: initialData.biometric?.leftLittleFinger || null,
-        leftFourFinger: initialData.biometric?.leftFourFinger || null,
-        ...initialData
+const GuardBioMetric = ({ onNext, onPrevious, onComplete, onSave, initialData = {} }) => {
+    const biometricFields = [
+        { name: 'rightThumb', label: 'Right Thumb' },
+        { name: 'rightForeFinger', label: 'Right Fore Finger' },
+        { name: 'rightMiddleFinger', label: 'Right Middle Finger' },
+        { name: 'rightRingFinger', label: 'Right Ring Finger' },
+        { name: 'rightLittleFinger', label: 'Right Little Finger' },
+        { name: 'rightFourFinger', label: 'Right Four Fingers' },
+        { name: 'leftThumb', label: 'Left Thumb' },
+        { name: 'leftForeFinger', label: 'Left Fore Finger' },
+        { name: 'leftMiddleFinger', label: 'Left Middle Finger' },
+        { name: 'leftRingFinger', label: 'Left Ring Finger' },
+        { name: 'leftLittleFinger', label: 'Left Little Finger' },
+        { name: 'leftFourFinger', label: 'Left Four Fingers' }
+    ];
+
+    const [uploadedFiles, setUploadedFiles] = useState(() => {
+        const initialFiles = {};
+        biometricFields.forEach(field => {
+            initialFiles[field.name] = initialData.biometric?.[field.name] || null;
+        });
+        return initialFiles;
     });
 
-    const handleFileChange = (field, file) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: file
-        }));
+    console.log('Uploaded biometric files:', uploadedFiles);
+
+    // Helper function to format biometric data
+    const formatBiometricData = (files, usePlaceholder = false) => {
+        console.log('=== formatBiometricData DEBUG ===');
+        console.log('files received:', files);
+        console.log('usePlaceholder:', usePlaceholder);
+
+        const result = {
+            biometric: {
+                rightThumb: files.rightThumb ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightThumb) : '',
+                rightForeFinger: files.rightForeFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightForeFinger) : '',
+                rightMiddleFinger: files.rightMiddleFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightMiddleFinger) : '',
+                rightRingFinger: files.rightRingFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightRingFinger) : '',
+                rightLittleFinger: files.rightLittleFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightLittleFinger) : '',
+                rightFourFinger: files.rightFourFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.rightFourFinger) : '',
+                leftThumb: files.leftThumb ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftThumb) : '',
+                leftForeFinger: files.leftForeFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftForeFinger) : '',
+                leftMiddleFinger: files.leftMiddleFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftMiddleFinger) : '',
+                leftRingFinger: files.leftRingFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftRingFinger) : '',
+                leftLittleFinger: files.leftLittleFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftLittleFinger) : '',
+                leftFourFinger: files.leftFourFinger ? (usePlaceholder ? 'uploaded_file_placeholder' : files.leftFourFinger) : ''
+            }
+        };
+
+        console.log('result.biometric:', result.biometric);
+        console.log('=== END formatBiometricData DEBUG ===');
+
+        return result;
+    };
+
+    const handleFileChange = async (field, file) => {
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/bmp', 'image/tiff', 'application/octet-stream'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please upload only JPG, PNG, BMP, TIFF, or Template files');
+                return;
+            }
+
+            // Validate file size (max 10MB for biometric files)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert('File size must be less than 10MB');
+                return;
+            }
+
+            try {
+                // Get upload URL from API
+                const getUploadKeyPayload = {
+                    fileName: file.name,
+                    fileType: file.type
+                };
+                console.log('Biometric upload payload:', getUploadKeyPayload);
+
+                const res = await userRequest.post("/file/url", getUploadKeyPayload);
+                const { key, uploadUrl } = res.data.data;
+                console.log("Biometric Key:", key);
+                console.log("Biometric Upload URL:", uploadUrl);
+
+                // Upload file to S3
+                const uploadFileResponse = await axios.put(uploadUrl, file, {
+                    headers: {
+                        "Content-Type": file.type,
+                    },
+                });
+
+                if (uploadFileResponse.status === 200) {
+                    console.log(file.name, "Uploaded successfully");
+                }
+
+                // Update the uploaded files state
+                const updatedFiles = {
+                    ...uploadedFiles,
+                    [field]: key
+                };
+
+                setUploadedFiles(updatedFiles);
+
+                // Auto-save the data immediately after file upload
+                const formattedData = formatBiometricData(updatedFiles);
+
+                // Auto-save to parent component for persistence (without navigation)
+                if (onSave) {
+                    onSave(formattedData);
+                }
+
+            } catch (error) {
+                console.error('File upload failed:', error);
+                alert('File upload failed. Please try again.');
+            }
+        }
+    };
+
+    const removeFile = (fieldName) => {
+        const updatedFiles = {
+            ...uploadedFiles,
+            [fieldName]: null
+        };
+
+        setUploadedFiles(updatedFiles);
+
+        // Auto-save the data after file removal
+        const formattedData = formatBiometricData(updatedFiles);
+
+        // Auto-save to parent component for persistence (without navigation)
+        if (onSave) {
+            onSave(formattedData);
+        }
     };
 
     const handleCapture = (field) => {
@@ -40,23 +153,14 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
     };
 
     const handleContinue = () => {
-        // Structure data according to API format with placeholders
-        const formattedData = {
-            biometric: {
-                rightThumb: formData.rightThumb ? 'uploaded_file_placeholder' : '',
-                rightMiddleFinger: formData.rightMiddleFinger ? 'uploaded_file_placeholder' : '',
-                rightLittleFinger: formData.rightLittleFinger ? 'uploaded_file_placeholder' : '',
-                leftThumb: formData.leftThumb ? 'uploaded_file_placeholder' : '',
-                leftMiddleFinger: formData.leftMiddleFinger ? 'uploaded_file_placeholder' : '',
-                leftLittleFinger: formData.leftLittleFinger ? 'uploaded_file_placeholder' : '',
-                rightForeFinger: formData.rightForeFinger ? 'uploaded_file_placeholder' : '',
-                rightRingFinger: formData.rightRingFinger ? 'uploaded_file_placeholder' : '',
-                rightFourFinger: formData.rightFourFinger ? 'uploaded_file_placeholder' : '',
-                leftFourFinger: formData.leftFourFinger ? 'uploaded_file_placeholder' : '',
-                leftRingFinger: formData.leftRingFinger ? 'uploaded_file_placeholder' : '',
-                leftForeFinger: formData.leftForeFinger ? 'uploaded_file_placeholder' : ''
-            }
-        };
+        console.log('=== DEBUG handleContinue ===');
+        console.log('uploadedFiles:', uploadedFiles);
+
+        // Structure data according to API format using helper function with actual keys
+        const formattedData = formatBiometricData(uploadedFiles, false);
+
+        console.log('Final biometric formattedData:', formattedData);
+        console.log('=== END DEBUG ===');
 
         if (onComplete) {
             onComplete(formattedData);
@@ -64,15 +168,25 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
     };
 
     const renderFileInput = (field, label) => {
-        const file = formData[field];
+        const file = uploadedFiles[field];
+
         return (
             <div className="space-y-1">
                 <label className="block text-sm font-medium text-gray-700">
                     {label}
                 </label>
                 <div className="flex">
-                    <div className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-sm text-gray-600 min-h-[42px] flex items-center">
-                        {file ? file.name : `No file selected`}
+                    <div className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-sm text-gray-600 min-h-[42px] flex items-center justify-between">
+                        <span>{file ? `File uploaded (${field})` : `No file selected`}</span>
+                        {file && (
+                            <button
+                                type="button"
+                                onClick={() => removeFile(field)}
+                                className="text-red-500 hover:text-red-700 ml-2"
+                            >
+                                ✕
+                            </button>
+                        )}
                     </div>
                     <input
                         type="file"
@@ -84,9 +198,12 @@ const GuardBioMetric = ({ onNext, onPrevious, onComplete, initialData = {} }) =>
                     <button
                         type="button"
                         onClick={() => handleCapture(field)}
-                        className="px-4 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+                        className={`px-4 py-2 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${file
+                                ? 'bg-green-100 hover:bg-green-200 text-green-600'
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                            }`}
                     >
-                        📁
+                        {file ? '✓' : '📁'}
                     </button>
                 </div>
             </div>
