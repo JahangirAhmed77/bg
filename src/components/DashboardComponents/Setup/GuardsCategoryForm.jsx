@@ -57,7 +57,7 @@ const GuardsCategoryForm = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl mx-auto">
             <h2 className="text-xl font-semibold text-gray-900 mb-8">Add Guards Category</h2>
             <Formik
                 initialValues={{ guardType: '' }}

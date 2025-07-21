@@ -272,7 +272,7 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-6">
                         {/* Document Upload Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid text-[13px] grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {documentFields.map((field) => (
                                 <DocumentUploadField key={field.name} field={field} />
                             ))}

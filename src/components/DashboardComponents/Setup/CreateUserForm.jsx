@@ -2,9 +2,9 @@ import React from 'react';
 
 const CreateUserForm = () => {
     return (
-        <div className="min-h-screen bg-formBGBlue flex flex-col items-center justify-center w-full">
+        <div className="min-h-screen bg-formBGBlue flex flex-col px-4 pt-4 w-full">
             {/* Breadcrumb */}
-            <div className="w-full max-w-5xl px-4 pt-4">
+            <div className="w-full max-w-5xl">
                 <aside className="bg-white border-b rounded-xl border-gray-200">
                     <div className="px-6 py-4">
                         <article className="flex items-center space-x-2 text-sm text-gray-600">

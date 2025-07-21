@@ -175,7 +175,7 @@ const Login = () => {
 
                 {/* Banner Background Image - Full Image Visible */}
                 <div
-                    className="absolute inset-x-0 bottom-0 top-32 bg-contain bg-center bg-no-repeat"
+                    className="absolute inset-x-0 bottom-0 top-16 w- bg-contain bg-center bg-no-repeat"
                     style={{
                         backgroundImage: 'url(/images/BannerLoginScreen.webp)'
                     }}
@@ -191,7 +191,7 @@ const Login = () => {
                         <p className="text-gray-600">Sign in to your account to start using Dashboard</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-2">
                         {/* API Error Display */}
                         {apiError && (
                             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -222,7 +222,7 @@ const Login = () => {
                         </div>
 
                         {/* Password Field */}
-                        <div>
+                        <div className='mb-4'>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                                 Password
                             </label>
@@ -254,7 +254,7 @@ const Login = () => {
                         </div>
 
                         {/* Keep Me Signed In & Forgot Password */}
-                        <div className="flex items-center justify-between">
+                        {/* <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <input
                                     type="checkbox"
@@ -271,7 +271,7 @@ const Login = () => {
                             <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
                                 Forgot Password?
                             </a>
-                        </div>
+                        </div> */}
 
                         {/* Sign In Button */}
                         <button

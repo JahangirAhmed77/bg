@@ -76,9 +76,9 @@ const CreateOfficeForm = () => {
     const renderSuggestion = suggestion => <div>{suggestion}</div>;
 
     return (
-        <div className="min-h-screen bg-formBGBlue flex flex-col items-center justify-center w-full">
+        <div className="min-h-screen bg-formBGBlue flex flex-col w-full px-4 pt-4">
             {/* Breadcrumb */}
-            <div className="w-full max-w-5xl px-4 pt-4">
+            <div className="w-full max-w-5xl ">
                 <aside className="bg-white border-b rounded-xl border-gray-200">
                     <div className="px-6 py-4">
                         <article className="flex items-center space-x-2 text-sm text-gray-600">
@@ -93,12 +93,9 @@ const CreateOfficeForm = () => {
             {/* Form Card */}
             <div className="w-full max-w-5xl bg-white rounded-xl shadow-md mt-8 p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between pb-6 border-b border-gray-200">
-                    <h1 className="text-2xl font-semibold text-gray-900">Create Office</h1>
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">Today</span>
-                        <ChevronDown className="h-4 w-4 text-gray-600" />
-                    </div>
+                <div className="flex items-center justify-between border-gray-200">
+                    <h1 className="text-xl font-semibold ">Create Office</h1>
+                   
                 </div>
                 {/* Form */}
                 <div className="pt-8">

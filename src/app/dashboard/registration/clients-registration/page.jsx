@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
-import ClientSidebar from '@/components/DashboardComponents/Registration/ClientRegistration.jsx/ClientSidebar';
-import ClientCompanyInformation from '@/components/DashboardComponents/Registration/ClientRegistration.jsx/ClientCompanyInformation';
-import ClientPrimaryContact from '@/components/DashboardComponents/Registration/ClientRegistration.jsx/ClientPrimaryContact';
+import ClientSidebar from '@/components/DashboardComponents/Registration/ClientRegistration/ClientSidebar';
+import ClientCompanyInformation from '@/components/DashboardComponents/Registration/ClientRegistration/ClientCompanyInformation';
+import ClientPrimaryContact from '@/components/DashboardComponents/Registration/ClientRegistration/ClientPrimaryContact';
 
 const ClientsRegistrationPage = () => {
     const [currentStep, setCurrentStep] = useState('company-info');
