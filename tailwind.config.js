@@ -1,19 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
       },
       colors: {
-        themeYellow: '#ffc20e',
-        formBGBlue: '#e3edf9',
-        sidebarGray: '#cfd3d4',
-        themeBlue: '#5570f1'
-      }
+        themeGray: "$374151",
+        themeYellow: "#ffc20e",
+        sidebarGray: "#cfd3d4",
+        formBGBlue: "#e3edf9",
+        themeBlue: "#5570f1",
+        formBgLightBlue: "#eef0fb",
+        formBgLightGreen: "#f5fbf8",
+      },
     },
   },
   plugins: [],
