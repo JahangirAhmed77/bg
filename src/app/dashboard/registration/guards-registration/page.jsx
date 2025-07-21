@@ -17,6 +17,9 @@ const GuardsRegistrationPage = () => {
     const [completedSteps, setCompletedSteps] = useState([]);
     const [formData, setFormData] = useState({});
 
+
+    
+
     const steps = [
         { id: 'personal-info', component: GuardPersonalInformation, label: 'Personal Information' },
         { id: 'next-of-kin', component: GuardNextOfKin, label: 'Next of Kin/ Emergency Contact' },

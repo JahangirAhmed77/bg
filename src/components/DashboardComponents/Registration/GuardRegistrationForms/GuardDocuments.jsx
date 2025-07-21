@@ -79,14 +79,25 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
         return result;
     };
 
-    const validationSchema = Yup.object({});
+    // 1. Update validationSchema to require picture, cnicFront, cnicBack, and originalCNICSubmitted
+    const validationSchema = Yup.object({
+        picture: Yup.string().required('Picture is required'),
+        cnicFront: Yup.string().required('CNIC Front is required'),
+        cnicBack: Yup.string().required('CNIC Back is required'),
+        originalCNICSubmitted: Yup.boolean()
+            .required('Please select Yes or No')
+            .typeError('Please select Yes or No')
+    });
 
     const initialValues = {
         ...documentFields.reduce((acc, field) => {
             acc[field.name] = initialData.guardDocuments?.[field.name] || '';
             return acc;
         }, {}),
-        originalCNICSubmitted: initialData.guardDocuments?.originalCNICSubmitted || false
+        originalCNICSubmitted:
+            typeof initialData.guardDocuments?.originalCNICSubmitted === 'boolean'
+                ? initialData.guardDocuments.originalCNICSubmitted
+                : undefined
     };
 
     const handleSubmit = (values) => {
@@ -105,7 +116,8 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
         }
     };
 
-    const handleFileUpload = async (fieldName, event) => {
+    // 2. Update handleFileUpload to accept setFieldValue and update Formik value after upload
+    const handleFileUpload = async (fieldName, event, setFieldValue) => {
         const file = event.target.files[0];
         if (file) {
             // Validate file type
@@ -157,6 +169,9 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
 
             setUploadedFiles(updatedFiles);
 
+            // Sync Formik value
+            setFieldValue(fieldName, key);
+
             // Auto-save the data immediately after file upload
             // This ensures persistence even without clicking continue
             const formattedData = formatGuardDocumentsData(updatedFiles);
@@ -190,7 +205,8 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
         }
     };
 
-    const DocumentUploadField = ({ field }) => {
+    // 3. Update DocumentUploadField to accept setFieldValue, error, and touched, and show error
+    const DocumentUploadField = ({ field, setFieldValue, error, touched }) => {
         const file = uploadedFiles[field.name];
         const isRequired = field.required;
 
@@ -205,48 +221,54 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
         }
 
         return (
-            <div className="flex items-center space-x-3">
-                <div className="flex-1">
-                    <input
-                        type="text"
-                        value={fileDisplayName}
-                        placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
-                        readOnly
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                    />
-                </div>
-                <div className="flex items-center space-x-2">
-                    <div className="relative">
+            <div className="flex flex-col">
+                <div className="flex items-center space-x-3">
+                    <div className="flex-1">
                         <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.pdf"
-                            onChange={(e) => handleFileUpload(field.name, e)}
-                            className="hidden"
-                            id={`upload-${field.name}`}
+                            type="text"
+                            value={fileDisplayName}
+                            placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
+                            readOnly
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                         />
-                        <label
-                            htmlFor={`upload-${field.name}`}
-                            className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-md cursor-pointer transition-colors border border-blue-200"
-                            title={file ? "Replace file" : "Upload file"}
-                        >
-                            {file ? (
-                                <Check className="h-5 w-5 text-green-600" />
-                            ) : (
-                                <Plus className="h-5 w-5 text-blue-600" />
-                            )}
-                        </label>
                     </div>
-                    {file && (
-                        <button
-                            type="button"
-                            onClick={() => removeFile(field.name)}
-                            className="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 rounded-md transition-colors border border-red-200"
-                            title="Remove file"
-                        >
-                            <X className="h-5 w-5 text-red-600" />
-                        </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                        <div className="relative">
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                onChange={(e) => handleFileUpload(field.name, e, setFieldValue)}
+                                className="hidden"
+                                id={`upload-${field.name}`}
+                            />
+                            <label
+                                htmlFor={`upload-${field.name}`}
+                                className="flex items-center justify-center w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-md cursor-pointer transition-colors border border-blue-200"
+                                title={file ? "Replace file" : "Upload file"}
+                            >
+                                {file ? (
+                                    <Check className="h-5 w-5 text-green-600" />
+                                ) : (
+                                    <Plus className="h-5 w-5 text-blue-600" />
+                                )}
+                            </label>
+                        </div>
+                        {file && (
+                            <button
+                                type="button"
+                                onClick={() => removeFile(field.name)}
+                                className="flex items-center justify-center w-10 h-10 bg-red-100 hover:bg-red-200 rounded-md transition-colors border border-red-200"
+                                title="Remove file"
+                            >
+                                <X className="h-5 w-5 text-red-600" />
+                            </button>
+                        )}
+                    </div>
                 </div>
+                {/* Show error if any */}
+                {error && touched && (
+                    <div className="text-red-500 text-xs mt-1">{error}</div>
+                )}
             </div>
         );
     };
@@ -269,12 +291,18 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
             >
-                {({ values, setFieldValue, isSubmitting }) => (
+                {({ values, setFieldValue, isSubmitting, errors, touched }) => (
                     <Form className="space-y-6">
                         {/* Document Upload Grid */}
                         <div className="grid text-[13px] grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {documentFields.map((field) => (
-                                <DocumentUploadField key={field.name} field={field} />
+                                <DocumentUploadField
+                                    key={field.name}
+                                    field={field}
+                                    setFieldValue={setFieldValue}
+                                    error={errors[field.name]}
+                                    touched={touched[field.name]}
+                                />
                             ))}
                         </div>
 
@@ -299,17 +327,35 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                             </div>
                         </div>
 
-                        {/* Original CNIC Submitted Checkbox */}
-                        <div className="flex items-center space-x-2">
-                            <Field
-                                type="checkbox"
-                                name="originalCNICSubmitted"
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor="originalCNICSubmitted" className="text-sm font-medium text-gray-700">
-                                Original CNIC Submitted
+                        {/* Original CNIC Submitted Radio Buttons */}
+                        <div className="flex justify-center items-center space-x-4">
+                            <p className=''>Original CNIC Submitted</p>
+                            <label className="flex items-center space-x-2">
+                                <Field
+                                    type="radio"
+                                    name="originalCNICSubmitted"
+                                    value="true"
+                                    checked={values.originalCNICSubmitted === true}
+                                    onChange={() => setFieldValue('originalCNICSubmitted', true)}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                />
+                                <span className="text-sm font-medium text-gray-700">Yes</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                                <Field
+                                    type="radio"
+                                    name="originalCNICSubmitted"
+                                    value="false"
+                                    checked={values.originalCNICSubmitted === false}
+                                    onChange={() => setFieldValue('originalCNICSubmitted', false)}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                />
+                                <span className="text-sm font-medium text-gray-700">No</span>
                             </label>
                         </div>
+                        {errors.originalCNICSubmitted && touched.originalCNICSubmitted && (
+                            <div className="text-red-500 text-xs mt-1">{errors.originalCNICSubmitted}</div>
+                        )}
 
                         {/* Buttons */}
                         <div className="flex justify-center space-x-4 pt-8">

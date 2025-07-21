@@ -14,7 +14,7 @@ const poppins = Poppins({
 
 
 export const metadata = {
-  title: "Helcon System",
+  title: "GuardsOS",
   description: "Security Guard Management Platform",
 };
 

@@ -1,8 +1,51 @@
 'use client';
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, useField, ErrorMessage, Field } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Calendar } from 'lucide-react';
+import CNICInput from '@/utils/FormHelpers/CNICField';
+import { CalculateAge } from '@/utils/FormHelpers/CalculateAge';
+
+
+
+// const CNICField = ({ ...props }) => {
+//   const [field, meta, helpers] = useField(props);
+
+//   const formatCNIC = (value) => {
+//     // Remove all non-digit characters
+//     const digits = value.replace(/\D/g, '').slice(0, 13); // Max 13 digits
+//     let formatted = digits;
+
+//     if (digits.length > 5) {
+//       formatted = digits.slice(0, 5) + '-' + digits.slice(5);
+//     }
+//     if (digits.length > 12) {
+//       formatted = formatted.slice(0, 13) + '-' + formatted.slice(13);
+//     }
+
+//     return formatted;
+//   };
+
+//   const handleChange = (e) => {
+//     const formatted = formatCNIC(e.target.value);
+//     helpers.setValue(formatted);
+//   };
+
+//   return (
+//     <>
+//       <input
+//         {...field}
+//         {...props}
+//         value={field.value}
+//         onChange={handleChange}
+//         placeholder="Enter CNIC Number (12345-1234567-1)"
+//         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+//       />
+//       <ErrorMessage name={field.name} component="div" className="text-red-500 text-sm mt-1" />
+//     </>
+//   );
+// };
+
 
 const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
   const validationSchema = Yup.object({
@@ -13,7 +56,9 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
     cnicNumber: Yup.string()
       .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
       .required('CNIC Number is required'),
-    dateOfBirth: Yup.date().required('Date of Birth is required'),
+    dateOfBirth: Yup.date()
+      .max(new Date(), 'Date of Birth must be in the past')
+      .required('Date of Birth is required'),
     cnicIssueDate: Yup.date().required('CNIC Issue Date is required'),
     cnicExpiryDate: Yup.date().required('CNIC Expiry Date is required'),
     contactNumber: Yup.string()
@@ -155,13 +200,7 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   CNIC Number
                 </label>
-                <Field
-                  type="text"
-                  name="cnicNumber"
-                  placeholder="Enter CNIC Number (12345-1234567-1)"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <ErrorMessage name="cnicNumber" component="div" className="text-red-500 text-sm mt-1" />
+                <CNICInput name="cnicNumber" type="text" />
               </div>
 
               {/* Date of Birth */}
@@ -176,6 +215,23 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                 />
                 <ErrorMessage name="dateOfBirth" component="div" className="text-red-500 text-sm mt-1" />
               </div>
+
+              {values.dateOfBirth && (
+                <div>
+                  <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={CalculateAge(values?.dateOfBirth)}
+                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none"
+                  />
+                </div>
+              )}
+
+
+
+              {/* Dynamically Show Age */}
+
 
               {/* CNIC Issue Date */}
               <div>

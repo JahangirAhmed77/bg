@@ -257,7 +257,7 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Service Period
                                 </label>
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-2 flex-col gap-2">
                                     <div className="flex-1">
                                         <NumberInput
                                             name="serviceYears"
@@ -266,7 +266,7 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                             disabled={values.isExServiceMen !== 'Yes'}
                                             label="Years"
                                         />
-                                        <div className="text-xs text-gray-500 mt-1 text-center">Years</div>
+                                        <div className="text-[13px] text-gray-500 mt-1 text-center">Years</div>
                                     </div>
                                     <div className="flex-1">
                                         <NumberInput
@@ -276,7 +276,7 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                             disabled={values.isExServiceMen !== 'Yes'}
                                             label="Months"
                                         />
-                                        <div className="text-xs text-gray-500 mt-1 text-center">Months</div>
+                                        <div className="text-[13px] text-gray-500 mt-1 text-center">Months</div>
                                     </div>
                                 </div>
                                 <ErrorMessage name="serviceYears" component="div" className="text-red-500 text-sm mt-1" />

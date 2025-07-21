@@ -1,6 +1,22 @@
-import React from 'react';
+"use client"
+import { useCurrentUser } from '@/lib/hooks';
+import React, { useEffect, useState } from 'react';
 
 const CreateUserForm = () => {
+
+    const { user } = useCurrentUser();
+    const [currentDate, setCurrentDate] = useState("");
+    const [currentTime, setCurrentTime] = useState("");
+
+    useEffect(() => {
+        const now = new Date();
+
+        const date = now.toLocaleDateString('en-GB');
+        const time = now.toLocaleTimeString('en-US');
+
+        setCurrentDate(date);
+        setCurrentTime(time);
+    }, []);
     return (
         <div className="min-h-screen bg-formBGBlue flex flex-col px-4 pt-4 w-full">
             {/* Breadcrumb */}
@@ -22,21 +38,18 @@ const CreateUserForm = () => {
                 <form className="space-y-8">
                     {/* Top Row: Office ID, Staff ID, Date, Time */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label className="block text-xs text-gray-500 mb-1">Office ID</label>
-                            <input type="text" value="Auto" disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
-                        </div>
+
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Staff ID</label>
-                            <input type="text" value="Auto" disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={user?.id} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
                         </div>
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Date</label>
-                            <input type="text" value="Auto" disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={currentDate} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
                         </div>
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Time</label>
-                            <input type="text" value="Auto" disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={currentTime} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
                         </div>
                     </div>
 
@@ -47,7 +60,7 @@ const CreateUserForm = () => {
                             <select className="w-full bg-gray-50 rounded-md px-4 py-2 border border-gray-200 text-gray-700">
                                 <option value="">Select</option>
                                 <option value="admin">Admin</option>
-                                <option value="user">User</option>
+                                <option value="user">Staff</option>
                                 <option value="supervisor">Supervisor</option>
                             </select>
                         </div>

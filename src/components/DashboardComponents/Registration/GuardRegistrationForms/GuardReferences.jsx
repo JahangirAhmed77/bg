@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import CNICInput from '@/utils/FormHelpers/CNICField';
 
 const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
     // Initialize with one reference from initialData or empty
@@ -169,13 +170,8 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             CNIC Number
                         </label>
-                        <Field
-                            type="text"
-                            name={`reference_${referenceIndex}_cnicNumber`}
-                            placeholder="Enter CNIC Number"
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <ErrorMessage name={`reference_${referenceIndex}_cnicNumber`} component="div" className="text-red-500 text-sm mt-1" />
+                        <CNICInput name={`reference_${referenceIndex}_cnicNumber`} label="CNIC Number" />
+
                     </div>
 
                     {/* Contact Number */}

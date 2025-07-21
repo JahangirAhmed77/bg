@@ -3,6 +3,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown } from 'lucide-react';
+import CNICInput from '@/utils/FormHelpers/CNICField';
 
 const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   const validationSchema = Yup.object({
@@ -125,13 +126,11 @@ const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   CNIC No.
                 </label>
-                <Field
-                  type="text"
+                <CNICInput
                   name="kinCNIC"
+                  label="CNIC No."
                   placeholder="Enter CNIC No."
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <ErrorMessage name="kinCNIC" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Contact Number */}
