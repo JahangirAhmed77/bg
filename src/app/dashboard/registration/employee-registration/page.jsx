@@ -8,21 +8,38 @@ import EmployeeExperience from '@/components/DashboardComponents/Registration/Em
 import EmployeeBankAccount from '@/components/DashboardComponents/Registration/EmployeeRegistrationForm/EmployeeBankAccount';
 import EmployeeReferences from '@/components/DashboardComponents/Registration/EmployeeRegistrationForm/EmployeeReferences';
 import EmployeeDocuments from '@/components/DashboardComponents/Registration/EmployeeRegistrationForm/EmployeeDocuments';
+import EmployeeBioMetric from '@/components/DashboardComponents/Registration/EmployeeRegistrationForm/EmployeeBioMetric';
+import toast from 'react-hot-toast';
+import { userRequest } from '@/lib/RequestMethods';
 
 const EmployeeRegistrationPage = () => {
     const [currentStep, setCurrentStep] = useState('personal-info');
     const [completedSteps, setCompletedSteps] = useState([]);
     const [formData, setFormData] = useState({});
 
+    const steps = [
+        { id: 'personal-info', component: EmployeePersonalInformation, label: 'Personal Information' },
+        { id: 'next-of-kin', component: EmployeeNextOfKin, label: 'Next of Kin/ Emergency Contact' },
+        { id: 'academics', component: EmployeeAcademics, label: 'Academics & Licenses' },
+        { id: 'experience', component: EmployeeExperience, label: 'Experience' },
+        { id: 'bank-account', component: EmployeeBankAccount, label: 'Add Bank Account' },
+        { id: 'references', component: EmployeeReferences, label: 'References / Guarantors' },
+        { id: 'documents', component: EmployeeDocuments, label: 'Upload Employee Documents' },
+        { id: 'bio-metric', component: EmployeeBioMetric, label: 'Bio-Metric' }
+    ];
+
+    const currentStepIndex = steps.findIndex(step => step.id === currentStep);
+    const CurrentStepComponent = steps[currentStepIndex]?.component;
+
     const handleStepChange = (stepId) => {
         setCurrentStep(stepId);
     };
 
-    const handleNext = (stepData) => {
+    const handleNext = (data = {}) => {
         // Save current step data
         setFormData(prev => ({
             ...prev,
-            [currentStep]: stepData
+            [currentStep]: data
         }));
 
         // Mark current step as completed
@@ -30,92 +47,173 @@ const EmployeeRegistrationPage = () => {
             setCompletedSteps(prev => [...prev, currentStep]);
         }
 
-        // Navigate to next step
-        const steps = ['personal-info', 'next-of-kin', 'academics', 'experience', 'bank-account', 'references', 'documents'];
-        const currentIndex = steps.indexOf(currentStep);
-        if (currentIndex < steps.length - 1) {
-            setCurrentStep(steps[currentIndex + 1]);
-        } else {
-            // Final step - handle form submission
-            console.log('Complete form data:', { ...formData, [currentStep]: stepData });
-            // Here you would typically submit to an API
+        // Move to next step
+        if (currentStepIndex < steps.length - 1) {
+            setCurrentStep(steps[currentStepIndex + 1].id);
         }
     };
 
     const handlePrevious = () => {
-        const steps = ['personal-info', 'next-of-kin', 'academics', 'experience', 'bank-account', 'references', 'documents'];
-        const currentIndex = steps.indexOf(currentStep);
-        if (currentIndex > 0) {
-            setCurrentStep(steps[currentIndex - 1]);
+        if (currentStepIndex > 0) {
+            setCurrentStep(steps[currentStepIndex - 1].id);
         }
     };
 
-    const renderCurrentStep = () => {
-        const stepData = formData[currentStep] || {};
+    // Handle auto-save for documents without navigation
+    const handleAutoSave = (data) => {
+        // Save the data to formData state without moving to next step
+        setFormData(prev => ({
+            ...prev,
+            [currentStep]: data
+        }));
+        console.log('Auto-saved:', currentStep, data);
+    };
 
-        switch (currentStep) {
-            case 'personal-info':
-                return (
-                    <EmployeePersonalInformation
-                        onNext={handleNext}
-                        initialData={stepData}
-                    />
-                );
-            case 'next-of-kin':
-                return (
-                    <EmployeeNextOfKin
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            case 'academics':
-                return (
-                    <EmployeeAcademics
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            case 'experience':
-                return (
-                    <EmployeeExperience
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            case 'bank-account':
-                return (
-                    <EmployeeBankAccount
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            case 'references':
-                return (
-                    <EmployeeReferences
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            case 'documents':
-                return (
-                    <EmployeeDocuments
-                        onNext={handleNext}
-                        onPrevious={handlePrevious}
-                        initialData={stepData}
-                    />
-                );
-            default:
-                return (
-                    <EmployeePersonalInformation
-                        onNext={handleNext}
-                        initialData={stepData}
-                    />
-                );
+    const handleComplete = async () => {
+        // Mark current step as completed
+        if (!completedSteps.includes(currentStep)) {
+            setCompletedSteps(prev => [...prev, currentStep]);
+        }
+
+        // Structure data according to API format
+        const personalInfo = formData['personal-info'] || {};
+        const nextOfKin = formData['next-of-kin'] || {};
+        const academics = formData['academics'] || {};
+        const experience = formData['experience'] || {};
+        const bankAccount = formData['bank-account'] || {};
+        const references = formData['references'] || {};
+        const employeeDocuments = formData['documents'] || {};
+        const biometric = formData['bio-metric'] || {};
+
+        const formatDateToISO = (dateValue) => {
+            if (!dateValue || dateValue === '') return null;
+
+            try {
+                const date = new Date(dateValue);
+                if (isNaN(date.getTime())) return null;
+                return date.toISOString(); // Returns full ISO timestamp like 2024-03-15T10:30:00.000Z
+            } catch (error) {
+                console.warn('Invalid date format:', dateValue);
+                return null;
+            }
+        };
+
+        const apiPayload = {
+            // Personal Information fields
+            registrationDate: formatDateToISO(personalInfo.registrationDate),
+            fullName: personalInfo.fullName || null,
+            fatherName: personalInfo.fatherName || null,
+            dateOfBirth: formatDateToISO(personalInfo.dateOfBirth),
+            cnicNumber: personalInfo.cnicNumber || null,
+            cnicIssueDate: formatDateToISO(personalInfo.cnicIssueDate),
+            cnicExpiryDate: formatDateToISO(personalInfo.cnicExpiryDate),
+            currentAddress: personalInfo.currentAddress || null,
+            permanentAddress: personalInfo.permanentAddress || null,
+            religion: personalInfo.religion || null,
+            religionSect: personalInfo.religionSect || null,
+            weight: personalInfo.weight ? parseInt(personalInfo.weight) : null,
+            height: personalInfo.height ? parseInt(personalInfo.height) : null,
+            bloodGroup: personalInfo.bloodGroup || null,
+            bloodPressure: personalInfo.bloodPressure || null,
+            heartBeat: personalInfo.heartBeat || null,
+            eyeColor: personalInfo.eyeColor || null,
+            contactNumber: personalInfo.contactNumber || null,
+            disability: personalInfo.disability || null,
+            eobiNumber: personalInfo.eobiNumber || null,
+            sessiNumber: personalInfo.sessiNumber || null,
+
+            // Next of Kin fields
+            kinName: nextOfKin.kinName || null,
+            kinFatherName: nextOfKin.kinFatherName || null,
+            kinRelation: nextOfKin.kinRelation || null,
+            kinCNIC: nextOfKin.kinCNIC || null,
+            kinContactNumber: nextOfKin.kinContactNumber || null,
+
+            // Academic object
+            academic: {
+                lastEducation: academics.lastEducation || null,
+                institute: academics.institute || null,
+                hasDrivingLicense: academics.hasDrivingLicense || false
+            },
+
+            // Driving License object (only if has driving license)
+            drivingLicense: academics.hasDrivingLicense ? {
+                drivingLicenseNo: academics.drivingLicenseNo || null,
+                drivingLicenseIssueDate: formatDateToISO(academics.drivingLicenseIssueDate),
+                drivingLicenseExpiryDate: formatDateToISO(academics.drivingLicenseExpiryDate),
+                licenseIssueCity: academics.licenseIssueCity || null
+            } : null,
+
+            // Employee Experience array
+            employeeExperience: experience.experiences ? experience.experiences.map(exp => ({
+                totalYears: exp.totalYears ? parseInt(exp.totalYears) : null,
+                placeOfDuty: exp.placeOfDuty || null,
+                recentCivilEmployment: exp.recentCivilEmployment || null
+            })) : [],
+
+            // References array
+            references: references.references ? references.references.map(ref => ({
+                fullName: ref.fullName || null,
+                fatherName: ref.fatherName || null,
+                cnicNumber: ref.cnicNumber || null,
+                cnicDocument: ref.cnicDocument || null,
+                contactNumber: ref.contactNumber || null,
+                relationship: ref.relationship || null,
+                currentAddress: ref.currentAddress || null,
+                permanentAddress: ref.permanentAddress || null
+            })) : [],
+
+            // Bank Account object
+            bankAccount: {
+                bankName: bankAccount.bankName || null,
+                bankCode: bankAccount.bankCode || null,
+                accountNumber: bankAccount.accountNumber || null,
+                IBAN: bankAccount.IBAN || null,
+                branchCode: bankAccount.branchCode || null,
+                branch: bankAccount.branch || null
+            },
+
+            // Employee Documents object
+            employeeDocuments: {
+                picture: employeeDocuments.employeeDocuments?.picture || "",
+                cnicFront: employeeDocuments.employeeDocuments?.cnicFront || "",
+                cnicBack: employeeDocuments.employeeDocuments?.cnicBack || "",
+                licenseFront: employeeDocuments.employeeDocuments?.licenseFront || "",
+                licenseBack: employeeDocuments.employeeDocuments?.licenseBack || ""
+            },
+
+            // Biometric object
+            biometric: {
+                rightThumb: biometric.biometric?.rightThumb || "",
+                rightMiddleFinger: biometric.biometric?.rightMiddleFinger || "",
+                rightLittleFinger: biometric.biometric?.rightLittleFinger || "",
+                leftThumb: biometric.biometric?.leftThumb || "",
+                leftMiddleFinger: biometric.biometric?.leftMiddleFinger || "",
+                leftLittleFinger: biometric.biometric?.leftLittleFinger || "",
+                rightForeFinger: biometric.biometric?.rightForeFinger || "",
+                rightRingFinger: biometric.biometric?.rightRingFinger || "",
+                rightFourFinger: biometric.biometric?.rightFourFinger || "",
+                leftFourFinger: biometric.biometric?.leftFourFinger || "",
+                leftRingFinger: biometric.biometric?.leftRingFinger || "",
+                leftForeFinger: biometric.biometric?.leftForeFinger || ""
+            }
+        };
+
+        try {
+            const res = await userRequest.post('/employee', apiPayload);
+
+            if (res) {
+                console.log('Employee Registration successful:', res.data);
+                toast.success('Employee Registration Successful');
+
+                // Reset form
+                setFormData({});
+                setCompletedSteps([]);
+                setCurrentStep('personal-info');
+            }
+        } catch (error) {
+            console.error('Employee Registration failed:', error);
+            toast.error("Failed to register employee: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -136,7 +234,6 @@ const EmployeeRegistrationPage = () => {
                 </aside>
             </div>
 
-
             {/* Main Content */}
             <div className="flex h-[calc(100vh-73px)] p-4 gap-5">
                 {/* Sidebar */}
@@ -148,7 +245,15 @@ const EmployeeRegistrationPage = () => {
 
                 {/* Form Content */}
                 <div className="flex-1 overflow-y-auto rounded-xl">
-                    {renderCurrentStep()}
+                    {CurrentStepComponent && (
+                        <CurrentStepComponent
+                            onNext={handleNext}
+                            onPrevious={handlePrevious}
+                            onComplete={handleComplete}
+                            onSave={handleAutoSave}
+                            initialData={formData[currentStep] || {}}
+                        />
+                    )}
                 </div>
             </div>
         </div>

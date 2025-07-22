@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import ClientSidebar from '@/components/DashboardComponents/Registration/ClientRegistration/ClientSidebar';
 import ClientCompanyInformation from '@/components/DashboardComponents/Registration/ClientRegistration/ClientCompanyInformation';
 import ClientPrimaryContact from '@/components/DashboardComponents/Registration/ClientRegistration/ClientPrimaryContact';
+import toast from 'react-hot-toast';
+import { userRequest } from '@/lib/RequestMethods';
 
 const ClientsRegistrationPage = () => {
     const [currentStep, setCurrentStep] = useState('company-info');
@@ -14,6 +16,16 @@ const ClientsRegistrationPage = () => {
 
     const handleStepChange = (stepId) => {
         setCurrentStep(stepId);
+    };
+
+    // Handle auto-save for contract upload without navigation
+    const handleAutoSave = (data) => {
+        // Save the data to formData state without moving to next step
+        setFormData(prev => ({
+            ...prev,
+            [currentStep]: data
+        }));
+        console.log('Auto-saved:', currentStep, data);
     };
 
     const handleNext = (stepData) => {
@@ -35,13 +47,31 @@ const ClientsRegistrationPage = () => {
         } else {
             // Final step - handle form submission
             const completeFormData = { ...formData, [currentStep]: stepData };
-            console.log('Complete client registration data:', completeFormData);
-
-            // Mark final step as completed
-            setCompletedSteps(prev => [...prev, currentStep]);
-
-            // Here you would typically submit to an API
-            alert('Client registration completed successfully!');
+            const company = completeFormData['company-info'] || {};
+            const poc = completeFormData['primary-contact'] || {};
+            // Prepare final payload
+            const payload = {
+                contractNumber: company.contractNumber,
+                contractFile: company.contractFile,
+                recruitmentDate: company.recruitmentDate,
+                companyName: company.companyName,
+                industry: company.industry,
+                websiteLink: company.websiteLink,
+                address: company.address,
+                city: company.city,
+                state: company.state,
+                country: company.country,
+                currentAddress: company.currentAddress,
+                contactNumber: company.contactNumber,
+                officialEmail: company.officialEmail,
+                POCName: poc.POCName,
+                POCDesignation: poc.POCDesignation,
+                POCEmail: poc.POCEmail,
+                POCContact: poc.POCContact,
+                AlternateContactPerson: poc.AlternateContactPerson,
+                AlternateContactNumber: poc.AlternateContactNumber
+            };
+            submitClient(payload);
         }
     };
 
@@ -56,6 +86,20 @@ const ClientsRegistrationPage = () => {
         return steps.indexOf(currentStep);
     };
 
+    const submitClient = async (payload) => {
+        try {
+            const res = await userRequest.post('/clients', payload);
+            if (res) {
+                toast.success('Client Registration Successful');
+                setFormData({});
+                setCompletedSteps([]);
+                setCurrentStep('company-info');
+            }
+        } catch (error) {
+            toast.error('Failed to register client: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
     const renderCurrentStep = () => {
         const stepData = formData[currentStep] || {};
         const currentStepIndex = getCurrentStepIndex();
@@ -65,6 +109,7 @@ const ClientsRegistrationPage = () => {
                 return (
                     <ClientCompanyInformation
                         onNext={handleNext}
+                        onSave={handleAutoSave}
                         initialData={stepData}
                         currentStepIndex={currentStepIndex}
                         totalSteps={totalSteps}
@@ -75,6 +120,7 @@ const ClientsRegistrationPage = () => {
                     <ClientPrimaryContact
                         onNext={handleNext}
                         onPrevious={handlePrevious}
+                        onSave={handleAutoSave}
                         initialData={stepData}
                         currentStepIndex={currentStepIndex}
                         totalSteps={totalSteps}
@@ -84,6 +130,7 @@ const ClientsRegistrationPage = () => {
                 return (
                     <ClientCompanyInformation
                         onNext={handleNext}
+                        onSave={handleAutoSave}
                         initialData={stepData}
                         currentStepIndex={currentStepIndex}
                         totalSteps={totalSteps}

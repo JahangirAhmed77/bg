@@ -98,7 +98,7 @@ const Login = () => {
         try {
             const res = await publicRequest.post('/auth/login', formData);
 
-           
+
 
             // Validate response structure
             if (res.data && res.data.data && res.data.data.token) {
@@ -116,9 +116,9 @@ const Login = () => {
                     localStorage.setItem("keepSignedIn", "true");
                 }
 
-             
 
-              
+
+
                 router.push('/dashboard');
                 toast.success('Login successful!');
             } else {
@@ -168,30 +168,25 @@ const Login = () => {
     };
 
     return (
-        <section className="min-h-screen flex">
+
+        <section className="max-h-screen grid grid-cols-1 md:grid-cols-2 overflow-hidden">
             {/* Left Side - Hero Section with Banner Image */}
-            <div className="flex-1 relative overflow-hidden flex flex-col bg-white">
-               
-
-                {/* Banner Background Image - Full Image Visible */}
-                <div
-                    className="absolute inset-x-0 bottom-0 top-16 w- bg-contain bg-center bg-no-repeat"
-                    style={{
-                        backgroundImage: 'url(/images/BannerLoginScreen.webp)'
-                    }}
-                >
-                </div>
+            <div className="hidden md:block bg-white overflow-hidden">
+                <img
+                    src="/images/BannerLoginScreen.webp"
+                    alt="Login Banner"
+                    className="w-full object-cover"
+                />
             </div>
-
             {/* Right Side - Login Form */}
-            <div className="flex-1 bg-white flex items-center justify-center p-8">
-                <div className="w-full max-w-md">
-                    <div className="mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign in</h2>
-                        <p className="text-gray-600">Sign in to your account to start using Dashboard</p>
+            <div className="flex items-center justify-center p-4 md:p-8 bg-white">
+                <div className="w-full max-w-md space-y-8">
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900">Sign in</h2>
+                        <p className="mt-2 text-gray-600">Sign in to your account to start using Dashboard</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-2">
+                    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                         {/* API Error Display */}
                         {apiError && (
                             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -201,7 +196,7 @@ const Login = () => {
 
                         {/* Email Field */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email
                             </label>
                             <input

@@ -41,15 +41,15 @@ const CreateUserForm = () => {
 
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Staff ID</label>
-                            <input type="text" value={user?.id} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={user?.id} disabled className="w-full bg-formBgLightGreen text-gray-700 rounded-md px-4 py-2" />
                         </div>
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Date</label>
-                            <input type="text" value={currentDate} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={currentDate} disabled className="w-full bg-formBgLightGreen text-gray-700 rounded-md px-4 py-2" />
                         </div>
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">Time</label>
-                            <input type="text" value={currentTime} disabled className="w-full bg-green-50 text-gray-700 rounded-md px-4 py-2 border border-gray-200" />
+                            <input type="text" value={currentTime} disabled className="w-full bg-formBgLightGreen text-gray-700 rounded-md px-4 py-2" />
                         </div>
                     </div>
 

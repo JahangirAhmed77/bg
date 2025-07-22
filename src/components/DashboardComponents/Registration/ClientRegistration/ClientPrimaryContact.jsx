@@ -5,28 +5,36 @@ import * as Yup from 'yup';
 
 const ClientPrimaryContact = ({ onNext, onPrevious, initialData = {}, currentStepIndex = 1, totalSteps = 2 }) => {
     const validationSchema = Yup.object({
-        pointOfContactName: Yup.string().required('Point of Contact Name is required'),
-        pocEmail: Yup.string().email('Invalid email').required('POC Email is required'),
-        pocDesignation: Yup.string().required('POC Designation is required'),
-        pocContactNo: Yup.string().required('POC Contact No. is required'),
-        alternateContactPerson: Yup.string(),
-        alternatePocContactNo: Yup.string()
+        POCName: Yup.string().required('POC Name is required'),
+        POCEmail: Yup.string().email('Invalid email').required('POC Email is required'),
+        POCDesignation: Yup.string().required('POC Designation is required'),
+        POCContact: Yup.string().required('POC Contact is required'),
+        AlternateContactPerson: Yup.string(),
+        AlternateContactNumber: Yup.string().min(11).max(11).required("Alternate contact number is required")
     });
 
     const initialValues = {
-        pointOfContactName: initialData.pointOfContactName || '',
-        pocEmail: initialData.pocEmail || '',
-        pocDesignation: initialData.pocDesignation || '',
-        pocContactNo: initialData.pocContactNo || '',
-        alternateContactPerson: initialData.alternateContactPerson || '',
-        alternatePocContactNo: initialData.alternatePocContactNo || '',
+        POCName: initialData.POCName || '',
+        POCEmail: initialData.POCEmail || '',
+        POCDesignation: initialData.POCDesignation || '',
+        POCContact: initialData.POCContact || '',
+        AlternateContactPerson: initialData.AlternateContactPerson || '',
+        AlternateContactNumber: initialData.AlternateContactNumber || '',
         ...initialData
     };
 
     const handleSubmit = (values) => {
-        console.log('Client Primary Contact:', values);
+        // Prepare payload for API
+        const payload = {
+            POCName: values.POCName,
+            POCEmail: values.POCEmail,
+            POCDesignation: values.POCDesignation,
+            POCContact: values.POCContact,
+            AlternateContactPerson: values.AlternateContactPerson,
+            AlternateContactNumber: values.AlternateContactNumber
+        };
         if (onNext) {
-            onNext(values);
+            onNext(payload);
         }
     };
 
@@ -55,20 +63,19 @@ const ClientPrimaryContact = ({ onNext, onPrevious, initialData = {}, currentSte
                 {({ isSubmitting }) => (
                     <Form className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Point of Contact Name */}
+                            {/* POC Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Point of Contact Name
+                                    POC Name
                                 </label>
                                 <Field
                                     type="text"
-                                    name="pointOfContactName"
-                                    placeholder="Enter Point of Contact Name"
+                                    name="POCName"
+                                    placeholder="Enter POC Name"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="pointOfContactName" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="POCName" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
-
                             {/* POC Designation */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -76,13 +83,12 @@ const ClientPrimaryContact = ({ onNext, onPrevious, initialData = {}, currentSte
                                 </label>
                                 <Field
                                     type="text"
-                                    name="pocDesignation"
+                                    name="POCDesignation"
                                     placeholder="Enter POC Designation"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="pocDesignation" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="POCDesignation" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
-
                             {/* POC Email */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -90,27 +96,25 @@ const ClientPrimaryContact = ({ onNext, onPrevious, initialData = {}, currentSte
                                 </label>
                                 <Field
                                     type="email"
-                                    name="pocEmail"
+                                    name="POCEmail"
                                     placeholder="Enter POC Email"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="pocEmail" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="POCEmail" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
-
-                            {/* POC Contact No. */}
+                            {/* POC Contact */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    POC Contact No.
+                                    POC Contact
                                 </label>
                                 <Field
                                     type="tel"
-                                    name="pocContactNo"
+                                    name="POCContact"
                                     placeholder="Enter POC Contact"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="pocContactNo" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="POCContact" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
-
                             {/* Alternate Contact Person */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -118,28 +122,27 @@ const ClientPrimaryContact = ({ onNext, onPrevious, initialData = {}, currentSte
                                 </label>
                                 <Field
                                     type="text"
-                                    name="alternateContactPerson"
+                                    name="AlternateContactPerson"
                                     placeholder="Enter Alternate Contact Person"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="alternateContactPerson" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="AlternateContactPerson" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
-
-                            {/* Alternate POC Contact No. */}
+                            {/* Alternate Contact Number */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Alternate POC Contact No.
+                                    Alternate Contact Number
                                 </label>
                                 <Field
                                     type="tel"
-                                    name="alternatePocContactNo"
-                                    placeholder="Enter Alternate POC Contact No."
+                                    maxLength={11}
+                                    name="AlternateContactNumber"
+                                    placeholder="eg: (03323312188)"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5570f1]"
                                 />
-                                <ErrorMessage name="alternatePocContactNo" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="AlternateContactNumber" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
                         </div>
-
                         {/* Action Buttons */}
                         <div className="flex justify-end space-x-4 mt-8">
                             <button

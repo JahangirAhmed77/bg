@@ -71,11 +71,11 @@ const GuardsCategoryForm = () => {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div>
                                 <label className="block text-xs font-medium text-gray-500 mb-1">Office</label>
-                                <input type="text" value={user?.id} readOnly className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-500" />
+                                <input type="text" value={user?.id} readOnly className="w-full px-4 py-2 bg-formBgLightGreen  rounded-md text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-gray-500 mb-1">Staff ID</label>
-                                <input type="text" value='Auto' readOnly className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-500" />
+                                <input type="text" value='Auto' readOnly className="w-full px-4 py-2 bg-formBgLightGreen  rounded-md text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
@@ -83,7 +83,7 @@ const GuardsCategoryForm = () => {
                                     type="text"
                                     value={currentDate}
                                     readOnly
-                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-700"
+                                    className="w-full px-4 py-2 bg-formBgLightGreen  rounded-md text-gray-700"
                                 />
                             </div>
                             <div>
@@ -92,7 +92,7 @@ const GuardsCategoryForm = () => {
                                     type="text"
                                     value={currentTime}
                                     readOnly
-                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-700"
+                                    className="w-full px-4 py-2 bg-formBgLightGreen  rounded-md text-gray-700"
                                 />
                             </div>
                         </div>

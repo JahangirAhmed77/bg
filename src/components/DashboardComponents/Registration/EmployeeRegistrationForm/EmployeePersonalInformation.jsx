@@ -3,49 +3,63 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Calendar } from 'lucide-react';
+import CNICInput from '@/utils/FormHelpers/CNICField';
+import { CalculateAge } from '@/utils/FormHelpers/CalculateAge';
+import { eyeColors, bloodGroups, religions, religionSects } from '@/constants/FormConstantFields';
 
 const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
   const validationSchema = Yup.object({
-    serviceNo: Yup.string().required('Service No. is required'),
-    dateOfRecruitment: Yup.date().required('Date of Recruitment is required'),
-    autoGenerate: Yup.boolean(),
+    registrationDate: Yup.date().required('Registration Date is required'),
     fullName: Yup.string().required('Full Name is required'),
     fatherName: Yup.string().required('Father Name is required'),
-    cnicNo: Yup.string()
+    cnicNumber: Yup.string()
       .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
-      .required('CNIC No. is required'),
-    dateOfBirth: Yup.date().required('Date of Birth is required'),
-    dateOfIssue: Yup.date().required('Date of Issue is required'),
-    contactNo: Yup.string()
-      .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid contact number')
-      .required('Contact No. is required'),
+      .required('CNIC Number is required'),
+    dateOfBirth: Yup.date()
+      .max(new Date(), 'Date of Birth must be in the past')
+      .required('Date of Birth is required'),
+    cnicIssueDate: Yup.date().required('CNIC Issue Date is required'),
+    cnicExpiryDate: Yup.date().required('CNIC Expiry Date is required'),
+    contactNumber: Yup.string()
+      .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid phone number')
+      .required('Contact Number is required'),
     currentAddress: Yup.string().required('Current Address is required'),
     permanentAddress: Yup.string().required('Permanent Address is required'),
-    religionSect: Yup.string().required('Religion Sect is required'),
-    height: Yup.number().positive('Height must be positive').required('Height is required'),
     religion: Yup.string().required('Religion is required'),
+    religionSect: Yup.string().required('Religion Sect is required'),
+    weight: Yup.number().positive('Weight must be positive').required('Weight is required'),
+    height: Yup.number().positive('Height must be positive').required('Height is required'),
     bloodGroup: Yup.string().required('Blood Group is required'),
-    eobiNo: Yup.string().required('EOBI No. is required')
+    bloodPressure: Yup.string().required('Blood Pressure is required'),
+    heartBeat: Yup.string().required('Heart Beat is required'),
+    eyeColor: Yup.string().required('Eye Color is required'),
+    disability: Yup.string().required('Disability status is required'),
+    eobiNumber: Yup.string().required('EOBI Number is required'),
+    sessiNumber: Yup.string().required('SESSI Number is required')
   });
 
   const initialValues = {
-    serviceNo: initialData.serviceNo || '12345',
-    dateOfRecruitment: initialData.dateOfRecruitment || '12/10/2020',
-    autoGenerate: initialData.autoGenerate || true,
+    registrationDate: initialData.registrationDate || new Date().toISOString().split('T')[0],
     fullName: initialData.fullName || '',
     fatherName: initialData.fatherName || '',
-    cnicNo: initialData.cnicNo || '',
-    dateOfBirth: initialData.dateOfBirth || '12/12/1997',
-    dateOfIssue: initialData.dateOfIssue || '12/12/1997',
-    contactNo: initialData.contactNo || '',
+    cnicNumber: initialData.cnicNumber || '',
+    dateOfBirth: initialData.dateOfBirth || '',
+    cnicIssueDate: initialData.cnicIssueDate || '',
+    cnicExpiryDate: initialData.cnicExpiryDate || '',
+    contactNumber: initialData.contactNumber || '',
     currentAddress: initialData.currentAddress || '',
     permanentAddress: initialData.permanentAddress || '',
-    religionSect: initialData.religionSect || '',
-    height: initialData.height || '',
     religion: initialData.religion || '',
+    religionSect: initialData.religionSect || '',
+    weight: initialData.weight || '',
+    height: initialData.height || '',
     bloodGroup: initialData.bloodGroup || '',
-    eobiNo: initialData.eobiNo || '',
-    ...initialData
+    bloodPressure: initialData.bloodPressure || '',
+    heartBeat: initialData.heartBeat || '',
+    eyeColor: initialData.eyeColor || '',
+    disability: initialData.disability || '',
+    eobiNumber: initialData.eobiNumber || '',
+    sessiNumber: initialData.sessiNumber || ''
   };
 
   const handleSubmit = (values) => {
@@ -55,16 +69,19 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
     }
   };
 
+
+
+
   return (
     <div className="flex-1 bg-white p-8">
-
+      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
-          <div className="text-sm text-gray-500">Step 1 of 7</div>
+          <div className="text-sm text-gray-500">Step 1 of 8</div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '14.3%' }}></div>
+          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '12.5%' }}></div>
         </div>
       </div>
 
@@ -76,49 +93,28 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
         {({ values, setFieldValue, isSubmitting }) => (
           <Form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Service No. */}
+              {/* Registration Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  SERVICE NO.
+                  Registration Date <span className="text-red-500">*</span>
                 </label>
                 <Field
-                  type="text"
-                  name="serviceNo"
+                  type="date"
+                  name="registrationDate"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <div className="text-xs text-gray-500 mt-1">Auto Generate SERVICE_NO.</div>
-                <ErrorMessage name="serviceNo" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
-
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date and Time of Recruitment
-                </label>
-                <div className="flex space-x-2">
-                  <Field
-                    type="text"
-                    name="dateOfRecruitment"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-md">
-                    12:00 PM
-                  </div>
-                  <Calendar className="mt-3 h-5 w-5 text-gray-400" />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">Auto Select date</div>
-                <ErrorMessage name="dateOfRecruitment" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="registrationDate" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <Field
                   type="text"
                   name="fullName"
-                  placeholder="Enter Full Name"
+                  placeholder="Enter full name"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <ErrorMessage name="fullName" component="div" className="text-red-500 text-sm mt-1" />
@@ -127,116 +123,108 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
               {/* Father Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Father Name
+                  Father Name <span className="text-red-500">*</span>
                 </label>
                 <Field
                   type="text"
                   name="fatherName"
-                  placeholder="Enter Father Name"
+                  placeholder="Enter father's name"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <ErrorMessage name="fatherName" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
+              {/* CNIC Number with auto-dashing */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  CNIC Number <span className="text-red-500">*</span>
+                </label>
+                <CNICInput name="cnicNumber" />
+              </div>
+
               {/* Date of Birth */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth
+                  Date of Birth <span className="text-red-500">*</span>
                 </label>
-                <div className="flex space-x-2">
-                  <Field
-                    type="text"
-                    name="dateOfBirth"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Calendar className="mt-3 h-5 w-5 text-gray-400" />
-                </div>
+                <Field
+                  type="date"
+                  name="dateOfBirth"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
                 <ErrorMessage name="dateOfBirth" component="div" className="text-red-500 text-sm mt-1" />
+                {values.dateOfBirth && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    Age: {CalculateAge(values.dateOfBirth)} years
+                  </div>
+                )}
               </div>
 
-              {/* CNIC No. */}
+              {/* CNIC Issue Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CNIC No.
+                  CNIC Issue Date <span className="text-red-500">*</span>
                 </label>
                 <Field
-                  type="text"
-                  name="cnicNo"
-                  placeholder="Enter CNIC No."
+                  type="date"
+                  name="cnicIssueDate"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <ErrorMessage name="cnicNo" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="cnicIssueDate" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              {/* Date of Issue (CNIC) */}
+              {/* CNIC Expiry Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date Of Issue(CNIC)
-                </label>
-                <div className="flex space-x-2">
-                  <Field
-                    type="text"
-                    name="dateOfIssue"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Calendar className="mt-3 h-5 w-5 text-gray-400" />
-                </div>
-                <ErrorMessage name="dateOfIssue" component="div" className="text-red-500 text-sm mt-1" />
-              </div>
-
-              {/* Date of Expiry (CNIC) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date Of Expiry(CNIC)
-                </label>
-                <div className="flex space-x-2">
-                  <Field
-                    type="text"
-                    name="dateOfExpiry"
-                    value="12/12/1997"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Calendar className="mt-3 h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-
-              {/* Contact No. */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact No.
+                  CNIC Expiry Date <span className="text-red-500">*</span>
                 </label>
                 <Field
-                  type="text"
-                  name="contactNo"
-                  placeholder="Enter Contact No."
+                  type="date"
+                  name="cnicExpiryDate"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <ErrorMessage name="contactNo" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="cnicExpiryDate" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* Contact Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Number <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="tel"
+                  name="contactNumber"
+                  placeholder="Enter contact number"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="contactNumber" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Current Address */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Address
+                  Current Address <span className="text-red-500">*</span>
                 </label>
                 <Field
-                  type="text"
+                  as="textarea"
                   name="currentAddress"
-                  placeholder="Enter Current Address"
+                  rows={3}
+                  placeholder="Enter current address"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <ErrorMessage name="currentAddress" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Permanent Address */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Permanent Address
+                  Permanent Address <span className="text-red-500">*</span>
                 </label>
                 <Field
-                  type="text"
+                  as="textarea"
                   name="permanentAddress"
-                  placeholder="Enter Permanent Address"
+                  rows={3}
+                  placeholder="Enter permanent address"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <ErrorMessage name="permanentAddress" component="div" className="text-red-500 text-sm mt-1" />
@@ -245,7 +233,7 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
               {/* Religion */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Religion
+                  Religion <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Field
@@ -253,11 +241,10 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
                     name="religion"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                   >
-                    <option value="">Select</option>
-                    <option value="Islam">Islam</option>
-                    <option value="Christianity">Christianity</option>
-                    <option value="Hinduism">Hinduism</option>
-                    <option value="Other">Other</option>
+                    <option value="">Select Religion</option>
+                    {religions.map(religion => (
+                      <option key={religion} value={religion}>{religion}</option>
+                    ))}
                   </Field>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
@@ -267,7 +254,7 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
               {/* Religion Sect */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Religion Sect
+                  Religion Sect <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Field
@@ -275,39 +262,48 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
                     name="religionSect"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                   >
-                    <option value="">Select</option>
-                    <option value="Sunni">Sunni</option>
-                    <option value="Shia">Shia</option>
-                    <option value="Other">Other</option>
+                    <option value="">Select Sect</option>
+                    {religionSects.map(sect => (
+                      <option key={sect} value={sect}>{sect}</option>
+                    ))}
                   </Field>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
                 <ErrorMessage name="religionSect" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
+              {/* Weight */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Weight (kg) <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="number"
+                  name="weight"
+                  placeholder="Enter weight in kg"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="weight" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
               {/* Height */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Height
+                  Height (cm) <span className="text-red-500">*</span>
                 </label>
-                <div className="flex">
-                  <Field
-                    type="number"
-                    name="height"
-                    value="0"
-                    className="flex-1 px-4 py-3 bg-gray-50 border border-r-0 border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <div className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-r-md text-sm text-gray-600">
-                    <ChevronDown className="h-4 w-4" />
-                  </div>
-                </div>
+                <Field
+                  type="number"
+                  name="height"
+                  placeholder="Enter height in cm"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
                 <ErrorMessage name="height" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               {/* Blood Group */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Blood Group
+                  Blood Group <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Field
@@ -315,50 +311,116 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
                     name="bloodGroup"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                   >
-                    <option value="">Select</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
+                    <option value="">Select Blood Group</option>
+                    {bloodGroups.map(group => (
+                      <option key={group} value={group}>{group}</option>
+                    ))}
                   </Field>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                 </div>
                 <ErrorMessage name="bloodGroup" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              {/* EOBI No. */}
+              {/* Blood Pressure */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  EOBI No.
+                  Blood Pressure <span className="text-red-500">*</span>
                 </label>
                 <Field
                   type="text"
-                  name="eobiNo"
-                  placeholder="Enter EOBI No"
+                  name="bloodPressure"
+                  placeholder="e.g., 120/80"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <ErrorMessage name="eobiNo" component="div" className="text-red-500 text-sm mt-1" />
+                <ErrorMessage name="bloodPressure" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* Heart Beat */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Heart Beat <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="text"
+                  name="heartBeat"
+                  placeholder="e.g., 72 bpm"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="heartBeat" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* Eye Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Eye Color <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <Field
+                    as="select"
+                    name="eyeColor"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                  >
+                    <option value="">Select Eye Color</option>
+                    {eyeColors.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </Field>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                </div>
+                <ErrorMessage name="eyeColor" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* Disability */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Disability <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="text"
+                  name="disability"
+                  placeholder="None or specify disability"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="disability" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* EOBI Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  EOBI Number <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="text"
+                  name="eobiNumber"
+                  placeholder="Enter EOBI number"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="eobiNumber" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
+
+              {/* SESSI Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  SESSI Number <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  type="text"
+                  name="sessiNumber"
+                  placeholder="Enter SESSI number"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <ErrorMessage name="sessiNumber" component="div" className="text-red-500 text-sm mt-1" />
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex justify-center space-x-4 pt-8">
-              <button
-                type="button"
-                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                Cancel
-              </button>
+            {/* Submit Button */}
+            <div className="flex justify-end pt-6">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {isSubmitting ? 'Saving...' : 'Continue'}
+                {isSubmitting ? 'Processing...' : 'Continue'}
               </button>
             </div>
           </Form>

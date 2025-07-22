@@ -9,7 +9,7 @@ const GuardsSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
         { id: 'experience', label: 'Experience', step: 4 },
         { id: 'bank-account', label: 'Add Bank Account', step: 5 },
         { id: 'references', label: 'References / Guarantors', step: 6 },
-        { id: 'documents', label: 'Upload Employee Documents/ Bio-Metric', step: 7 },
+        { id: 'documents', label: 'Upload Employee Documents', step: 7 },
         { id: 'bio-metric', label: 'Bio-Metric', step: 8 }
     ];
 

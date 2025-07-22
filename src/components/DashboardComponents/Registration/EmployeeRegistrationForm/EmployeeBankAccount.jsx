@@ -8,27 +8,26 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
         bankName: Yup.string().required('Bank Name is required'),
         bankCode: Yup.string().required('Bank Code is required'),
-        accountNo: Yup.string()
+        accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
             .min(8, 'Account number must be at least 8 digits')
-            .required('Account No. is required'),
-        iban: Yup.string()
+            .required('Account Number is required'),
+        IBAN: Yup.string()
             .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
             .min(15, 'IBAN must be at least 15 characters')
             .max(34, 'IBAN must not exceed 34 characters')
             .required('IBAN is required'),
         branchCode: Yup.string().required('Branch Code is required'),
-        branchName: Yup.string().required('Branch Name is required')
+        branch: Yup.string().required('Branch Name is required')
     });
 
     const initialValues = {
         bankName: initialData.bankName || '',
         bankCode: initialData.bankCode || '',
-        accountNo: initialData.accountNo || '',
-        iban: initialData.iban || '',
+        accountNumber: initialData.accountNumber || '',
+        IBAN: initialData.IBAN || '',
         branchCode: initialData.branchCode || '',
-        branchName: initialData.branchName || '',
-        ...initialData
+        branch: initialData.branch || ''
     };
 
     const handleSubmit = (values) => {
@@ -39,21 +38,21 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     };
 
     const pakistaniBanks = [
-        'Habib Bank Limited (HBL)',
-        'United Bank Limited (UBL)',
-        'Muslim Commercial Bank (MCB)',
-        'National Bank of Pakistan (NBP)',
-        'Allied Bank Limited (ABL)',
-        'Bank Alfalah Limited',
-        'Standard Chartered Bank Pakistan',
-        'Faysal Bank Limited',
-        'Bank Al Habib Limited',
-        'Askari Bank Limited',
-        'Soneri Bank Limited',
-        'Bank of Punjab (BOP)',
-        'Meezan Bank Limited',
-        'JS Bank Limited',
-        'Silk Bank Limited'
+        { name: 'Habib Bank Limited (HBL)', code: '001' },
+        { name: 'United Bank Limited (UBL)', code: '002' },
+        { name: 'Muslim Commercial Bank (MCB)', code: '003' },
+        { name: 'National Bank of Pakistan (NBP)', code: '004' },
+        { name: 'Allied Bank Limited (ABL)', code: '005' },
+        { name: 'Bank Alfalah Limited', code: '006' },
+        { name: 'Standard Chartered Bank Pakistan', code: '007' },
+        { name: 'Faysal Bank Limited', code: '008' },
+        { name: 'Bank Al Habib Limited', code: '009' },
+        { name: 'Askari Bank Limited', code: '010' },
+        { name: 'Soneri Bank Limited', code: '011' },
+        { name: 'Bank of Punjab (BOP)', code: '012' },
+        { name: 'Meezan Bank Limited', code: '013' },
+        { name: 'JS Bank Limited', code: '014' },
+        { name: 'Silk Bank Limited', code: '015' }
     ];
 
     return (
@@ -62,10 +61,10 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Add Bank Account</h2>
-                    <div className="text-sm text-gray-500">Step 5 of 7</div>
+                    <div className="text-sm text-gray-500">Step 5 of 8</div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '71.4%' }}></div>
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '62.5%' }}></div>
                 </div>
             </div>
 
@@ -80,18 +79,25 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Name
+                                    Bank Name <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <Field
                                         as="select"
                                         name="bankName"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                        onChange={(e) => {
+                                            const selectedBank = pakistaniBanks.find(bank => bank.name === e.target.value);
+                                            setFieldValue('bankName', e.target.value);
+                                            if (selectedBank) {
+                                                setFieldValue('bankCode', selectedBank.code);
+                                            }
+                                        }}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                                     >
                                         <option value="">Select Bank</option>
                                         {pakistaniBanks.map((bank) => (
-                                            <option key={bank} value={bank}>
-                                                {bank}
+                                            <option key={bank.code} value={bank.name}>
+                                                {bank.name}
                                             </option>
                                         ))}
                                     </Field>
@@ -103,55 +109,57 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Code
+                                    Bank Code <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
                                     name="bankCode"
-                                    placeholder="Enter Bank Code"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Bank code (auto-filled)"
+                                    readOnly
+                                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 cursor-not-allowed"
                                 />
                                 <ErrorMessage name="bankCode" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Account No. */}
+                            {/* Account Number */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Account No.
+                                    Account Number <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
-                                    name="accountNo"
-                                    placeholder="Enter Account Number"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    name="accountNumber"
+                                    placeholder="Enter account number"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <ErrorMessage name="accountNo" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="accountNumber" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* IBAN */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    IBAN
+                                    IBAN <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
-                                    name="iban"
-                                    placeholder="Enter IBAN (e.g., PK36SCBL0000001123456702)"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    name="IBAN"
+                                    placeholder="PK57UNIL0000009876543210"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <ErrorMessage name="iban" component="div" className="text-red-500 text-sm mt-1" />
+                                <div className="text-xs text-gray-500 mt-1">Format: PK followed by 22 characters</div>
+                                <ErrorMessage name="IBAN" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* Branch Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Branch Code
+                                    Branch Code <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
                                     name="branchCode"
-                                    placeholder="Enter Branch Code"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Enter branch code"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 <ErrorMessage name="branchCode" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
@@ -159,33 +167,52 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Branch Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Branch Name
+                                    Branch Name <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
-                                    name="branchName"
-                                    placeholder="Enter Branch Name"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    name="branch"
+                                    placeholder="Enter branch name"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <ErrorMessage name="branchName" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="branch" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
                         </div>
 
-                        {/* Buttons */}
+                        {/* Information Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                            <div className="flex">
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-blue-800">
+                                        Bank Account Information
+                                    </h3>
+                                    <div className="mt-2 text-sm text-blue-700">
+                                        <ul className="list-disc pl-5 space-y-1">
+                                            <li>Ensure account number is correct and active</li>
+                                            <li>IBAN format: PK followed by 22 characters</li>
+                                            <li>Branch code should match your account's branch</li>
+                                            <li>Salary will be deposited to this account</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Submit Buttons */}
                         <div className="flex justify-center space-x-4 pt-8">
                             <button
                                 type="button"
                                 onClick={onPrevious}
-                                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
                             >
-                                Cancel
+                                Previous
                             </button>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Saving...' : 'Continue'}
+                                {isSubmitting ? 'Processing...' : 'Continue'}
                             </button>
                         </div>
                     </Form>

@@ -6,36 +6,39 @@ import { ChevronDown } from 'lucide-react';
 
 const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        lastHighestEducation: Yup.string().required('Last Highest Education is required'),
-        institutionCity: Yup.string().required('Institution City is required'),
-        drivingLicense: Yup.string().required('Driving License is required'),
-        drivingLicenseNo: Yup.string().when('drivingLicense', {
-            is: (value) => value === 'Yes',
+        lastEducation: Yup.string().required('Last Education is required'),
+        institute: Yup.string().required('Institute/Institution is required'),
+        hasDrivingLicense: Yup.boolean().required('Please specify if you have a driving license'),
+        drivingLicenseNo: Yup.string().when('hasDrivingLicense', {
+            is: true,
             then: (schema) => schema.required('Driving License No. is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        dateOfIssueDriving: Yup.date().when('drivingLicense', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Date of Issue is required'),
+        drivingLicenseIssueDate: Yup.date().when('hasDrivingLicense', {
+            is: true,
+            then: (schema) => schema.required('Issue Date is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        stateOfExpiryDriving: Yup.date().when('drivingLicense', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('State of Expiry is required'),
+        drivingLicenseExpiryDate: Yup.date().when('hasDrivingLicense', {
+            is: true,
+            then: (schema) => schema.required('Expiry Date is required'),
             otherwise: (schema) => schema.notRequired()
         }),
-        smokingCity: Yup.string().required('Smoking City is required')
+        licenseIssueCity: Yup.string().when('hasDrivingLicense', {
+            is: true,
+            then: (schema) => schema.required('License Issue City is required'),
+            otherwise: (schema) => schema.notRequired()
+        })
     });
 
     const initialValues = {
-        lastHighestEducation: initialData.lastHighestEducation || '',
-        institutionCity: initialData.institutionCity || '',
-        drivingLicense: initialData.drivingLicense || '',
+        lastEducation: initialData.lastEducation || '',
+        institute: initialData.institute || '',
+        hasDrivingLicense: initialData.hasDrivingLicense || false,
         drivingLicenseNo: initialData.drivingLicenseNo || '',
-        dateOfIssueDriving: initialData.dateOfIssueDriving || '1997-12-12',
-        stateOfExpiryDriving: initialData.stateOfExpiryDriving || '1997-12-12',
-        smokingCity: initialData.smokingCity || '',
-        ...initialData
+        drivingLicenseIssueDate: initialData.drivingLicenseIssueDate || '',
+        drivingLicenseExpiryDate: initialData.drivingLicenseExpiryDate || '',
+        licenseIssueCity: initialData.licenseIssueCity || ''
     };
 
     const handleSubmit = (values) => {
@@ -43,16 +46,6 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
         if (onNext) {
             onNext(values);
         }
-    };
-
-    // Format date for display (convert from YYYY-MM-DD to DD/MM/YYYY)
-    const formatDateForDisplay = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
     };
 
     const educationLevels = [
@@ -68,14 +61,23 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
         'Other'
     ];
 
-    const drivingLicenseOptions = [
-        'Yes',
-        'No'
-    ];
-
-    const smokingOptions = [
-        'Yes',
-        'No'
+    const pakistaniCities = [
+        'Karachi',
+        'Lahore',
+        'Islamabad',
+        'Rawalpindi',
+        'Faisalabad',
+        'Multan',
+        'Peshawar',
+        'Quetta',
+        'Sialkot',
+        'Gujranwala',
+        'Hyderabad',
+        'Sargodha',
+        'Bahawalpur',
+        'Sukkur',
+        'Larkana',
+        'Other'
     ];
 
     return (
@@ -84,10 +86,10 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Academics & Licenses</h2>
-                    <div className="text-sm text-gray-500">Step 3 of 7</div>
+                    <div className="text-sm text-gray-500">Step 3 of 8</div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '42.9%' }}></div>
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '37.5%' }}></div>
                 </div>
             </div>
 
@@ -99,158 +101,153 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Last Highest Education */}
+                            {/* Last Education */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Last Highest Education
+                                    Last Education <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <Field
                                         as="select"
-                                        name="lastHighestEducation"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                        name="lastEducation"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                                     >
-                                        <option value="">Select</option>
-                                        {educationLevels.map((level) => (
-                                            <option key={level} value={level}>
-                                                {level}
-                                            </option>
+                                        <option value="">Select Education Level</option>
+                                        {educationLevels.map(level => (
+                                            <option key={level} value={level}>{level}</option>
                                         ))}
                                     </Field>
                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                 </div>
-                                <ErrorMessage name="lastHighestEducation" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="lastEducation" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Institution City */}
+                            {/* Institute */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Institution City
+                                    Institute/Institution <span className="text-red-500">*</span>
                                 </label>
                                 <Field
                                     type="text"
-                                    name="institutionCity"
-                                    placeholder="Enter Institution City"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    name="institute"
+                                    placeholder="Enter institute/institution name"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <ErrorMessage name="institutionCity" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="institute" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Driving License */}
-                            <div>
+                            {/* Has Driving License */}
+                            <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Driving License
+                                    Do you have a Driving License? <span className="text-red-500">*</span>
                                 </label>
-                                <div className="relative">
-                                    <Field
-                                        as="select"
-                                        name="drivingLicense"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                                    >
-                                        <option value="">Select</option>
-                                        {drivingLicenseOptions.map((option) => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </Field>
-                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                <div className="flex space-x-4">
+                                    <label className="flex items-center">
+                                        <Field
+                                            type="radio"
+                                            name="hasDrivingLicense"
+                                            value={true}
+                                            onChange={() => setFieldValue('hasDrivingLicense', true)}
+                                            className="mr-2"
+                                        />
+                                        Yes
+                                    </label>
+                                    <label className="flex items-center">
+                                        <Field
+                                            type="radio"
+                                            name="hasDrivingLicense"
+                                            value={false}
+                                            onChange={() => setFieldValue('hasDrivingLicense', false)}
+                                            className="mr-2"
+                                        />
+                                        No
+                                    </label>
                                 </div>
-                                <ErrorMessage name="drivingLicense" component="div" className="text-red-500 text-sm mt-1" />
+                                <ErrorMessage name="hasDrivingLicense" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
-                            {/* Driving License No. */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Driving License No.
-                                </label>
-                                <Field
-                                    type="text"
-                                    name="drivingLicenseNo"
-                                    placeholder="Enter Driving License No."
-                                    disabled={values.drivingLicense !== 'Yes'}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                <ErrorMessage name="drivingLicenseNo" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
-
-                            {/* Date of Issue (Driving License) */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Date of Issue (Driving License)
-                                </label>
-                                <Field
-                                    type="date"
-                                    name="dateOfIssueDriving"
-                                    disabled={values.drivingLicense !== 'Yes'}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                {values.dateOfIssueDriving && (
-                                    <div className="text-xs text-gray-500 mt-1">
-                                        Display: {formatDateForDisplay(values.dateOfIssueDriving)}
+                            {/* Driving License Details - Only show if hasDrivingLicense is true */}
+                            {values.hasDrivingLicense && (
+                                <>
+                                    {/* Driving License Number */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Driving License No. <span className="text-red-500">*</span>
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="drivingLicenseNo"
+                                            placeholder="Enter driving license number"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                        <ErrorMessage name="drivingLicenseNo" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
-                                )}
-                                <ErrorMessage name="dateOfIssueDriving" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
 
-                            {/* State of Expiry (Driving License) */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    State of Expiry (Driving License)
-                                </label>
-                                <Field
-                                    type="date"
-                                    name="stateOfExpiryDriving"
-                                    disabled={values.drivingLicense !== 'Yes'}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                {values.stateOfExpiryDriving && (
-                                    <div className="text-xs text-gray-500 mt-1">
-                                        Display: {formatDateForDisplay(values.stateOfExpiryDriving)}
+                                    {/* License Issue City */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            License Issue City <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <Field
+                                                as="select"
+                                                name="licenseIssueCity"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                                            >
+                                                <option value="">Select City</option>
+                                                {pakistaniCities.map(city => (
+                                                    <option key={city} value={city}>{city}</option>
+                                                ))}
+                                            </Field>
+                                            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                        </div>
+                                        <ErrorMessage name="licenseIssueCity" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
-                                )}
-                                <ErrorMessage name="stateOfExpiryDriving" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
 
-                            {/* Smoking City */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Smoking City
-                                </label>
-                                <div className="relative">
-                                    <Field
-                                        as="select"
-                                        name="smokingCity"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                                    >
-                                        <option value="">Select</option>
-                                        {smokingOptions.map((option) => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </Field>
-                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                                </div>
-                                <ErrorMessage name="smokingCity" component="div" className="text-red-500 text-sm mt-1" />
-                            </div>
+                                    {/* Issue Date */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Issue Date <span className="text-red-500">*</span>
+                                        </label>
+                                        <Field
+                                            type="date"
+                                            name="drivingLicenseIssueDate"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                        <ErrorMessage name="drivingLicenseIssueDate" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+
+                                    {/* Expiry Date */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Expiry Date <span className="text-red-500">*</span>
+                                        </label>
+                                        <Field
+                                            type="date"
+                                            name="drivingLicenseExpiryDate"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                        <ErrorMessage name="drivingLicenseExpiryDate" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        {/* Buttons */}
+                        {/* Submit Buttons */}
                         <div className="flex justify-center space-x-4 pt-8">
                             <button
                                 type="button"
                                 onClick={onPrevious}
-                                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
                             >
-                                Cancel
+                                Previous
                             </button>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Saving...' : 'Continue'}
+                                {isSubmitting ? 'Processing...' : 'Continue'}
                             </button>
                         </div>
                     </Form>
