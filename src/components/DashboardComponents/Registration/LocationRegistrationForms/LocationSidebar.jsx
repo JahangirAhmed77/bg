@@ -4,7 +4,7 @@ import React from 'react';
 const LocationSidebar = ({ currentStep, onStepChange, completedSteps = [] }) => {
     const steps = [
         { id: 'location-info', label: 'Location Information', step: 1 },
-        { id: 'guard-details', label: 'Details of Guards/ Employees Requested', step: 2 },
+        { id: 'guard-details', label: 'Guards Requirement', step: 2 },
         { id: 'charges-breakup', label: 'Salary/ Charges Breakup for Office Use', step: 3 },
         { id: 'setup-invoice', label: 'Setup Location Invoice', step: 4 }
     ];

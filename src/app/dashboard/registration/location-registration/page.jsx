@@ -1,4 +1,6 @@
 'use client';
+
+//prompt: I want a flow in which once I enter valuesin location details of guards form, then display those dteals in next ompoent table tha is salary/chreds breakup fpr office use, then display the values from location details of guards as readonly vlaues in next compoentn which is salary/changes then display guards ctaeogty, chrages per motnh, overtime/hour , allowance, as read only ,then the remaing 3 fields the user will enter which would be under new object called finances whch will have these fields Salary/Month	Overtime/Hour	Allowance and then match the final api requets as passed below 
 import React, { useState } from 'react';
 import LocationSidebar from '@/components/DashboardComponents/Registration/LocationRegistrationForms/LocationSidebar';
 import LocationInformation from '@/components/DashboardComponents/Registration/LocationRegistrationForms/LocationInformation';
@@ -30,6 +32,8 @@ const LocationRegistrationPage = () => {
             ...prev,
             [currentStep]: data
         }));
+
+        console.log(formData)
 
         if (!completedSteps.includes(currentStep)) {
             setCompletedSteps(prev => [...prev, currentStep]);

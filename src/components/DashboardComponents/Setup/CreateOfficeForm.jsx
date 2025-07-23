@@ -9,12 +9,16 @@ import { PAKISTAN_CITIES } from '@/constants/PakistanCities';
 import Autosuggest from 'react-autosuggest';
 
 const CreateOfficeForm = () => {
+
     const validationSchema = Yup.object({
+        branchName: Yup.string().required("Branch name is required"),
         province: Yup.string().required('Province is required'),
         city: Yup.string().required('City is required'),
         contactNo: Yup.string()
             .matches(/^[0-9+\-\s()]+$/, 'Invalid phone number format')
             .required('Contact number is required'),
+        contactNumberOpt: Yup.string()
+            .matches(/^[0-9+\-\s()]+$/, 'Invalid phone number format'),
         email: Yup.string()
             .email('Invalid email format')
             .required('Email is required'),
@@ -23,9 +27,11 @@ const CreateOfficeForm = () => {
     });
 
     const initialValues = {
+        branchName: '',
         province: '',
         city: '',
         contactNo: '',
+        contactNumberOpt: '',
         email: '',
         addressLine1: '',
         addressLine2: ''
@@ -35,15 +41,21 @@ const CreateOfficeForm = () => {
 
         const addOfficePayload = {
 
+            branchName: values.branchName,
             email: values.email,
             province: values.province,
             city: values.city,
             address: values.addressLine1,
             addressOpt: values.addressLine2 || "",
-            contactNumber: values.contactNo
+            contactNumber: values.contactNo,
+            contactNumberOpt: values.contactNumberOpt
         }
 
-        await userRequest.post("/organizations/add-office", addOfficePayload);
+
+
+        const res = await userRequest.post("/organizations/add-office", addOfficePayload);
+
+        console.log(res.data);
 
         toast.success("Office Created Successfully")
 
@@ -95,10 +107,11 @@ const CreateOfficeForm = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between border-gray-200">
                     <h1 className="text-xl font-semibold ">Create Office</h1>
-                   
+
                 </div>
                 {/* Form */}
                 <div className="pt-8">
+
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
@@ -163,6 +176,21 @@ const CreateOfficeForm = () => {
                                         <ErrorMessage name="city" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
 
+                                    {/* {Enter Branch Name} */}
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Branch Name
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="branchName"
+                                            placeholder="Enter Branch Name."
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <ErrorMessage name="branchName" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+
                                     {/* Contact No */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -175,6 +203,20 @@ const CreateOfficeForm = () => {
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                         <ErrorMessage name="contactNo" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+
+                                    {/* {Optional Contact No. } */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Optional Contact No.
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            name="contactNumberOpt"
+                                            placeholder="Enter Contact No."
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <ErrorMessage name="contactNumberOpt" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
 
                                     {/* Email ID */}

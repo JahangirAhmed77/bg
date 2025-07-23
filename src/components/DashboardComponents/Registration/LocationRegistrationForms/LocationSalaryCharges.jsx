@@ -3,12 +3,42 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {} }) => {
+  console.log(initialData)
+  const defaultGuardTypes =
+    [
+    {
+      guardCategory: 'Ex-Servicemen',
+      chargesMonth: '30,000',
+      overtimeHour: '150',
+      allowance: '0',
+      // gazetedHoliday: '0',
+      salaryMonth: '',
+      salaryOvertimeHour: '',
+      salaryAllowance: '',
+      salaryGazetedHoliday: ''
+    },
+    {
+      guardCategory: 'Civilian Guards',
+      chargesMonth: '25,000',
+      overtimeHour: '120',
+      allowance: '0',
+      // gazetedHoliday: '0',
+      salaryMonth: '',
+      salaryOvertimeHour: '',
+      salaryAllowance: '',
+      salaryGazetedHoliday: ''
+    }
+  ];
+   
+
+
   const validationSchema = Yup.object().shape({
     charges: Yup.array().of(
       Yup.object().shape({
-        salaryMonth: Yup.number().required('Salary/Month is required'),
-        salaryOvertimeHour: Yup.number().required('Overtime/Hour is required'),
-        salaryAllowance: Yup.number().required('Allowance is required'),
+        salaryMonth: Yup.string().required('Required'),
+        salaryOvertimeHour: Yup.string().required('Required'),
+        salaryAllowance: Yup.string().required('Required'),
+        
       })
     )
   });
@@ -26,7 +56,7 @@ const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {} })
         </div>
       </div>
       <Formik
-        initialValues={initialData}
+        initialValues={initialData.charges ? initialData : { charges: defaultGuardTypes }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
           onSave(values);
@@ -41,62 +71,81 @@ const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {} })
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Description</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Charges/Month</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Overtime/Hour</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Allowance</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Salary Month</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Overtime Hour</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Allowance</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">guardCategory</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Charges/Month</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Overtime/Hour</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Allowance</th>
+                        {/* <th className="p-2 text-left text-xs font-medium text-gray-700">Gazeted Holiday</th> */}
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Salary/Month</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Overtime/Hour</th>
+                        <th className="p-2 text-left text-xs font-medium text-gray-700">Allowance</th>
+                       
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {values.charges && values.charges.length > 0 && values.charges.map((charge, index) => (
                         <tr key={index}>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center">
-                              <span>{charge.description}</span>
-                              <div className="ml-2 w-4 h-4 rounded-full border-2 border-green-500 bg-green-100 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                              </div>
+                          <td className="p-2">
+                            <div className="flex items-center text-sm">
+                              <span>{charge.guardCategory}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center">
+                          <td className="p-2">
+                            <div className="flex items-center text-sm">
                               <span>{charge.chargesMonth}</span>
-                              <div className="ml-2 w-4 h-4 rounded-full border-2 border-green-500 bg-green-100 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                              </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center">
+                          <td className="p-2">
+                            <div className="flex items-center text-sm">
                               <span>{charge.overtimeHour}</span>
-                              <div className="ml-2 w-4 h-4 rounded-full border-2 border-green-500 bg-green-100 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                              </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center">
+                          <td className="p-2">
+                            <div className="flex items-center text-sm">
                               <span>{charge.allowance}</span>
-                              <div className="ml-2 w-4 h-4 rounded-full border-2 border-green-500 bg-green-100 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                              </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <Field name={`charges.${index}.salaryMonth`} type="number" placeholder="Enter" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <ErrorMessage name={`charges.${index}.salaryMonth`} component="div" className="text-red-500 text-sm mt-1" />
+                          {/* <td className="p-2">
+                            <div className="flex items-center text-sm">
+                              <span>{charge.gazetedHoliday}</span>
+                            </div>
+                          </td> */}
+                          <td className="p-2">
+                            <Field
+                              name={`charges.${index}.salaryMonth`}
+                              type="text"
+                              placeholder="Enter"
+                              className="w-full px-2 py-1 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <ErrorMessage name={`charges.${index}.salaryMonth`} component="div" className="text-red-500 text-xs" />
                           </td>
-                          <td className="px-4 py-3">
-                            <Field name={`charges.${index}.salaryOvertimeHour`} type="number" placeholder="Enter" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <ErrorMessage name={`charges.${index}.salaryOvertimeHour`} component="div" className="text-red-500 text-sm mt-1" />
+                          <td className="p-2">
+                            <Field
+                              name={`charges.${index}.salaryOvertimeHour`}
+                              type="text"
+                              placeholder="Enter"
+                              className="w-full px-2 py-1 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <ErrorMessage name={`charges.${index}.salaryOvertimeHour`} component="div" className="text-red-500 text-xs" />
                           </td>
-                          <td className="px-4 py-3">
-                            <Field name={`charges.${index}.salaryAllowance`} type="number" placeholder="Enter" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <ErrorMessage name={`charges.${index}.salaryAllowance`} component="div" className="text-red-500 text-sm mt-1" />
+                          <td className="p-2">
+                            <Field
+                              name={`charges.${index}.salaryAllowance`}
+                              type="text"
+                              placeholder="Enter"
+                              className="w-full px-2 py-1 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <ErrorMessage name={`charges.${index}.salaryAllowance`} component="div" className="text-red-500 text-xs" />
                           </td>
+                          {/* <td className="p-2">
+                            <Field
+                              name={`charges.${index}.salaryGazetedHoliday`}
+                              type="text"
+                              placeholder="Enter"
+                              className="w-full px-2 py-1 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <ErrorMessage name={`charges.${index}.salaryGazetedHoliday`} component="div" className="text-red-500 text-xs" />
+                          </td> */}
                         </tr>
                       ))}
                     </tbody>
