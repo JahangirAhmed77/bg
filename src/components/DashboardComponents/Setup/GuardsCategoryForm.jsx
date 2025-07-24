@@ -20,16 +20,37 @@ const GuardsCategoryForm = () => {
 
     const [currentDate, setCurrentDate] = useState("");
     const [currentTime, setCurrentTime] = useState("");
+    const [createdGuardCategories, setCreatedGuardCategories] = useState(null);
+    const [isLoading, setisLoading] = useState(false)
 
     useEffect(() => {
         const now = new Date();
 
-        const date = now.toLocaleDateString('en-GB'); 
-        const time = now.toLocaleTimeString('en-US'); 
+        const date = now.toLocaleDateString('en-GB');
+        const time = now.toLocaleTimeString('en-US');
 
         setCurrentDate(date);
         setCurrentTime(time);
     }, []);
+
+    useEffect(() => {
+
+        const getCreatedGuardCategories = async () => {
+            setisLoading(true)
+            const res = await userRequest.get("/guard-category/by-organization");
+            setCreatedGuardCategories(res.data.data);
+            console.log(res.data.data);
+            if (res.data) {
+                setisLoading(false)
+            }
+
+        }
+
+        getCreatedGuardCategories();
+
+
+    }, [])
+
 
     const handleSubmit = async (values, { resetForm, setSubmitting }) => {
         try {
@@ -44,8 +65,6 @@ const GuardsCategoryForm = () => {
 
             // Reset form on successful submission
             resetForm();
-
-
 
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -108,14 +127,30 @@ const GuardsCategoryForm = () => {
                             <ErrorMessage name="guardType" component="div" className="text-red-500 text-xs mt-1" />
                         </div>
 
-                        <div className="bg-green-50 rounded-lg p-6 mt-2">
-                            {initialCategories.map((cat, idx) => (
-                                <div key={cat} className="flex items-center mb-2 last:mb-0">
-                                    <span className="w-7 h-7 flex items-center justify-center bg-purple-200 text-purple-700 rounded-full mr-3 text-sm font-semibold">{idx + 1}</span>
-                                    <span className="text-gray-800 text-sm">{cat}</span>
-                                </div>
-                            ))}
-                        </div>
+                        {isLoading ? (
+                            <div className="bg-green-50 rounded-lg p-6 mt-2 flex justify-center items-center h-24">
+                                <div className="animate-spin rounded-full h-6 w-6 border-2 border-green-500 border-t-transparent"></div>
+                                <span className="ml-2 text-sm text-green-700">Loading categories...</span>
+                            </div>
+                        ) : (
+                            <div
+                                className="bg-green-50 rounded-lg p-6 mt-2 overflow-y-auto"
+                                style={{
+                                    maxHeight: createdGuardCategories?.length > 10 ? "300px" : "auto",
+                                }}
+                            >
+                                {createdGuardCategories?.map((cat, idx) => (
+                                    <div key={cat.id} className="flex items-center mb-2 last:mb-0">
+                                        <span className="w-7 h-7 flex items-center justify-center bg-purple-200 text-purple-700 rounded-full mr-3 text-sm font-semibold">
+                                            {idx + 1}
+                                        </span>
+                                        <span className="text-gray-800 text-sm">{cat.categoryName}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+
 
                         <div className="flex justify-end space-x-4 pt-8">
                             <button
