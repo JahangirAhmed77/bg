@@ -1,91 +1,59 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Form, useField, ErrorMessage, Field } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Calendar } from 'lucide-react';
 import CNICInput from '@/utils/FormHelpers/CNICField';
 import { CalculateAge } from '@/utils/FormHelpers/CalculateAge';
-
-
-
-// const CNICField = ({ ...props }) => {
-//   const [field, meta, helpers] = useField(props);
-
-//   const formatCNIC = (value) => {
-//     // Remove all non-digit characters
-//     const digits = value.replace(/\D/g, '').slice(0, 13); // Max 13 digits
-//     let formatted = digits;
-
-//     if (digits.length > 5) {
-//       formatted = digits.slice(0, 5) + '-' + digits.slice(5);
-//     }
-//     if (digits.length > 12) {
-//       formatted = formatted.slice(0, 13) + '-' + formatted.slice(13);
-//     }
-
-//     return formatted;
-//   };
-
-//   const handleChange = (e) => {
-//     const formatted = formatCNIC(e.target.value);
-//     helpers.setValue(formatted);
-//   };
-
-//   return (
-//     <>
-//       <input
-//         {...field}
-//         {...props}
-//         value={field.value}
-//         onChange={handleChange}
-//         placeholder="Enter CNIC Number (12345-1234567-1)"
-//         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-//       />
-//       <ErrorMessage name={field.name} component="div" className="text-red-500 text-sm mt-1" />
-//     </>
-//   );
-// };
-
+import { userRequest } from '@/lib/RequestMethods';
+import { maxDOB, minDOB } from '@/utils/FormHelpers/AgeLimitCalculator';
 
 const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
+  const [offices, setOffices] = useState(null);
+
   const validationSchema = Yup.object({
-    registrationDate: Yup.date().required('Registration Date is required'),
-    serviceNumber: Yup.number().required('Service Number is required'),
-    fullName: Yup.string().required('Full Name is required'),
-    fatherName: Yup.string().required('Father Name is required'),
+    officeId: Yup.string().required("Branch name is required"), //branch name is required
+    registrationDate: Yup.date(),
+    serviceNumber: Yup.number().required('Service Number is required'), //service number is required
+    fullName: Yup.string().required('Full Name is required'),//required
+    fatherName: Yup.string(),
     cnicNumber: Yup.string()
       .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
-      .required('CNIC Number is required'),
+      .required('CNIC Number is required'), //cnic required
     dateOfBirth: Yup.date()
-      .max(new Date(), 'Date of Birth must be in the past')
-      .required('Date of Birth is required'),
-    cnicIssueDate: Yup.date().required('CNIC Issue Date is required'),
-    cnicExpiryDate: Yup.date().required('CNIC Expiry Date is required'),
+      .required('Date of Birth is required')
+      .max(maxDOB, 'You must be at least 21 years old')
+      .min(minDOB, 'You must be younger than 55 years old'), //date of birth is required
+    cnicIssueDate: Yup.date().required('CNIC Issue Date is required'), //required
+    cnicExpiryDate: Yup.date().required('CNIC Expiry Date is required'), //required
     contactNumber: Yup.string()
       .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid phone number')
-      .required('Contact Number is required'),
-    currentAddress: Yup.string().required('Current Address is required'),
-    currentAreaPoliceStation: Yup.string().required('Current Area Police Station is required'),
-    currentAreaPoliceContact: Yup.string().required('Current Area Police Contact is required'),
-    permanentAddress: Yup.string().required('Permanent Address is required'),
-    permanentAreaPoliceStation: Yup.string().required('Permanent Area Police Station is required'),
-    permanentAreaPoliceContact: Yup.string().required('Permanent Area Police Contact is required'),
-    religion: Yup.string().required('Religion is required'),
-    religionSect: Yup.string().required('Religion Sect is required'),
-    weight: Yup.number().positive('Weight must be positive').required('Weight is required'),
-    height: Yup.number().positive('Height must be positive').required('Height is required'),
-    bloodGroup: Yup.string().required('Blood Group is required'),
-    bloodPressure: Yup.string().required('Blood Pressure is required'),
-    heartBeat: Yup.string().required('Heart Beat is required'),
-    eyeColor: Yup.string().required('Eye Color is required'),
-    disability: Yup.string().required('Disability status is required'),
-    eobiNumber: Yup.string().required('EOBI Number is required'),
-    sessiNumber: Yup.string().required('SESSI Number is required')
+      .required('Contact Number is required'), //contact is required
+    currentAddress: Yup.string(),
+    currentAreaPoliceStation: Yup.string(),
+    currentAreaPoliceContact: Yup.string(),
+    permanentAddress: Yup.string(),
+    permanentAreaPoliceStation: Yup.string(),
+    permanentAreaPoliceContact: Yup.string(),
+    religion: Yup.string(),
+    religionSect: Yup.string(),
+    weight: Yup.number().positive('Weight must be positive'),
+    height: Yup.number()
+      .required('Height is required')
+      .min(5.6, 'Height must be greater than 5.6 ft'), //height required shold be above 5.6ft or above
+    bloodGroup: Yup.string(),
+    bloodPressure: Yup.string(),
+    heartBeat: Yup.string(),
+    eyeColor: Yup.string(),
+    disability: Yup.string(),
+    eobiNumber: Yup.string(),
+    sessiNumber: Yup.string()
   });
 
   const initialValues = {
+    officeId: initialData.officeId || "",
     registrationDate: initialData.registrationDate || new Date().toISOString().split('T')[0],
-    serviceNumber: initialData.serviceNumber || 12345,
+    serviceNumber: initialData.serviceNumber || null,
     fullName: initialData.fullName || '',
     fatherName: initialData.fatherName || '',
     cnicNumber: initialData.cnicNumber || '',
@@ -120,6 +88,20 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
     }
   };
 
+  useEffect(() => {
+
+    const getAllOffices = async () => {
+      //This all offices contain the branch
+      const res = await userRequest.get("/organizations/get-offices");
+      console.log("Offices", res.data.data);
+      setOffices(res.data.data);
+    }
+
+
+    getAllOffices();
+
+  }, []);
+
   return (
     <div className="flex-1 bg-white p-8">
       {/* Header */}
@@ -153,6 +135,27 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                 />
                 <ErrorMessage name="registrationDate" component="div" className="text-red-500 text-sm mt-1" />
               </div>
+              {/* Branch Name  */}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Branch
+                </label>
+                <Field
+                  as="select"
+                  name="officeId"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select</option>
+                  {offices?.map((office) => (
+                    <option key={office.id} value={office.id}>
+                      {`${office.branchName} (ID: ${office.branchCode})`}
+                    </option>
+                  ))}
+
+                </Field>
+                <ErrorMessage name="officeId" component="div" className="text-red-500 text-sm mt-1" />
+              </div>
 
               {/* Service Number */}
               <div>
@@ -162,6 +165,7 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                 <Field
                   type="number"
                   name="serviceNumber"
+                  placeholder="Enter your service number"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <ErrorMessage name="serviceNumber" component="div" className="text-red-500 text-sm mt-1" />
@@ -421,7 +425,7 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
               {/* Height */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Height (cm)
+                  Height (ft)
                 </label>
                 <Field
                   type="number"

@@ -6,34 +6,19 @@ import { ChevronDown, Plus, Minus } from 'lucide-react';
 
 const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        isExServiceMen: Yup.string().required('Ex-Service Men is required'),
-        rankName: Yup.string().required('Rank Name is required'),
-        armyNumber: Yup.string().when('isExServiceMen', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Army Number is required'),
-            otherwise: (schema) => schema.notRequired()
-        }),
-        unit: Yup.string().when('isExServiceMen', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Unit is required'),
-            otherwise: (schema) => schema.notRequired()
-        }),
-        exServiceDischargeNumber: Yup.string().when('isExServiceMen', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Ex-Service Discharge Number is required'),
-            otherwise: (schema) => schema.notRequired()
-        }),
-        branch: Yup.string().when('isExServiceMen', {
-            is: (value) => value === 'Yes',
-            then: (schema) => schema.required('Branch is required'),
-            otherwise: (schema) => schema.notRequired()
-        }),
+        isExServiceMen: Yup.string(),
+        rankName: Yup.string(),
+        armyNumber: Yup.string(),
+        unit: Yup.string(),
+        exServiceDischargeNumber: Yup.string(),
+        branch: Yup.string(),
         serviceYears: Yup.number().min(0, 'Years must be 0 or greater'),
         serviceMonths: Yup.number().min(0, 'Months must be 0 or greater').max(11, 'Months must be less than 12'),
-        securityYears: Yup.number().min(0, 'Years must be 0 or greater').required('Security Years is required'),
+        securityYears: Yup.number().min(0, 'Years must be 0 or greater'),
         place: Yup.string(),
         recentCivilEmployment: Yup.string()
     });
+
 
     const initialValues = {
         isExServiceMen: initialData.guardExperience?.[0]?.isExServiceMen ? 'Yes' : 'No',

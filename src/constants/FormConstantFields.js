@@ -60,3 +60,19 @@ export const eyeColors = [
     'Violet',
     'Heterochromia' // condition where eyes are two different colors
 ];
+
+export const relationships = [
+        'Father',
+        'Mother',
+        'Brother',
+        'Sister',
+        'Uncle',
+        'Aunt',
+        'Cousin',
+        'Friend',
+        'Colleague',
+        'Neighbor',
+        'Teacher',
+        'Employer',
+        'Other'
+    ];

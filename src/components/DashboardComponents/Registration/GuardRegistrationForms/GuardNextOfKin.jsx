@@ -7,15 +7,12 @@ import CNICInput from '@/utils/FormHelpers/CNICField';
 
 const GuardNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   const validationSchema = Yup.object({
-    kinName: Yup.string().required('Full Name is required'),
-    kinFatherName: Yup.string().required('Father Name is required'),
-    kinRelation: Yup.string().required('Relation is required'),
-    kinCNIC: Yup.string()
-      .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
-      .required('CNIC No. is required'),
+    kinName: Yup.string(),
+    kinFatherName: Yup.string(),
+    kinRelation: Yup.string(),
+    kinCNIC: Yup.string(),
     kinContactNumber: Yup.string()
-      .matches(/^(\+92|0)?[0-9]{10}$/, 'Contact Number format should be valid')
-      .required('Contact Number is required')
+    
   });
 
   const initialValues = {

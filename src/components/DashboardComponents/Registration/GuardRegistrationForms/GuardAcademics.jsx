@@ -6,30 +6,35 @@ import { ChevronDown } from 'lucide-react';
 
 const GuardAcademics = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        lastEducation: Yup.string().required('Last Education is required'),
-        institute: Yup.string().required('Institute is required'),
-        hasDrivingLicense: Yup.string().required('Driving License is required'),
+        lastEducation: Yup.string().notRequired(),
+        institute: Yup.string().notRequired(),
+        hasDrivingLicense: Yup.string().notRequired(),
+
         drivingLicenseNo: Yup.string().when('hasDrivingLicense', {
             is: (value) => value === 'Yes',
             then: (schema) => schema.required('Driving License No. is required'),
-            otherwise: (schema) => schema.notRequired()
+            otherwise: (schema) => schema.notRequired(),
         }),
+
         drivingLicenseIssueDate: Yup.date().when('hasDrivingLicense', {
             is: (value) => value === 'Yes',
             then: (schema) => schema.required('Date of Issue is required'),
-            otherwise: (schema) => schema.notRequired()
+            otherwise: (schema) => schema.notRequired(),
         }),
+
         drivingLicenseExpiryDate: Yup.date().when('hasDrivingLicense', {
             is: (value) => value === 'Yes',
             then: (schema) => schema.required('Expiry Date is required'),
-            otherwise: (schema) => schema.notRequired()
+            otherwise: (schema) => schema.notRequired(),
         }),
+
         licenseIssueCity: Yup.string().when('hasDrivingLicense', {
             is: (value) => value === 'Yes',
             then: (schema) => schema.required('License Issue City is required'),
-            otherwise: (schema) => schema.notRequired()
-        })
+            otherwise: (schema) => schema.notRequired(),
+        }),
     });
+
 
     const initialValues = {
         lastEducation: initialData.academic?.lastEducation || '',

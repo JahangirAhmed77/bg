@@ -229,7 +229,7 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                             value={fileDisplayName}
                             placeholder={field.label + (isRequired ? ' (Required)' : ' (Optional)')}
                             readOnly
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-[#212121]"
                         />
                     </div>
                     <div className="flex items-center space-x-2">
@@ -294,7 +294,8 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                 {({ values, setFieldValue, isSubmitting, errors, touched }) => (
                     <Form className="space-y-6">
                         {/* Document Upload Grid */}
-                        <div className="grid text-[13px] grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid text-[13px] grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+
                             {documentFields.map((field) => (
                                 <DocumentUploadField
                                     key={field.name}
@@ -304,27 +305,6 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                                     touched={touched[field.name]}
                                 />
                             ))}
-                        </div>
-
-                        {/* Information Box */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                            <div className="flex">
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-blue-800">
-                                        Document Upload Guidelines
-                                    </h3>
-                                    <div className="mt-2 text-sm text-blue-700">
-                                        <ul className="list-disc pl-5 space-y-1">
-                                            <li>Upload clear, high-quality images or PDF files</li>
-                                            <li>Picture should be passport size with clear face visibility</li>
-                                            <li>CNIC documents must be readable and valid</li>
-                                            <li>License documents are optional but recommended if available</li>
-                                            <li>Maximum file size: 10MB per document</li>
-                                            <li>Supported formats: JPG, PNG, PDF</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Original CNIC Submitted Radio Buttons */}
@@ -356,6 +336,29 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                         {errors.originalCNICSubmitted && touched.originalCNICSubmitted && (
                             <div className="text-red-500 text-xs mt-1">{errors.originalCNICSubmitted}</div>
                         )}
+
+                        {/* Information Box */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                            <div className="flex">
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-blue-800">
+                                        Document Upload Guidelines
+                                    </h3>
+                                    <div className="mt-2 text-sm text-blue-700">
+                                        <ul className="list-disc pl-5 space-y-1">
+                                            <li>Upload clear, high-quality images or PDF files</li>
+                                            <li>Picture should be passport size with clear face visibility</li>
+                                            <li>CNIC documents must be readable and valid</li>
+                                            <li>License documents are optional but recommended if available</li>
+                                            <li>Maximum file size: 10MB per document</li>
+                                            <li>Supported formats: JPG, PNG, PDF</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                       
 
                         {/* Buttons */}
                         <div className="flex justify-center space-x-4 pt-8">

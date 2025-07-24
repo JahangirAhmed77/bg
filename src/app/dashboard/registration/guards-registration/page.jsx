@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import GuardsSidebar from '@/components/DashboardComponents/Registration/GuardRegistrationForms/GuardsSidebar';
 import GuardPersonalInformation from '@/components/DashboardComponents/Registration/GuardRegistrationForms/GuardPersonalInformation';
 import GuardNextOfKin from '@/components/DashboardComponents/Registration/GuardRegistrationForms/GuardNextOfKin';
@@ -18,7 +18,7 @@ const GuardsRegistrationPage = () => {
     const [formData, setFormData] = useState({});
 
 
-    
+
 
     const steps = [
         { id: 'personal-info', component: GuardPersonalInformation, label: 'Personal Information' },
@@ -44,6 +44,8 @@ const GuardsRegistrationPage = () => {
             ...prev,
             [currentStep]: data
         }));
+
+        console.log(formData)
 
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
@@ -72,11 +74,37 @@ const GuardsRegistrationPage = () => {
         console.log('Auto-saved:', currentStep, data);
     };
 
+    // Utility to recursively clean payload
+    function cleanPayload(obj) {
+        if (Array.isArray(obj)) {
+            return obj
+                .map(cleanPayload)
+                .filter(item => !(item == null || (typeof item === 'object' && Object.keys(item).length === 0)));
+        } else if (typeof obj === 'object' && obj !== null) {
+            const cleaned = {};
+            Object.entries(obj).forEach(([key, value]) => {
+                if (
+                    value !== null &&
+                    value !== undefined &&
+                    value !== '' &&
+                    !(Array.isArray(value) && value.length === 0) &&
+                    !(typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+                ) {
+                    cleaned[key] = cleanPayload(value);
+                }
+            });
+            return cleaned;
+        }
+        return obj;
+    }
+
     const handleComplete = async () => {
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
             setCompletedSteps(prev => [...prev, currentStep]);
         }
+
+
 
         // Structure data according to API format
         const personalInfo = formData['personal-info'] || {};
@@ -104,6 +132,7 @@ const GuardsRegistrationPage = () => {
 
         const apiPayload = {
             // Personal Information fields
+            officeId: personalInfo.officeId || null,
             registrationDate: formatDateToISO(personalInfo.registrationDate),
             serviceNumber: personalInfo.serviceNumber ? parseInt(personalInfo.serviceNumber) : null,
             dateOfBirth: formatDateToISO(personalInfo.dateOfBirth),
@@ -186,6 +215,8 @@ const GuardsRegistrationPage = () => {
                     fullName: ref.fullName || null,
                     fatherName: ref.fatherName || null,
                     cnicNumber: ref.cnicNumber || null,
+                    cnicFront: ref.cnicFront || null,
+                    cnicBack: ref.cnicFront || null,
                     contactNumber: ref.contactNumber || null,
                     relationship: ref.relationship || null,
                     currentAddress: ref.currentAddress || null,
@@ -195,6 +226,8 @@ const GuardsRegistrationPage = () => {
                     fullName: null,
                     fatherName: null,
                     cnicNumber: null,
+                    cnicFront: null,
+                    cnicBack: null,
                     contactNumber: null,
                     relationship: null,
                     currentAddress: null,
@@ -251,13 +284,10 @@ const GuardsRegistrationPage = () => {
             }
         };
 
-
-
+        const cleanedPayload = cleanPayload(apiPayload);
+        console.log("final Payload", cleanedPayload)
         try {
-
-
-
-            const res = await userRequest.post('/guards', apiPayload);
+            const res = await userRequest.post('/guards', cleanedPayload);
 
             if (res) {
                 console.log('Registration successful:', res.data);
@@ -269,7 +299,11 @@ const GuardsRegistrationPage = () => {
             }
         } catch (error) {
             console.error('Registration failed:', error);
-            toast.error("Failed", error.response.data)
+
+            const errorMessage = "Registration failed";
+            const errorCause = error?.response?.data?.cause;
+
+            toast.error(`${errorMessage}${errorCause ? `: ${errorCause}` : ""}`);
         }
     };
 

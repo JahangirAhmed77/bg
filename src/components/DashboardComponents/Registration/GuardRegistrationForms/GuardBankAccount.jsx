@@ -6,20 +6,19 @@ import { ChevronDown } from 'lucide-react';
 
 const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        bankName: Yup.string().required('Bank Name is required'),
-        bankCode: Yup.string().required('Bank Code is required'),
+        bankName: Yup.string(),
+        bankCode: Yup.string(),
         accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
-            .min(8, 'Account number must be at least 8 digits')
-            .required('Account Number is required'),
+            .min(8, 'Account number must be at least 8 digits'),
         IBAN: Yup.string()
             .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
             .min(15, 'IBAN must be at least 15 characters')
-            .max(34, 'IBAN must not exceed 34 characters')
-            .required('IBAN is required'),
-        branchCode: Yup.string().required('Branch Code is required'),
-        branch: Yup.string().required('Branch is required')
+            .max(34, 'IBAN must not exceed 34 characters'),
+        branchCode: Yup.string(),
+        branch: Yup.string()
     });
+
 
     const initialValues = {
         bankName: initialData.bankAccount?.bankName || '',

@@ -1,0 +1,117 @@
+{
+  "officeId": "0c1613ec-9815-480f-b7b8-d9fa7af4d6e2",
+  "registrationDate": "2025-07-24T00:00:00.000Z",
+  "serviceNumber": 12345,
+  "dateOfBirth": "1989-06-02T00:00:00.000Z",
+  "fullName": "wdwdw",
+  "fatherName": null,
+  "cnicNumber": "23232-3232323-2",
+
+  "cnicIssueDate": "2025-07-09T00:00:00.000Z",
+  "cnicExpiryDate": "2025-08-06T00:00:00.000Z",
+  "contactNumber": "2233232323",
+  "currentAddress": null,
+  "permanentAddress": null,
+  "currentAreaPoliceStation": null,
+  "currentAreaPoliceContact": null,
+  "permanentAreaPoliceStation": null,
+  "permanentAreaPoliceContact": null,
+  "religion": null,
+  "religionSect": null,
+  "weight": null,
+  "height": 6,
+  "bloodGroup": null,
+  "bloodPressure": "120/80",
+  "heartBeat": null,
+  "eyeColor": null,
+  "disability": null,
+  "eobiNumber": null,
+  "sessiNumber": null,
+  "kinName": null,
+  "kinFatherName": null,
+  "kinRelation": null,
+  "kinCNIC": null,
+  "kinContactNumber": null,
+  "academic": {
+    "lastEducation": null,
+    "institute": null,
+    "hasDrivingLicense": false
+  },
+  "drivingLicense": {
+    "drivingLicenseNo": null,
+    "drivingLicenseIssueDate": null,
+    "drivingLicenseExpiryDate": null,
+    "licenseIssueCity": null
+  },
+  "guardExperience": [
+    {
+      "isExServiceMen": false,
+      "rankName": null,
+      "armyNumber": null,
+      "unit": null,
+      "exServiceDischargeNumber": null,
+      "branch": null,
+      "serviceYears": null,
+      "serviceMonths": null,
+      "securityYears": null,
+      "place": null,
+      "recentCivilEmployment": null
+    }
+  ],
+  "references": [
+    {
+      "fullName": "wdwdwd",
+      "fatherName": "wdwdwd",
+      "cnicNumber": "23232-3232323-2",
+      "cnicFront": "uploads/1753361452317-nft.png",
+      "cnicBack": "uploads/1753361452317-nft.png",
+      "contactNumber": "232323232332",
+      "relationship": "Other",
+      "currentAddress": "wdwd",
+      "permanentAddress": "wwdwd"
+    }
+  ],
+  "bankAccount": {
+    "bankName": null,
+    "bankCode": null,
+    "accountNumber": null,
+    "IBAN": null,
+    "branchCode": null,
+    "branch": null
+  },
+  "guardDocuments": {
+    "picture": "uploads/1753361465510-nft.png",
+    "cnicFront": "uploads/1753361469472-bizl.png",
+    "cnicBack": "uploads/1753361472545-windmillphoto.jpg",
+    "licenseFront": "",
+    "licenseBack": "",
+    "policeVerification": "",
+    "specialBranchVerification": "",
+    "dischargeBook": "",
+    "NadraVeriSys": "",
+    "NadraVeriSysRef1": "",
+    "NadraVeriSysRef2": "",
+    "healthCertificate": "",
+    "medicalDocument": "",
+    "DDCDriving": "",
+    "educationCertificate": "",
+    "APSAATrainingCertificate": "",
+    "misc1": "",
+    "misc2": "",
+    "originalCNICSubmitted": true
+  },
+  "biometric": {
+    "rightThumb": "uploads/1753361482498-nft.png",
+    "rightMiddleFinger": "",
+    "rightLittleFinger": "",
+    "leftThumb": "",
+    "leftMiddleFinger": "",
+    "leftLittleFinger": "",
+    "rightForeFinger": "",
+    "rightRingFinger": "",
+    "rightFourFinger": "",
+    "leftFourFinger": "",
+    "leftRingFinger": "",
+    "leftForeFinger": ""
+  }
+}

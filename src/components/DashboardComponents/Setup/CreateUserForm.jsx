@@ -52,7 +52,7 @@ const CreateUserForm = () => {
         const getAllRoles = async () => {
             const res = await userRequest.get("/roles/for-organization");
             setRoles(res.data.data);
-            console.log(res.data.data)
+       
         }
 
         const getAllEmployees = async () => {
@@ -140,7 +140,7 @@ const CreateUserForm = () => {
             const response = await userRequest.post('/users/create', createUserPayload);
 
 
-            console.log(response.data)
+      
             if (response.data) {
                 toast.success('User created successfully!');
                 resetForm();

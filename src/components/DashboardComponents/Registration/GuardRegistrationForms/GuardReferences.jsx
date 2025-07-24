@@ -3,20 +3,30 @@ import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { userRequest } from '@/lib/RequestMethods';
+import axios from 'axios';
 import CNICInput from '@/utils/FormHelpers/CNICField';
+import { relationships } from '@/constants/FormConstantFields';
 
 const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
     // Initialize with one reference from initialData or empty
     const [references, setReferences] = useState(() => {
         if (initialData.references && initialData.references.length > 0) {
-            return initialData.references;
+            return initialData.references.map(ref => ({
+                ...ref,
+                id: ref.id || Date.now(),
+                cnicFront: ref.cnicFront || null,
+                cnicBack: ref.cnicBack || null
+            }));
         }
         return [
             {
-                id: 1,
+                id: Date.now(),
                 fullName: '',
-                fatherName: '',
                 cnicNumber: '',
+                cnicFront: null,
+                cnicBack: null,
+                fatherName: '',
                 contactNumber: '',
                 relationship: '',
                 currentAddress: '',
@@ -25,21 +35,6 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
         ];
     });
 
-    const relationships = [
-        'Father',
-        'Mother',
-        'Brother',
-        'Sister',
-        'Uncle',
-        'Aunt',
-        'Cousin',
-        'Friend',
-        'Colleague',
-        'Neighbor',
-        'Teacher',
-        'Employer',
-        'Other'
-    ];
 
     // Create validation schema dynamically based on number of references
     const createValidationSchema = () => {
@@ -56,6 +51,8 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
             schema[`reference_${index}_relationship`] = Yup.string().required('Relationship is required');
             schema[`reference_${index}_currentAddress`] = Yup.string().required('Current Address is required');
             schema[`reference_${index}_permanentAddress`] = Yup.string().required('Permanent Address is required');
+            schema[`reference_${index}_cnicFront`] = Yup.string().required('CNIC Front image is required');
+            schema[`reference_${index}_cnicBack`] = Yup.string().required('CNIC Back image is required');
         });
         return Yup.object(schema);
     };
@@ -71,27 +68,120 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
             values[`reference_${index}_relationship`] = reference.relationship || '';
             values[`reference_${index}_currentAddress`] = reference.currentAddress || '';
             values[`reference_${index}_permanentAddress`] = reference.permanentAddress || '';
+            values[`reference_${index}_cnicFront`] = reference.cnicFront || '';
+            values[`reference_${index}_cnicBack`] = reference.cnicBack || '';
         });
         return values;
     };
 
-    const addReference = () => {
+    const addReference = (values) => {
         const newReference = {
-            id: Date.now(), // Simple ID generation
+            id: Date.now(),
             fullName: '',
             fatherName: '',
             cnicNumber: '',
             contactNumber: '',
             relationship: '',
             currentAddress: '',
-            permanentAddress: ''
+            permanentAddress: '',
+            cnicFront: null,
+            cnicBack: null
         };
-        setReferences(prev => [...prev, newReference]);
+
+        // Preserve existing references' values while adding new one
+        setReferences(prev => {
+            const updatedReferences = prev.map((ref, idx) => ({
+                ...ref,
+                fullName: values[`reference_${idx}_fullName`] || ref.fullName,
+                fatherName: values[`reference_${idx}_fatherName`] || ref.fatherName,
+                cnicNumber: values[`reference_${idx}_cnicNumber`] || ref.cnicNumber,
+                contactNumber: values[`reference_${idx}_contactNumber`] || ref.contactNumber,
+                relationship: values[`reference_${idx}_relationship`] || ref.relationship,
+                currentAddress: values[`reference_${idx}_currentAddress`] || ref.currentAddress,
+                permanentAddress: values[`reference_${idx}_permanentAddress`] || ref.permanentAddress,
+                cnicFront: values[`reference_${idx}_cnicFront`] || ref.cnicFront,
+                cnicBack: values[`reference_${idx}_cnicBack`] || ref.cnicBack
+            }));
+            return [...updatedReferences, newReference];
+        });
     };
 
     const removeReference = (indexToRemove) => {
         if (references.length > 1) {
             setReferences(prev => prev.filter((_, index) => index !== indexToRemove));
+        }
+    };
+
+    const handleFileUpload = async (fieldName, event, setFieldValue, values) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please upload only JPG, PNG, or PDF files');
+                return;
+            }
+
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert('File size must be less than 10MB');
+                return;
+            }
+
+            try {
+                // Get upload URL from API
+                const getUploadKeyPayload = {
+                    fileName: file.name,
+                    fileType: file.type
+                };
+                console.log('Document upload payload:', getUploadKeyPayload);
+
+                const res = await userRequest.post("/file/url", getUploadKeyPayload);
+                const { key, uploadUrl } = res.data.data;
+                console.log("Key:", key);
+                console.log("Upload URL:", uploadUrl);
+
+                // Upload file to S3
+                const uploadFileResponse = await axios.put(uploadUrl, file, {
+                    headers: {
+                        "Content-Type": file.type,
+                    },
+                });
+
+                if (uploadFileResponse.status === 200) {
+                    console.log(file.name, "Uploaded successfully");
+
+                    // Update Formik value
+                    setFieldValue(fieldName, key);
+
+                    // Extract reference index and type from fieldName
+                    const [, referenceIndex, documentType] = fieldName.match(/reference_(\d+)_(cnicFront|cnicBack)/);
+
+                    // Update references state while preserving form values
+                    setReferences(prevReferences => {
+                        const updatedReferences = prevReferences.map((ref, idx) => {
+                            if (idx === parseInt(referenceIndex)) {
+                                return {
+                                    ...ref,
+                                    [documentType]: key,
+                                    fullName: values[`reference_${idx}_fullName`] || ref.fullName,
+                                    fatherName: values[`reference_${idx}_fatherName`] || ref.fatherName,
+                                    cnicNumber: values[`reference_${idx}_cnicNumber`] || ref.cnicNumber,
+                                    contactNumber: values[`reference_${idx}_contactNumber`] || ref.contactNumber,
+                                    relationship: values[`reference_${idx}_relationship`] || ref.relationship,
+                                    currentAddress: values[`reference_${idx}_currentAddress`] || ref.currentAddress,
+                                    permanentAddress: values[`reference_${idx}_permanentAddress`] || ref.permanentAddress
+                                };
+                            }
+                            return ref;
+                        });
+                        return updatedReferences;
+                    });
+                }
+            } catch (error) {
+                console.error('File upload failed:', error);
+                alert('File upload failed. Please try again.');
+            }
         }
     };
 
@@ -101,6 +191,8 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
             fullName: values[`reference_${index}_fullName`],
             fatherName: values[`reference_${index}_fatherName`],
             cnicNumber: values[`reference_${index}_cnicNumber`],
+            cnicFront: values[`reference_${index}_cnicFront`] || '',
+            cnicBack: values[`reference_${index}_cnicBack`] || '',
             contactNumber: values[`reference_${index}_contactNumber`],
             relationship: values[`reference_${index}_relationship`],
             currentAddress: values[`reference_${index}_currentAddress`],
@@ -117,7 +209,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
         }
     };
 
-    const ReferenceSection = ({ referenceIndex, reference, isRemovable }) => {
+    const ReferenceSection = ({ referenceIndex, reference, isRemovable, setFieldValue, values }) => {
         return (
             <div className="bg-gray-50 rounded-lg p-6 space-y-4 relative">
                 <div className="flex items-center justify-between mb-4">
@@ -140,7 +232,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     {/* Full Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name
+                            Full Name <span className="text-red-500">*</span>
                         </label>
                         <Field
                             type="text"
@@ -154,7 +246,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     {/* Father's Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Father's Name
+                            Father's Name <span className="text-red-500">*</span>
                         </label>
                         <Field
                             type="text"
@@ -168,16 +260,17 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     {/* CNIC Number */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            CNIC Number
+                            CNIC Number <span className="text-red-500">*</span>
                         </label>
                         <CNICInput name={`reference_${referenceIndex}_cnicNumber`} label="CNIC Number" />
+
 
                     </div>
 
                     {/* Contact Number */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Contact Number
+                            Contact Number <span className="text-red-500">*</span>
                         </label>
                         <Field
                             type="text"
@@ -191,7 +284,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     {/* Relationship */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Relationship
+                            Relationship <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <Field
@@ -214,7 +307,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     {/* Current Address */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Current Address
+                            Current Address <span className="text-red-500">*</span>
                         </label>
                         <Field
                             type="text"
@@ -229,7 +322,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                 {/* Permanent Address - Full Width */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Permanent Address
+                        Permanent Address <span className="text-red-500">*</span>
                     </label>
                     <Field
                         type="text"
@@ -239,6 +332,64 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     />
                     <ErrorMessage name={`reference_${referenceIndex}_permanentAddress`} component="div" className="text-red-500 text-sm mt-1" />
                 </div>
+
+
+                <aside className='flex flex-col items-center justify-center'>
+
+                    <div className="flex items-center gap-4">
+
+                        <div className="mt-2 flex flex-col relative">
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                onChange={(e) => handleFileUpload(`reference_${referenceIndex}_cnicFront`, e, setFieldValue, values)}
+                                className="hidden"
+                                id={`upload-cnic-front-${referenceIndex}`}
+                            />
+                            <span className="absolute top-[-19px] right-[3px] text-red-500 text-lg">*</span>
+                            <label
+                                htmlFor={`upload-cnic-front-${referenceIndex}`}
+                                className="inline-flex items-center px-6 py-3 bg-[#5570F1]
+                                hover:bg-blue-600 text-white rounded-xl cursor-pointer"
+                            >
+                                {reference.cnicFront ? "✓ CNIC Front Uploaded" : "Upload CNIC Front"} 
+                            </label>
+                            <ErrorMessage
+                                name={`reference_${referenceIndex}_cnicFront`}
+                                component="div"
+                                className="text-red-500 text-sm mt-1 text-center"
+                            />
+                        </div>
+
+                        {/* CNIC Back Upload */}
+                        <div className="mt-2 flex flex-col relative">
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                onChange={(e) => handleFileUpload(`reference_${referenceIndex}_cnicBack`, e, setFieldValue, values)}
+                                className="hidden"
+                                id={`upload-cnic-back-${referenceIndex}`}
+                            />
+                            <span className="absolute top-[-19px] right-[3px] text-red-500 text-lg">*</span>
+                            <label
+                                htmlFor={`upload-cnic-back-${referenceIndex}`}
+                                className="inline-flex items-center px-6 py-3 bg-[#5570F1] hover:bg-blue-600
+                                 text-white rounded-xl cursor-pointer"
+                            >
+                                {reference.cnicBack ? "✓ CNIC Back Uploaded" : "Upload CNIC Back"} 
+                            </label>
+                            <ErrorMessage
+                                name={`reference_${referenceIndex}_cnicBack`}
+                                component="div"
+                                className="text-red-500 text-sm mt-1 text-center"
+                            />
+                        </div>
+                    </div>
+                </aside>
+                {/* CNIC Front Upload */}
+
+
+
             </div>
         );
     };
@@ -257,11 +408,10 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
             </div>
 
             <Formik
-                key={references.length} // Force re-render when references change
                 initialValues={createInitialValues()}
                 validationSchema={createValidationSchema()}
                 onSubmit={handleSubmit}
-                enableReinitialize={true}
+                enableReinitialize={false}
             >
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-8">
@@ -272,6 +422,8 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                                 referenceIndex={index}
                                 reference={reference}
                                 isRemovable={references.length > 1}
+                                setFieldValue={setFieldValue}
+                                values={values}
                             />
                         ))}
 
@@ -279,7 +431,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                         <div className="flex justify-center">
                             <button
                                 type="button"
-                                onClick={addReference}
+                                onClick={() => addReference(values)}
                                 className="flex items-center px-6 py-3 border-2 border-dashed border-blue-300 text-blue-600 rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
