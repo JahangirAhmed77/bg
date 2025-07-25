@@ -1,34 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-// import Autosuggest from 'react-autosuggest';
-import { countries } from '@/constants/countries';
-import { pakistanCities } from '@/constants/PakistanCities';
-import { locationTypes } from '@/constants/locationTypes';
-import { pakistanProvinces } from '@/constants/pakistanProvinces';
+import { userRequest } from '@/lib/RequestMethods';
 
 const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) => {
-  const [countrySuggestions, setCountrySuggestions] = useState([]);
-  const [citySuggestions, setCitySuggestions] = useState([]);
-  const [provinceSuggestions, setProvinceSuggestions] = useState([]);
-  // Professionalized getSuggestions for province (string)
-  const getProvinceSuggestions = (value) => {
-    const inputValue = value?.trim().toLowerCase() || '';
-    if (!inputValue) return [];
-    return pakistanProvinces
-      .filter(province => province.toLowerCase().includes(inputValue))
-      .slice(0, 5);
-  };
+  const [myClients, setMyClients] = useState(null);
+  const [myOffices, setMyOffices] = useState(null);
+  const [locationTypes, setMyLocationTypes] = useState(null);
 
   const validationSchema = Yup.object({
-    client: Yup.string().required('Client is required'),
-    time: Yup.string().required('Time is required'),
+    clientId: Yup.string().required('Client is required'),
+    officeId: Yup.string().required('Office ID is required'),
     locationName: Yup.string().required('Location Name is required'),
+    createdLocationId: Yup.string().required('Created Location ID is required'),
     address: Yup.string().required('Address is required'),
     city: Yup.string().required('City is required'),
-    province: Yup.string().required('Province is required'),
+    provinceState: Yup.string().required('Province/State is required'),
     country: Yup.string().required('Country is required'),
-    locationType: Yup.string().required('Location Type is required'),
+    GPScoordinate: Yup.string().required('GPS Coordinate is required'),
+    locationTypeId: Yup.string().required('Location Type is required'),
     authorizedPersonName: Yup.string().required('Authorized Person Name is required'),
     authorizedPersonNumber: Yup.string().required('Authorized Person Number is required'),
     authorizedPersonDesignation: Yup.string().required('Authorized Person Designation is required'),
@@ -43,15 +33,45 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
     { id: 5, name: "Citywide Protection" }
   ];
 
-  // ...existing code...
-
-  const getCountrySuggestions = (value) => {
-    const inputValue = value?.trim().toLowerCase() || '';
-    if (!inputValue) return [];
-    return countries
-      .filter(country => country.name.toLowerCase().includes(inputValue))
-      .slice(0, 5);
+  // Ensure initial values have all required fields with default empty strings
+  const defaultInitialValues = {
+    clientId: '',
+    officeId: '',
+    locationName: '',
+    createdLocationId: '',
+    address: '',
+    city: '',
+    provinceState: '',
+    country: '',
+    GPScoordinate: '',
+    locationTypeId: '',
+    authorizedPersonName: '',
+    authorizedPersonNumber: '',
+    authorizedPersonDesignation: '',
+    ...initialData
   };
+
+  useEffect(() => {
+
+    const getMyClients = async () => {
+      const res = await userRequest.get("/clients/by-organization")
+      setMyClients(res.data.data);
+    }
+    const getOffices = async () => {
+      const res = await userRequest.get("/organizations/get-offices");
+    
+      setMyOffices(res.data.data)
+    }
+
+    const getLocationTypes = async () => {
+      const res = await userRequest.get("/location-type");
+      setMyLocationTypes(res.data.data);
+      
+    }
+    getMyClients();
+    getOffices();
+    getLocationTypes();
+  }, [])
 
   return (
     <div className="flex-1 bg-white p-8 rounded-xl">
@@ -62,14 +82,14 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
           <div className="text-sm text-gray-500">Step 1 of 4</div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+          <div className="bg-formButtonBlue h-2 rounded-full" style={{ width: '25%' }}></div>
         </div>
       </div>
       <Formik
-        initialValues={initialData}
+        initialValues={defaultInitialValues}
         validationSchema={validationSchema}
         onSubmit={(values) => {
-          console.log('Form Values:', values); // This will show the payload in browser console
+          // console.log('Location Information Form Values:', values); 
           onSave(values);
           onNext(values);
         }}
@@ -77,28 +97,44 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
         {({ setFieldValue, values }) => (
           <Form>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Field name="client">
+              <Field name="clientId">
                 {({ field }) => (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Select Client</label>
-                    <select {...field} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select {...field} className="w-full px-4 py-3 bg-gray-50 cursor-pointer border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <option value="">Select</option>
-                      {sampleClients.map(client => (
-                        <option key={client.id} value={client.id}>
-                          {client.name}
+                      {myClients?.map(client => (
+                        <option key={client.id} value={client.id} >
+                          {`${client.companyName} (ID: ${client.id.slice(0, 8)}...)`}
                         </option>
                       ))}
                     </select>
-                    <ErrorMessage name="client" component="div" className="text-red-500 text-sm mt-1" />
+                    <ErrorMessage name="clientId" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
                 )}
               </Field>
-              <Field name="time">
+              <Field name="officeId">
                 {({ field }) => (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date and Time</label>
-                    <input {...field} type="datetime-local" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <ErrorMessage name="time" component="div" className="text-red-500 text-sm mt-1" />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Office ID</label>
+                    <select {...field} className="w-full px-4 py-3 bg-gray-50 cursor-pointer border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="">Select</option>
+                      {myOffices?.map(office => (
+                        <option key={office.id} value={office.id} >
+                          {`${office.branchName} (ID: ${office.id.slice(0, 8)}...)`}
+                        </option>
+                      ))}
+                    </select>
+                    <ErrorMessage name="officeId" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
+                )}
+              </Field>
+              <Field name="createdLocationId">
+                {({ field }) => (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Created Location ID</label>
+                    <input {...field} placeholder="Enter Created Location ID" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <ErrorMessage name="createdLocationId" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
                 )}
               </Field>
@@ -129,12 +165,12 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
                   </div>
                 )}
               </Field>
-              <Field name="province">
+              <Field name="provinceState">
                 {({ field }) => (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Province/State</label>
                     <input {...field} placeholder="Enter Province/State" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <ErrorMessage name="province" component="div" className="text-red-500 text-sm mt-1" />
+                    <ErrorMessage name="provinceState" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
                 )}
               </Field>
@@ -147,17 +183,26 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
                   </div>
                 )}
               </Field>
-              <Field name="locationType">
+              <Field name="GPScoordinate">
+                {({ field }) => (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">GPS Coordinate</label>
+                    <input {...field} placeholder="Enter GPS Coordinate" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <ErrorMessage name="GPScoordinate" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
+                )}
+              </Field>
+              <Field name="locationTypeId">
                 {({ field }) => (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Location Type</label>
                     <select {...field} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <option value="">Select</option>
-                      {locationTypes.map(type => (
-                        <option key={type.name} value={type.name}>{type.name}</option>
+                      {locationTypes?.map(location => (
+                        <option key={location.id} value={location.id}>{location.type.charAt(0).toUpperCase() + location.type.slice(1)}</option>
                       ))}
                     </select>
-                    <ErrorMessage name="locationType" component="div" className="text-red-500 text-sm mt-1" />
+                    <ErrorMessage name="locationTypeId" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
                 )}
               </Field>
@@ -199,7 +244,7 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
               </button>
               <button
                 type="submit"
-                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-8 py-3 bg-formButtonBlue text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Next
               </button>

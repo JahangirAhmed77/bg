@@ -1,117 +1,48 @@
 {
-  "officeId": "0c1613ec-9815-480f-b7b8-d9fa7af4d6e2",
-  "registrationDate": "2025-07-24T00:00:00.000Z",
-  "serviceNumber": 12345,
-  "dateOfBirth": "1989-06-02T00:00:00.000Z",
-  "fullName": "wdwdw",
-  "fatherName": null,
-  "cnicNumber": "23232-3232323-2",
-
-  "cnicIssueDate": "2025-07-09T00:00:00.000Z",
-  "cnicExpiryDate": "2025-08-06T00:00:00.000Z",
-  "contactNumber": "2233232323",
-  "currentAddress": null,
-  "permanentAddress": null,
-  "currentAreaPoliceStation": null,
-  "currentAreaPoliceContact": null,
-  "permanentAreaPoliceStation": null,
-  "permanentAreaPoliceContact": null,
-  "religion": null,
-  "religionSect": null,
-  "weight": null,
-  "height": 6,
-  "bloodGroup": null,
-  "bloodPressure": "120/80",
-  "heartBeat": null,
-  "eyeColor": null,
-  "disability": null,
-  "eobiNumber": null,
-  "sessiNumber": null,
-  "kinName": null,
-  "kinFatherName": null,
-  "kinRelation": null,
-  "kinCNIC": null,
-  "kinContactNumber": null,
-  "academic": {
-    "lastEducation": null,
-    "institute": null,
-    "hasDrivingLicense": false
-  },
-  "drivingLicense": {
-    "drivingLicenseNo": null,
-    "drivingLicenseIssueDate": null,
-    "drivingLicenseExpiryDate": null,
-    "licenseIssueCity": null
-  },
-  "guardExperience": [
-    {
-      "isExServiceMen": false,
-      "rankName": null,
-      "armyNumber": null,
-      "unit": null,
-      "exServiceDischargeNumber": null,
-      "branch": null,
-      "serviceYears": null,
-      "serviceMonths": null,
-      "securityYears": null,
-      "place": null,
-      "recentCivilEmployment": null
-    }
-  ],
-  "references": [
-    {
-      "fullName": "wdwdwd",
-      "fatherName": "wdwdwd",
-      "cnicNumber": "23232-3232323-2",
-      "cnicFront": "uploads/1753361452317-nft.png",
-      "cnicBack": "uploads/1753361452317-nft.png",
-      "contactNumber": "232323232332",
-      "relationship": "Other",
-      "currentAddress": "wdwd",
-      "permanentAddress": "wwdwd"
-    }
-  ],
-  "bankAccount": {
-    "bankName": null,
-    "bankCode": null,
-    "accountNumber": null,
-    "IBAN": null,
-    "branchCode": null,
-    "branch": null
-  },
-  "guardDocuments": {
-    "picture": "uploads/1753361465510-nft.png",
-    "cnicFront": "uploads/1753361469472-bizl.png",
-    "cnicBack": "uploads/1753361472545-windmillphoto.jpg",
-    "licenseFront": "",
-    "licenseBack": "",
-    "policeVerification": "",
-    "specialBranchVerification": "",
-    "dischargeBook": "",
-    "NadraVeriSys": "",
-    "NadraVeriSysRef1": "",
-    "NadraVeriSysRef2": "",
-    "healthCertificate": "",
-    "medicalDocument": "",
-    "DDCDriving": "",
-    "educationCertificate": "",
-    "APSAATrainingCertificate": "",
-    "misc1": "",
-    "misc2": "",
-    "originalCNICSubmitted": true
-  },
-  "biometric": {
-    "rightThumb": "uploads/1753361482498-nft.png",
-    "rightMiddleFinger": "",
-    "rightLittleFinger": "",
-    "leftThumb": "",
-    "leftMiddleFinger": "",
-    "leftLittleFinger": "",
-    "rightForeFinger": "",
-    "rightRingFinger": "",
-    "rightFourFinger": "",
-    "leftFourFinger": "",
-    "leftRingFinger": "",
-    "leftForeFinger": ""
-  }
+    "clientId": "1a9da746-adb8-4db2-86cb-66176b76f68f",
+    "officeId": "bc4b7f18-b028-48cf-af23-858a20af0cb2",
+    "locationName": "BridgeView",
+    "createdLocationId": "655445",
+    "address": "Parkway",
+    "city": "karachi",
+    "provinceState": "sindh",
+    "country": "pakistan",
+    "GPScoordinate": "343434 343434 ",
+    "locationTypeId": "1fd44926-473d-4063-ad24-fb9e289603f1",
+    "authorizedPersonName": "Imran",
+    "authorizedPersonNumber": "34343",
+    "authorizedPersonDesignation": "CEO",
+    "taxes": [],
+    "requestedGuards": [
+        {
+            "guardCategoryId": "4aa837d4-8f20-47dc-992b-3998808d3b69",
+            "shiftId": "521d3607-c27c-4cdd-bf92-5aafaae39fc7",
+            "quantity": 23,
+            "gazettedHoliday": 45,
+            "chargesPerMonth": 23,
+            "overtimePerHour": 1,
+            "allowance": 545,
+            "finances": {
+                "salaryPerMonth": 34,
+                "gazettedHoliday": 34,
+                "overtimePerHour": 34,
+                "allowance": 34
+            }
+        },
+        {
+            "guardCategoryId": "d6fa0734-6db8-454a-bfce-6c2ab2a01ba4",
+            "shiftId": "521d3607-c27c-4cdd-bf92-5aafaae39fc7",
+            "quantity": 435,
+            "gazettedHoliday": 7,
+            "chargesPerMonth": 7,
+            "overtimePerHour": 7,
+            "allowance": 7,
+            "finances": {
+                "salaryPerMonth": 34,
+                "gazettedHoliday": 34,
+                "overtimePerHour": 34,
+                "allowance": 34
+            }
+        }
+    ]
 }

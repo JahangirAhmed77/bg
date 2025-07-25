@@ -26,7 +26,7 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="w-64 h-screen bg-white border-r border-gray-200 overflow-y-auto">
+        <div className="w-60 h-screen bg-white border-r border-gray-200 overflow-y-auto">
             <div className="p-4">
 
                 {/* Dashboards Section */}
@@ -36,7 +36,7 @@ const Sidebar = () => {
                     </h3>
                     <Link
                         href="/dashboard"
-                        className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        className="flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                     >
                         <img src='/icons/overview.png' className="mr-3 h-4 w-4" />
                         Overview
@@ -52,7 +52,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('setup')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/setup.png' className="mr-3 h-4 w-4" />
@@ -68,19 +68,19 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/setup/create-office"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Create Office
                                 </Link>
                                 <Link
                                     href="/dashboard/setup/create-user"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Create User
                                 </Link>
                                 <Link
                                     href="/dashboard/setup/add-guards-category"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Add Guards Category
                                 </Link>
@@ -92,7 +92,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('registration')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/registration.png' className="mr-3 h-4 w-4" />
@@ -108,25 +108,25 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/registration/guards-registration"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Guards Registration
                                 </Link>
                                 <Link
                                     href="/dashboard/registration/employee-registration"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Employee Registration
                                 </Link>
                                 <Link
                                     href="/dashboard/registration/clients-registration"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Clients Registration
                                 </Link>
                                 <Link
                                     href="/dashboard/registration/location-registration"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Location Registration
                                 </Link>
@@ -138,7 +138,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('deployment')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/deployment.png' className="mr-3 h-4 w-4" />
@@ -154,13 +154,13 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/deployment/assign-guards"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Assign Guards
                                 </Link>
                                 <Link
                                     href="/dashboard/deployment/assign-supervisor"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Assign Supervisor
                                 </Link>
@@ -172,7 +172,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('attendance')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/deployment.png' className="mr-3 h-4 w-4" />
@@ -188,13 +188,13 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/attendance/location-attendance"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Location Attendance
                                 </Link>
                                 <Link
                                     href="/dashboard/attendance/attendance-sheet"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Attendance Sheet
                                 </Link>
@@ -206,7 +206,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('payroll')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/payroll.png' className="mr-3 h-4 w-4" />
@@ -222,7 +222,7 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/payroll/generate-pay-roll"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Generate Pay Roll
                                 </Link>
@@ -234,7 +234,7 @@ const Sidebar = () => {
                     <div className="mb-2">
                         <button
                             onClick={() => toggleSection('accounts')}
-                            className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
@@ -250,13 +250,13 @@ const Sidebar = () => {
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/accounts/petty-cash"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Petty Cash
                                 </Link>
                                 <Link
                                     href="/dashboard/accounts/payment-vouchers"
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Payment Vouchers
                                 </Link>
