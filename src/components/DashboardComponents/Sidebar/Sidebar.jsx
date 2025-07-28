@@ -15,7 +15,13 @@ const Sidebar = () => {
         deployment: false,
         attendance: false,
         payroll: false,
-        accounts: false
+        accounts: false,
+        salesMonitor: false,
+        performanceManager: false,
+        inventoryManagement: false,
+        complaints: false,
+        notifications: false,
+        reports: false
     });
 
     const toggleSection = (section) => {
@@ -26,7 +32,7 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="w-60 h-screen bg-white border-r border-gray-200 overflow-y-auto">
+        <div className="w-[280px] h-screen bg-white border-r border-gray-200 overflow-y-auto">
             <div className="p-4">
 
                 {/* Dashboards Section */}
@@ -260,6 +266,248 @@ const Sidebar = () => {
                                 >
                                     -Payment Vouchers
                                 </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sales Monitor */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('salesMonitor')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Sales Monitor
+                            </div>
+                            {expandedSections.salesMonitor ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.salesMonitor && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/sales-monitor/leads"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Leads
+                                </Link>
+                                <Link
+                                    href="/dashboard/sales-monitor/qualify"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Qualify
+                                </Link>
+                                <Link
+                                    href="/dashboard/sales-monitor/meetings"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Meetings
+                                </Link>
+                                <Link
+                                    href="/dashboard/sales-monitor/proposals"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Proposals
+                                </Link>
+                                <Link
+                                    href="/dashboard/sales-monitor/opportunity"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Opportunity
+                                </Link>
+                                <Link
+                                    href="/dashboard/sales-monitor/opportunity"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Closed & Won
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Performance Manager */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('performanceManager')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Performance Manager
+                            </div>
+                            {expandedSections.performanceManager ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.performanceManager && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/performance-manager/initiate-event"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Inititate Event
+                                </Link>
+                                <Link
+                                    href="/dashboard/performance-manager/profile-rating"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Profile Rating
+                                </Link>
+                               
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Inventory Management */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('inventoryManagement')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Inventory Management
+                            </div>
+                            {expandedSections.inventoryManagement ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.inventoryManagement && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/inventory-management/vendors"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Vendors
+                                </Link>
+                                <Link
+                                    href="/dashboard/inventory-management/create-po"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Create PO
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Complaints */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('complaints')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Complaints
+                            </div>
+                            {expandedSections.complaints ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.complaints && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/complaints/complaints"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Complaints List
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Notifications & Announcements */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('notifications')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Notifications
+                            </div>
+                            {expandedSections.notifications ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.notifications && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/notifications-announcements/notifications"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Notifications List
+                                </Link>
+                                <Link
+                                    href="/dashboard/notifications-announcements/add-new-notification"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Add new Notification
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Reports */}
+                    <div className="mb-2">
+                        <button
+                            onClick={() => toggleSection('reports')}
+                            className="flex items-center justify-between w-full px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                        >
+                            <div className="flex items-center">
+                                <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
+                                Reports
+                            </div>
+                            {expandedSections.reports ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
+                        </button>
+                        {expandedSections.reports && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/reports/reports"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Offices
+                                </Link>
+                                <Link
+                                    href="/dashboard/reports/employee"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Employees
+                                </Link>
+                                <Link
+                                    href="/dashboard/reports/guards"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Guards
+                                </Link>
+                                <Link
+                                    href="/dashboard/reports/clients"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Clients
+                                </Link>
+                                <Link
+                                    href="/dashboard/reports/location"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Location
+                                </Link>
+                                
                             </div>
                         )}
                     </div>

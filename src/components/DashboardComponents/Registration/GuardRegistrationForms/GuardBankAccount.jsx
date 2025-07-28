@@ -8,21 +8,23 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
         bankName: Yup.string(),
         bankCode: Yup.string(),
+        accountTitle: Yup.string(),
         accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
             .min(8, 'Account number must be at least 8 digits'),
-        IBAN: Yup.string()
-            .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
-            .min(15, 'IBAN must be at least 15 characters')
-            .max(34, 'IBAN must not exceed 34 characters'),
-        branchCode: Yup.string(),
-        branch: Yup.string()
+            IBAN: Yup.string()
+                .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
+                .min(15, 'IBAN must be at least 15 characters')
+                .max(34, 'IBAN must not exceed 34 characters'),
+            branchCode: Yup.string(),
+            branch: Yup.string()
     });
 
 
     const initialValues = {
         bankName: initialData.bankAccount?.bankName || '',
         bankCode: initialData.bankAccount?.bankCode || '',
+        accountTitle: initialData.bankAccount?.accountTitle || '',
         accountNumber: initialData.bankAccount?.accountNumber || '',
         IBAN: initialData.bankAccount?.IBAN || '',
         branchCode: initialData.bankAccount?.branchCode || '',
@@ -36,6 +38,7 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
             bankAccount: {
                 bankName: values.bankName,
                 bankCode: values.bankCode,
+                accountTitle: values.accountTitle,
                 accountNumber: values.accountNumber,
                 IBAN: values.IBAN.toUpperCase(),
                 branchCode: values.branchCode,
@@ -147,6 +150,20 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                                 <ErrorMessage name="accountNumber" component="div" className="text-red-500 text-sm mt-1" />
+                            </div>
+
+                            {/* Account Title */}
+                            <div>
+                                <label className='block text-sm font-medium text-gray-700'>
+                                    Account Title
+                                </label>
+                                <Field
+                                    type='text'
+                                    name='accountTitle'
+                                    placeholder="Enter Account Title"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <ErrorMessage name="accountTitle" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             {/* IBAN */}

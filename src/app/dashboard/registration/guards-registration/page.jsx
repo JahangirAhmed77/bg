@@ -104,7 +104,54 @@ const GuardsRegistrationPage = () => {
             setCompletedSteps(prev => [...prev, currentStep]);
         }
 
+        // Comprehensive validation of all required fields
+        const validationErrors = [];
 
+        // 1. Personal Information validation
+        const personalData = formData['personal-info'] || {};
+        if (!personalData.officeId) validationErrors.push('Branch/Office selection');
+        if (!personalData.serviceNumber) validationErrors.push('Service Number');
+        if (!personalData.fullName) validationErrors.push('Full Name');
+        if (!personalData.cnicNumber) validationErrors.push('CNIC Number');
+        if (!personalData.dateOfBirth) validationErrors.push('Date of Birth');
+        if (!personalData.cnicIssueDate) validationErrors.push('CNIC Issue Date');
+        if (!personalData.cnicExpiryDate) validationErrors.push('CNIC Expiry Date');
+        if (!personalData.contactNumber) validationErrors.push('Contact Number');
+        if (!personalData.height || personalData.height < 5.6) validationErrors.push('Height (minimum 5.6 ft)');
+
+        // 2. Documents validation
+        const documentsData = formData['documents']?.guardDocuments || {};
+        if (!documentsData.picture) validationErrors.push('Picture');
+        if (!documentsData.cnicFront) validationErrors.push('CNIC Front');
+        if (!documentsData.cnicBack) validationErrors.push('CNIC Back');
+        if (typeof documentsData.originalCNICSubmitted !== 'boolean') {
+            validationErrors.push('Original CNIC Submitted (Yes/No)');
+        }
+
+        // 3. Check if user has completed all steps
+        const requiredSteps = ['personal-info', 'documents'];
+        const missingSteps = requiredSteps.filter(step => !formData[step]);
+
+        if (missingSteps.length > 0) {
+            const stepNames = missingSteps.map(step => {
+                switch (step) {
+                    case 'personal-info': return 'Personal Information';
+                    case 'documents': return 'Documents Upload';
+                    default: return step;
+                }
+            }).join(', ');
+            validationErrors.push(`Complete the following steps: ${stepNames}`);
+        }
+
+        // Show validation errors if any
+        if (validationErrors.length > 0) {
+            const errorMessage = validationErrors.length === 1
+                ? `Please fill in: ${validationErrors[0]}`
+                : `Please fill in the following required fields:\n• ${validationErrors.join('\n• ')}`;
+
+            toast.error(errorMessage);
+            return;
+        }
 
         // Structure data according to API format
         const personalInfo = formData['personal-info'] || {};
@@ -238,6 +285,7 @@ const GuardsRegistrationPage = () => {
             bankAccount: {
                 bankName: bankAccount.bankAccount?.bankName || null,
                 bankCode: bankAccount.bankAccount?.bankCode || null,
+                accountTitle: bankAccount.bankAccount?.accountTitle || null,
                 accountNumber: bankAccount.bankAccount?.accountNumber || null,
                 IBAN: bankAccount.bankAccount?.IBAN || null,
                 branchCode: bankAccount.bankAccount?.branchCode || null,

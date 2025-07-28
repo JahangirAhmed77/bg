@@ -217,7 +217,8 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                   name="dateOfBirth"
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <ErrorMessage name="dateOfBirth" component="div" className="text-red-500 text-sm mt-1" />
+                {/* moved the error message from date of birth input to the age input  */}
+              
               </div>
 
               {values.dateOfBirth && (
@@ -229,6 +230,7 @@ const GuardPersonalInformation = ({ onNext, initialData = {} }) => {
                     value={CalculateAge(values?.dateOfBirth)}
                     className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none"
                   />
+                  <ErrorMessage name="dateOfBirth" component="div" className="text-red-500 text-sm mt-1" /> 
                 </div>
               )}
 

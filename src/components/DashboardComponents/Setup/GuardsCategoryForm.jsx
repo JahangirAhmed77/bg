@@ -7,13 +7,6 @@ import { userRequest } from '@/lib/RequestMethods';
 import { useCurrentUser } from '@/lib/hooks';
 import toast from 'react-hot-toast';
 
-const initialCategories = [
-    'Armed',
-    'Un-Armed',
-    'Ex-Service man',
-    'Civilian',
-];
-
 const GuardsCategoryForm = () => {
 
     const { user } = useCurrentUser();
@@ -45,9 +38,7 @@ const GuardsCategoryForm = () => {
             }
 
         }
-
         getCreatedGuardCategories();
-
 
     }, [])
 
@@ -60,16 +51,22 @@ const GuardsCategoryForm = () => {
 
             const res = await userRequest.post('/guard-category', GuardCategoryPayload);
             console.log('Success:', res.data);
-            toast.success("Guard Cartegory Created Successfully")
+            toast.success("Guard Category Created Successfully")
 
+            // Add the new category to the local state
+            const newCategory = {
+                id: res.data.data?.id || Date.now(), 
+                categoryName: values.guardType
+            };
+
+            setCreatedGuardCategories((prev) => ([...prev, newCategory]));
 
             // Reset form on successful submission
             resetForm();
 
         } catch (error) {
             console.error('Error submitting form:', error);
-            // Handle error - show error message to user
-            // alert('Error adding guard category. Please try again.');
+            toast.error('Error adding guard category. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -85,7 +82,7 @@ const GuardsCategoryForm = () => {
                 })}
                 onSubmit={handleSubmit}
             >
-                {({ isSubmitting }) => (
+                {({ isSubmitting, values }) => (
                     <Form className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div>

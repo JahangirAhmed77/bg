@@ -191,18 +191,12 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                 </label>
                                 <div className="relative">
                                     <Field
-                                        as="select"
+                                     
                                         name="rankName"
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                                    >
-                                        <option value="">Select</option>
-                                        {rankNames.map((rank) => (
-                                            <option key={rank} value={rank}>
-                                                {rank}
-                                            </option>
-                                        ))}
-                                    </Field>
-                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                    />
+                                        
+                                   
                                 </div>
                                 <ErrorMessage name="rankName" component="div" className="text-red-500 text-sm mt-1" />
                             </div>
@@ -275,19 +269,13 @@ const GuardExperience = ({ onNext, onPrevious, initialData = {} }) => {
                                 </label>
                                 <div className="relative">
                                     <Field
-                                        as="select"
+                                       
                                         name="branch"
                                         disabled={values.isExServiceMen !== 'Yes'}
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select</option>
-                                        {branches.map((branch) => (
-                                            <option key={branch} value={branch}>
-                                                {branch}
-                                            </option>
-                                        ))}
-                                    </Field>
-                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                    />
+                                   
+                                    
                                 </div>
                                 <ErrorMessage name="branch" component="div" className="text-red-500 text-sm mt-1" />
                             </div>

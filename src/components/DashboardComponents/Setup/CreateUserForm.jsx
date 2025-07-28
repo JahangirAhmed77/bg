@@ -4,7 +4,7 @@ import { userRequest } from '@/lib/RequestMethods';
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';        
 import axios from 'axios';
 
 // Validation Schema
@@ -29,6 +29,7 @@ const userValidationSchema = Yup.object().shape({
 const CreateUserForm = () => {
 
     const { user } = useCurrentUser();
+
     const fileInputRef = React.useRef(null);
     const [currentDate, setCurrentDate] = useState("");
     const [currentTime, setCurrentTime] = useState("");
@@ -37,9 +38,9 @@ const CreateUserForm = () => {
     const [offices, setOffices] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+
     useEffect(() => {
         const now = new Date();
-
         const date = now.toLocaleDateString('en-GB');
         const time = now.toLocaleTimeString('en-US');
 
@@ -47,12 +48,20 @@ const CreateUserForm = () => {
         setCurrentTime(time);
     }, []);
 
+
+
+
+    const getSelectedEmployeeName = (employeeId) => {
+        const employee = employees?.find((employee) => employee.id === employeeId);
+        return employee?.fullName || "Not Selected";
+    }
+
     useEffect(() => {
 
         const getAllRoles = async () => {
             const res = await userRequest.get("/roles/for-organization");
             setRoles(res.data.data);
-       
+
         }
 
         const getAllEmployees = async () => {
@@ -63,7 +72,7 @@ const CreateUserForm = () => {
         const getAllOffices = async () => {
             //This all offices contain the branch
             const res = await userRequest.get("/organizations/get-offices")
-            
+
             setOffices(res.data.data);
         }
 
@@ -119,10 +128,7 @@ const CreateUserForm = () => {
         }
     };
 
-
-
     const handleSubmit = async (values, { resetForm }) => {
-
         try {
             setIsLoading(true);
 
@@ -135,12 +141,8 @@ const CreateUserForm = () => {
                 profileImage: values.profileImage,
                 roleId: values.role
             }
-
-
             const response = await userRequest.post('/users/create', createUserPayload);
 
-
-      
             if (response.data) {
                 toast.success('User created successfully!');
                 resetForm();
@@ -187,12 +189,12 @@ const CreateUserForm = () => {
                     validationSchema={userValidationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ errors, touched, isValid, resetForm, setFieldValue }) => (
+                    {({ values, errors, touched, isValid, resetForm, setFieldValue }) => (
                         <Form className="space-y-8">
                             {/* Top Row: Office ID, Staff ID, Date, Time */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Staff ID</label>
+                                    <label className="block text-xs text-gray-500 mb-1">ID</label>
                                     <input type="text" value={user?.id} disabled className="w-full bg-formBgLightGreen text-gray-700 rounded-md px-4 py-2" />
                                 </div>
                                 <div>
@@ -274,13 +276,23 @@ const CreateUserForm = () => {
                                         <option value="">Select</option>
                                         {employees?.map((employee) => (
                                             <option key={employee.id} value={employee.id}>
-                                                {`${employee.fullName} (ID: ${employee.id})`}
+                                                {/* {`${employee.fullName} (ID: ${employee.id})`} */}
+                                                {`${employee.id}`}
                                             </option>
                                         ))}
                                     </Field>
                                     {touched.employeeId && errors.employeeId && (
                                         <p className="mt-1 text-sm text-red-500">{errors.employeeId}</p>
                                     )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">
+                                        Employee Name                                    </label>
+                                    <input type="text" value={getSelectedEmployeeName(values?.employeeId)} disabled className={`w-full bg-gray-50 rounded-md px-4 py-2 border ${touched.employeeId && errors.employeeId
+                                        ? 'border-red-500'
+                                        : 'border-gray-200'
+                                        } text-gray-700`} />
                                 </div>
                             </div>
 

@@ -46,11 +46,10 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                 .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
                 .required('CNIC Number is required');
             schema[`reference_${index}_contactNumber`] = Yup.string()
-                .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid contact number')
-                .required('Contact Number is required');
-            schema[`reference_${index}_relationship`] = Yup.string().required('Relationship is required');
-            schema[`reference_${index}_currentAddress`] = Yup.string().required('Current Address is required');
-            schema[`reference_${index}_permanentAddress`] = Yup.string().required('Permanent Address is required');
+                .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid contact number');
+            schema[`reference_${index}_relationship`] = Yup.string();
+            schema[`reference_${index}_currentAddress`] = Yup.string();
+            schema[`reference_${index}_permanentAddress`] = Yup.string();
             schema[`reference_${index}_cnicFront`] = Yup.string().required('CNIC Front image is required');
             schema[`reference_${index}_cnicBack`] = Yup.string().required('CNIC Back image is required');
         });
@@ -134,12 +133,10 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                     fileName: file.name,
                     fileType: file.type
                 };
-                console.log('Document upload payload:', getUploadKeyPayload);
+
 
                 const res = await userRequest.post("/file/url", getUploadKeyPayload);
                 const { key, uploadUrl } = res.data.data;
-                console.log("Key:", key);
-                console.log("Upload URL:", uploadUrl);
 
                 // Upload file to S3
                 const uploadFileResponse = await axios.put(uploadUrl, file, {
@@ -149,7 +146,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                 });
 
                 if (uploadFileResponse.status === 200) {
-                    console.log(file.name, "Uploaded successfully");
+
 
                     // Update Formik value
                     setFieldValue(fieldName, key);
@@ -352,7 +349,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                                 className="inline-flex items-center px-6 py-3 bg-[#5570F1]
                                 hover:bg-blue-600 text-white rounded-xl cursor-pointer"
                             >
-                                {reference.cnicFront ? "✓ CNIC Front Uploaded" : "Upload CNIC Front"} 
+                                {reference.cnicFront ? "✓ CNIC Front Uploaded" : "Upload CNIC Front"}
                             </label>
                             <ErrorMessage
                                 name={`reference_${referenceIndex}_cnicFront`}
@@ -376,7 +373,7 @@ const GuardReferences = ({ onNext, onPrevious, initialData = {} }) => {
                                 className="inline-flex items-center px-6 py-3 bg-[#5570F1] hover:bg-blue-600
                                  text-white rounded-xl cursor-pointer"
                             >
-                                {reference.cnicBack ? "✓ CNIC Back Uploaded" : "Upload CNIC Back"} 
+                                {reference.cnicBack ? "✓ CNIC Back Uploaded" : "Upload CNIC Back"}
                             </label>
                             <ErrorMessage
                                 name={`reference_${referenceIndex}_cnicBack`}

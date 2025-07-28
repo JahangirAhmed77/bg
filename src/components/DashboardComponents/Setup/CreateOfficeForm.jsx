@@ -39,25 +39,30 @@ const CreateOfficeForm = () => {
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
 
-        const addOfficePayload = {
+        try {
+            const addOfficePayload = {
+                branchName: values.branchName,
+                email: values.email,
+                province: values.province,
+                city: values.city,
+                address: values.addressLine1,
+                addressOpt: values.addressLine2 || "",
+                contactNumber: values.contactNo,
+                contactNumberOpt: values.contactNumberOpt
+            }
 
-            branchName: values.branchName,
-            email: values.email,
-            province: values.province,
-            city: values.city,
-            address: values.addressLine1,
-            addressOpt: values.addressLine2 || "",
-            contactNumber: values.contactNo,
-            contactNumberOpt: values.contactNumberOpt
+            const res = await userRequest.post("/organizations/add-office", addOfficePayload);
+
+            console.log(res.data);
+
+            toast.success("Office Created Successfully")
+        } catch (error) {
+            console.log(error);
+            toast.error("Error Creating Office")
         }
 
+        
 
-
-        const res = await userRequest.post("/organizations/add-office", addOfficePayload);
-
-        console.log(res.data);
-
-        toast.success("Office Created Successfully")
 
         setTimeout(() => {
             setSubmitting(false);

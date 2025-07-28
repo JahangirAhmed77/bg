@@ -278,7 +278,7 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Upload Employee Documents</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Upload Guard Documents</h2>
                     <div className="text-sm text-gray-500">Step 7 of 8</div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -358,7 +358,7 @@ const GuardDocuments = ({ onNext, onPrevious, onSave, initialData = {} }) => {
                             </div>
                         </div>
 
-                       
+
 
                         {/* Buttons */}
                         <div className="flex justify-center space-x-4 pt-8">
