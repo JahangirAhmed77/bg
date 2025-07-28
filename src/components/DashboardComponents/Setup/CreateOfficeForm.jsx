@@ -56,18 +56,20 @@ const CreateOfficeForm = () => {
             console.log(res.data);
 
             toast.success("Office Created Successfully")
+            setTimeout(() => {
+                setSubmitting(false);
+                resetForm();
+            }, 1000);
         } catch (error) {
             console.log(error);
-            toast.error("Error Creating Office")
+            const errMessage = error?.response?.data?.message;
+            toast.error(errMessage)
         }
 
-        
 
 
-        setTimeout(() => {
-            setSubmitting(false);
-            resetForm();
-        }, 1000);
+
+
     };
 
     const provinces = [

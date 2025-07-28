@@ -118,9 +118,9 @@ const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {}, g
                         <th className="p-2 text-left text-xs font-medium text-gray-700">Allowance</th>
                         <th className="p-2 text-left text-xs font-medium text-gray-700">Gazeted Holiday</th>
                         <th className="p-2 text-left text-xs font-medium text-blue-700">Finance - Salary/Month</th>
-                        <th className="p-2 text-left text-xs font-medium text-blue-700">Finance - Gazetted Holiday</th>
                         <th className="p-2 text-left text-xs font-medium text-blue-700">Finance - Overtime/Hour</th>
                         <th className="p-2 text-left text-xs font-medium text-blue-700">Finance - Allowance</th>
+                        <th className="p-2 text-left text-xs font-medium text-blue-700">Finance - Gazetted Holiday</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -162,15 +162,7 @@ const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {}, g
                             />
                             <ErrorMessage name={`charges.${index}.finSalaryPerMonth`} component="div" className="text-red-500 text-xs" />
                           </td>
-                          <td className="p-2">
-                            <Field
-                              name={`charges.${index}.finGazettedHoliday`}
-                              type="number"
-                              placeholder="Enter "
-                              className="w-full px-2 py-2 text-sm bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name={`charges.${index}.finGazettedHoliday`} component="div" className="text-red-500 text-xs" />
-                          </td>
+
                           <td className="p-2">
                             <Field
                               name={`charges.${index}.finOvertimePerHour`}
@@ -188,6 +180,15 @@ const LocationSalaryCharges = ({ onNext, onPrevious, onSave, initialData = {}, g
                               className="w-full px-2 py-2 text-sm bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                             <ErrorMessage name={`charges.${index}.finAllowance`} component="div" className="text-red-500 text-xs" />
+                          </td>
+                          <td className="p-2">
+                            <Field
+                              name={`charges.${index}.finGazettedHoliday`}
+                              type="number"
+                              placeholder="Enter "
+                              className="w-full px-2 py-2 text-sm bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <ErrorMessage name={`charges.${index}.finGazettedHoliday`} component="div" className="text-red-500 text-xs" />
                           </td>
 
                         </tr>

@@ -35,7 +35,7 @@ const LocationRegistrationPage = () => {
             ...prev,
             [currentStep]: data
         }));
-
+        console.log(formData)
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
             setCompletedSteps(prev => [...prev, currentStep]);
@@ -131,23 +131,32 @@ const LocationRegistrationPage = () => {
             }
         });
 
-        return {
+        // Build base payload
+        const payload = {
             clientId: locationInfo.clientId || "",
             officeId: locationInfo.officeId || "",
             locationName: locationInfo.locationName || "",
-            createdLocationId: locationInfo.createdLocationId || "",
             address: locationInfo.address || "",
             city: locationInfo.city || "",
             provinceState: locationInfo.provinceState || "",
             country: locationInfo.country || "",
-            GPScoordinate: locationInfo.GPScoordinate || "",
-            locationTypeId: locationInfo.locationTypeId || "",
             authorizedPersonName: locationInfo.authorizedPersonName || "",
             authorizedPersonNumber: locationInfo.authorizedPersonNumber || "",
             authorizedPersonDesignation: locationInfo.authorizedPersonDesignation || "",
             taxes: taxes,
             requestedGuards: requestedGuards
         };
+
+        // Add optional fields only if they have values
+        if (locationInfo.GPScoordinate && locationInfo.GPScoordinate.trim() !== "") {
+            payload.GPScoordinate = locationInfo.GPScoordinate;
+        }
+
+        if (locationInfo.locationTypeId && locationInfo.locationTypeId.trim() !== "") {
+            payload.locationTypeId = locationInfo.locationTypeId;
+        }
+
+        return payload;
     };
 
     return (

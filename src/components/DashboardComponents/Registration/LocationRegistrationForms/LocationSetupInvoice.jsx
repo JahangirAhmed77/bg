@@ -7,9 +7,21 @@ const LocationSetupInvoice = ({ onNext, onPrevious, onSave, initialData = {}, on
     taxes: Yup.array().of(
       Yup.object().shape({
         taxType: Yup.string().required('Tax type is required'),
-        percentage: Yup.number().required('Percentage is required'),
-        amount: Yup.number().required('Amount is required'),
+        percentage: Yup.number().nullable(),
+        amount: Yup.number().nullable(),
         addInvoice: Yup.boolean(),
+      }).test('percentage-or-amount', 'Please fill either percentage or amount, not both', function (value) {
+        const { percentage, amount } = value;
+        const hasPercentage = percentage !== null && percentage !== '' && !isNaN(percentage);
+        const hasAmount = amount !== null && amount !== '' && !isNaN(amount);
+
+        if (hasPercentage && hasAmount) {
+          return this.createError({ message: 'Please fill either percentage or amount, not both' });
+        }
+        if (!hasPercentage && !hasAmount) {
+          return this.createError({ message: 'Please fill either percentage or amount' });
+        }
+        return true;
       })
     )
   });
@@ -18,6 +30,22 @@ const LocationSetupInvoice = ({ onNext, onPrevious, onSave, initialData = {}, on
   const defaultInitialValues = {
     taxes: [{ taxType: '', percentage: '', amount: '', addInvoice: true }],
     ...initialData
+  };
+
+  const handleFieldChange = (setFieldValue, index, field, value) => {
+    // Ensure only numeric values
+    if (value !== '' && isNaN(value)) {
+      return;
+    }
+
+    // If user is entering percentage, clear amount and vice versa
+    if (field === 'percentage' && value !== '') {
+      setFieldValue(`taxes.${index}.amount`, '');
+    } else if (field === 'amount' && value !== '') {
+      setFieldValue(`taxes.${index}.percentage`, '');
+    }
+
+    setFieldValue(`taxes.${index}.${field}`, value);
   };
 
   return (
@@ -43,7 +71,7 @@ const LocationSetupInvoice = ({ onNext, onPrevious, onSave, initialData = {}, on
           }
         }}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
             <FieldArray name="taxes">
               {({ push, remove }) => (
@@ -67,11 +95,25 @@ const LocationSetupInvoice = ({ onNext, onPrevious, onSave, initialData = {}, on
                               <ErrorMessage name={`taxes.${index}.taxType`} component="div" className="text-red-500 text-sm mt-1" />
                             </td>
                             <td className="px-4 py-3">
-                              <Field name={`taxes.${index}.percentage`} type="number" placeholder="18" className="w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                              <input
+                                type="number"
+                                placeholder="18"
+                                value={tax.percentage || ''}
+                                onChange={(e) => handleFieldChange(setFieldValue, index, 'percentage', e.target.value)}
+                                className={`w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${tax.amount ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={!!tax.amount}
+                              />
                               <ErrorMessage name={`taxes.${index}.percentage`} component="div" className="text-red-500 text-sm mt-1" />
                             </td>
                             <td className="px-4 py-3">
-                              <Field name={`taxes.${index}.amount`} type="number" placeholder="150" className="w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                              <input
+                                type="number"
+                                placeholder="150"
+                                value={tax.amount || ''}
+                                onChange={(e) => handleFieldChange(setFieldValue, index, 'amount', e.target.value)}
+                                className={`w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${tax.percentage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={!!tax.percentage}
+                              />
                               <ErrorMessage name={`taxes.${index}.amount`} component="div" className="text-red-500 text-sm mt-1" />
                             </td>
                             <td className="px-4 py-3">

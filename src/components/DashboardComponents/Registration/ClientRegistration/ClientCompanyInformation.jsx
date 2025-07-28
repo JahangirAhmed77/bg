@@ -21,7 +21,7 @@ const ClientCompanyInformation = ({ onNext, onSave, initialData = {}, currentSte
         city: Yup.string().required('City is required'),
         country: Yup.string().required('Country is required'),
         contactNumber: Yup.string().min(11).max(11).required('Contact Number is required'),
-        recruitmentDate: Yup.string().required('Recruitment Date is required'),
+        recruitmentDate: Yup.string().required('Contract Date is required'), //Renamed the recruitment date to contract date but sending the recruitment date to the backend
         industry: Yup.string().required('Industry is required'),
         address: Yup.string().required('Address is required'),
         state: Yup.string().required('State/Province is required'),
@@ -202,8 +202,13 @@ const ClientCompanyInformation = ({ onNext, onSave, initialData = {}, currentSte
 
                             {/* Recruitment Date */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {/* <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Recruitment Date
+                                </label> */}
+                                {/* Renamed the recruitment date to contract date */}
+                                
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Contract Date
                                 </label>
                                 <Field
                                     type="date"

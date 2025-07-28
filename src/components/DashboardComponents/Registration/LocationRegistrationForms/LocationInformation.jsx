@@ -11,14 +11,13 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
   const validationSchema = Yup.object({
     clientId: Yup.string().required('Client is required'),
     officeId: Yup.string().required('Office ID is required'),
-    locationName: Yup.string().required('Location Name is required'),
-    createdLocationId: Yup.string().required('Created Location ID is required'),
+    locationName: Yup.string().required('Location Name is required'), 
     address: Yup.string().required('Address is required'),
     city: Yup.string().required('City is required'),
     provinceState: Yup.string().required('Province/State is required'),
     country: Yup.string().required('Country is required'),
-    GPScoordinate: Yup.string().required('GPS Coordinate is required'),
-    locationTypeId: Yup.string().required('Location Type is required'),
+    GPScoordinate: Yup.string(),
+    locationTypeId: Yup.string(),
     authorizedPersonName: Yup.string().required('Authorized Person Name is required'),
     authorizedPersonNumber: Yup.string().required('Authorized Person Number is required'),
     authorizedPersonDesignation: Yup.string().required('Authorized Person Designation is required'),
@@ -38,7 +37,6 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
     clientId: '',
     officeId: '',
     locationName: '',
-    createdLocationId: '',
     address: '',
     city: '',
     provinceState: '',
@@ -59,14 +57,14 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
     }
     const getOffices = async () => {
       const res = await userRequest.get("/organizations/get-offices");
-    
+
       setMyOffices(res.data.data)
     }
 
     const getLocationTypes = async () => {
       const res = await userRequest.get("/location-type");
       setMyLocationTypes(res.data.data);
-      
+
     }
     getMyClients();
     getOffices();
@@ -129,15 +127,7 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
                   </div>
                 )}
               </Field>
-              <Field name="createdLocationId">
-                {({ field }) => (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Created Location ID</label>
-                    <input {...field} placeholder="Enter Created Location ID" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <ErrorMessage name="createdLocationId" component="div" className="text-red-500 text-sm mt-1" />
-                  </div>
-                )}
-              </Field>
+             
               <Field name="locationName">
                 {({ field }) => (
                   <div>
@@ -178,11 +168,18 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
                 {({ field }) => (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                    <input {...field} placeholder="Enter Country" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <select
+                      {...field}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Country</option>
+                      <option value="Pakistan">Pakistan</option>
+                    </select>
                     <ErrorMessage name="country" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
                 )}
               </Field>
+
               <Field name="GPScoordinate">
                 {({ field }) => (
                   <div>
@@ -218,10 +215,37 @@ const LocationInformation = ({ onNext, onPrevious, onSave, initialData = {} }) =
               <Field name="authorizedPersonNumber">
                 {({ field }) => (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Authorized Person Number</label>
-                    <input {...field} placeholder="Enter Contact Number" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <ErrorMessage name="authorizedPersonNumber" component="div" className="text-red-500 text-sm mt-1" />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Authorized Person Number
+                    </label>
+
+                    <div className="flex w-full">
+             
+                      <div className="flex items-center px-3 bg-gray-50 border border-gray-200 border-r-0 rounded-l-md">
+                        <img
+                          src="https://img.freepik.com/premium-vector/pakistan-circle-flag-logo-icon-computer-vector-illustration-design_1143296-2001.jpg?semt=ais_hybrid&w=740"
+                          alt="Pakistan Flag"
+                          className="w-5 h-5 object-cover rounded-full mr-1"
+                        />
+                        <span className="text-sm text-gray-700">+92</span>
+                      </div>
+
+                      {/* Input field */}
+                      <input
+                        {...field}
+                        placeholder="3001234567"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    {/* Error message */}
+                    <ErrorMessage
+                      name="authorizedPersonNumber"
+                      component="div"
+                      className="text-red-500 text-sm mt-1"
+                    />
                   </div>
+
                 )}
               </Field>
               <Field name="authorizedPersonDesignation">
