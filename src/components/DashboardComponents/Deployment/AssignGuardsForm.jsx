@@ -6,6 +6,8 @@ import * as Yup from 'yup';
 import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { formatDate } from '@/utils/FormHelpers/formatDate';
+import { getCurrentDate, getCurrentTime } from '@/utils/FormHelpers/CurrentDateTime';
+import { useCurrentUser } from '@/lib/hooks';
 
 
 // Initial form values
@@ -27,6 +29,7 @@ const validationSchema = Yup.object({
 });
 
 const AssignGuardsForm = () => {
+    const { user } = useCurrentUser();
     const [guards, setGuards] = useState([]);
     const [selectedGuardId, setSelectedGuardId] = useState(null);
     const [clients, setClients] = useState([]);
@@ -188,7 +191,7 @@ const AssignGuardsForm = () => {
                                         Office ID
                                     </label>
                                     <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        Auto
+                                        {user?.id?.slice(0, 8)}
                                     </div>
                                 </div>
                                 <div>
@@ -204,7 +207,7 @@ const AssignGuardsForm = () => {
                                         Date
                                     </label>
                                     <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        Auto
+                                        {formatDate(getCurrentDate())}
                                     </div>
                                 </div>
                                 <div>
@@ -212,7 +215,7 @@ const AssignGuardsForm = () => {
                                         Time
                                     </label>
                                     <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        Auto
+                                        {getCurrentTime()}
                                     </div>
                                 </div>
                             </div>
