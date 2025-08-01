@@ -12,7 +12,7 @@ const ToasterProvider = () => {
             containerStyle={{}}
             toastOptions={{
                 // Default options for all toasts
-                duration: 4000,
+                duration: 5000,
                 style: {
                     background: '#363636',
                     color: '#fff',

@@ -169,18 +169,12 @@ const Login = () => {
 
     return (
 
-        <section className="max-h-screen grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        <section className="flex items-center justify-center h-screen">
             {/* Left Side - Hero Section with Banner Image */}
-            <div className="hidden md:block bg-white overflow-hidden">
-                <img
-                    src="/images/BannerLoginScreen.webp"
-                    alt="Login Banner"
-                    className="w-full object-cover"
-                />
-            </div>
+
             {/* Right Side - Login Form */}
-            <div className="flex items-center justify-center p-4 md:p-8 bg-white">
-                <div className="w-full max-w-md space-y-8">
+            <div className="">
+                <div className="w-full ">
                     <div>
                         <h2 className="text-3xl font-bold text-gray-900">Sign in</h2>
                         <p className="mt-2 text-gray-600">Sign in to your account to start using Dashboard</p>

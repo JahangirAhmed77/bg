@@ -78,7 +78,7 @@ const AssignGuardsForm = () => {
             try {
                 const res = await userRequest.get(`/guards/assigned-guard/${selectedGuardId}`);
                 setAssignedGuardForLocation(res.data.data);
-                console.log("assignedGuardForLocation", res.data.data);
+
             } catch (error) {
                 console.log(error)
             }
@@ -92,9 +92,6 @@ const AssignGuardsForm = () => {
 
 
 
-    useEffect(() => {
-        console.log("selectedGuardId", selectedGuardId)
-    }, [selectedGuardId])
 
 
     useEffect(() => {
@@ -123,9 +120,9 @@ const AssignGuardsForm = () => {
         }
 
         try {
-            console.log('Form submitted with values:', assignGuardsPayload);
+
             const res = await userRequest.post('/guards/assign-guard', assignGuardsPayload);
-            console.log('Response:', res);
+
             toast.success('Guard assigned successfully');
 
 
@@ -286,44 +283,6 @@ const AssignGuardsForm = () => {
                                     </div>
                                 </div>
 
-                                {/* Table */}
-                                {assignedGuardForLocation && assignedGuardForLocation?.id && (
-                                    <div className=" rounded-2xl bg-formBGBlue p-6">
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full ">
-                                                <thead>
-                                                    <tr className="border-b border-gray-200">
-                                                        <th className="text-left  py-3 px-4 font-medium text-gray-700">Client ID</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Location ID</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployment Date</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployed Till</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Total Working Days</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className='bg-white rounded-2xl'>
-
-                                                    <tr className="border-b border-gray-100">
-                                                        <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.location?.clientId.slice(0, 4)}</td>
-                                                        <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.location?.createdLocationId}</td>
-                                                        <td className="py-3 px-4 text-gray-600">
-                                                            {formatDate(assignedGuardForLocation?.deploymentDate)}
-                                                        </td>
-
-                                                        <td className="py-3 px-4 text-gray-600">
-                                                            {formatDate(assignedGuardForLocation?.deploymentTill)}
-                                                        </td>
-
-                                                        <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.totalWorkingDays}</td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                )}
-
-
                                 {/* Bottom Form Section */}
                                 <div className="grid grid-cols-3 gap-6">
                                     {/* clientId field */}
@@ -449,6 +408,46 @@ const AssignGuardsForm = () => {
                         </Form>
                     )}
                 </Formik>
+
+
+                {/* Table - Outside Formik */}
+                {assignedGuardForLocation && assignedGuardForLocation?.id && (
+                    <>
+                        <h2 className="text-lg font-medium text-gray-900 pt-5 pb-2 pl-2">Assigned Guard Details
+                        </h2>
+
+                        <div className="rounded-2xl bg-formBGBlue p-6">
+
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b border-gray-200">
+                                            <th className="text-left py-3 px-4 font-medium text-gray-700">Client ID</th>
+                                            <th className="text-left py-3 px-4 font-medium text-gray-700">Location ID</th>
+                                            <th className="text-left py-3 px-4 font-medium text-gray-700">Deployment Date</th>
+                                            <th className="text-left py-3 px-4 font-medium text-gray-700">Deployed Till</th>
+                                            <th className="text-left py-3 px-4 font-medium text-gray-700">Total Working Days</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='bg-white rounded-2xl'>
+                                        <tr className="border-b border-gray-100">
+                                            <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.location?.clientId.slice(0, 4)}</td>
+                                            <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.location?.createdLocationId}</td>
+                                            <td className="py-3 px-4 text-gray-600">
+                                                {formatDate(assignedGuardForLocation?.deploymentDate)}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-600">
+                                                {formatDate(assignedGuardForLocation?.deploymentTill)}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-600">{assignedGuardForLocation?.totalWorkingDays}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

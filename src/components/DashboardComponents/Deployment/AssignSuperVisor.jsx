@@ -129,7 +129,7 @@ const AssignSuperVisor = () => {
 
     const changeSupervisorActiveStatus = async (assignedSupervisorId, isActive) => {
         try {
-            const res = await userRequest.patch(`/employee/update-assigned-supervisor/${assignedSupervisorId}?assignedSupervisorId=${assignedSupervisorId}&isActive=${isActive}`, {
+            const res = await userRequest.patch(`/employee/update-assigned-supervisor/${assignedSupervisorId}?assignedSupervisorId=${assignedSupervisorId}`, {
                 isActive: !isActive
             });
             console.log(res.data);
@@ -254,46 +254,6 @@ const AssignSuperVisor = () => {
                                     </div>
                                 </div>
 
-                                {/* Table */}
-                                {assignedSupervisor && assignedSupervisor?.id && (
-                                    <div className="bg-formBGBlue rounded-2xl p-6">
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full">
-                                                <thead>
-                                                    <tr className="border-b     border-gray-200">
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">S.NO</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Client ID</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Location ID</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployment Date</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployed Till</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Total Working Days</th>
-                                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className='bg-white'>
-
-                                                    <tr className="border-b border-gray-100">
-                                                        <td className="py-3 px-4 text-gray-600">1</td>
-                                                        <td className="py-3 px-4 text-gray-600">{assignedSupervisor?.client?.contractNumber}</td>
-                                                        <td className="py-3 px-4 text-gray-600">{assignedSupervisor?.location?.createdLocationId}</td>
-                                                        <td className="py-3 px-4 text-gray-600">{formatDate(assignedSupervisor?.deploymentDate)}</td>
-                                                        <td className="py-3 px-4 text-gray-600">{(assignedSupervisor?.deploymentTill !== null ? formatDate(assignedSupervisor?.deploymentTill) : "Present")}</td>
-                                                        <td className="py-3 px-4 text-gray-600 ">{assignedSupervisor?.totalWorkingDays}</td>
-                                                        <td className="py-3 px-4">
-                                                            <button
-                                                                onClick={() => changeSupervisorActiveStatus(assignedSupervisor.id, assignedSupervisor.isActive)}
-                                                                className={`px-2 py-1 bg-[#FF3B30] text-white text-[11px] rounded-[100px]  ${assignedSupervisor?.isActive ? 'bg-red-600' : 'bg-green-600'} ${assignedSupervisor.isActive ? 'hover:bg-red-500' : 'hover:bg-green-500'}`}>
-                                                                {assignedSupervisor?.isActive ? "Disable" : "Enable"}
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
                                 {/* Bottom Form Section */}
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
@@ -371,6 +331,51 @@ const AssignSuperVisor = () => {
                         </Form>
                     )}
                 </Formik>
+
+                {/* Table - Outside Formik */}
+                {assignedSupervisor && assignedSupervisor?.id && (
+                    <>
+                        <h2 className="text-lg font-medium text-gray-900 pt-5 pb-2 pl-2">Assigned Supervisor Details
+                        </h2>
+
+                        <div className="rounded-2xl bg-formBGBlue p-6">
+
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-gray-200">
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">S.NO</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Client ID</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Location ID</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployment Date</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Deployed Till</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Total Working Days</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className='bg-white'>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-3 px-4 text-gray-600">1</td>
+                                        <td className="py-3 px-4 text-gray-600">{assignedSupervisor?.client?.contractNumber}</td>
+                                        <td className="py-3 px-4 text-gray-600">{assignedSupervisor?.location?.createdLocationId}</td>
+                                        <td className="py-3 px-4 text-gray-600">{formatDate(assignedSupervisor?.deploymentDate)}</td>
+                                        <td className="py-3 px-4 text-gray-600">{(assignedSupervisor?.deploymentTill !== null ? formatDate(assignedSupervisor?.deploymentTill) : "Present")}</td>
+                                        <td className="py-3 px-4 text-gray-600 ">{assignedSupervisor?.totalWorkingDays}</td>
+                                        <td className="py-3 px-4">
+                                            <button
+                                                onClick={() => changeSupervisorActiveStatus(assignedSupervisor.id, assignedSupervisor.isActive)}
+                                                className={`px-2 py-1 bg-[#FF3B30] text-white text-[11px] rounded-[100px]  ${assignedSupervisor?.isActive ? 'bg-red-600' : 'bg-green-600'} ${assignedSupervisor.isActive ? 'hover:bg-red-500' : 'hover:bg-green-500'}`}>
+                                                {assignedSupervisor?.isActive ? "Disable" : "Enable"}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

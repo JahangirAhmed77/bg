@@ -1,8 +1,12 @@
 'use client';
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Download, Edit2, Printer, PrinterCheck, Send } from 'lucide-react';
+import { getCurrentDate, getCurrentTime } from '@/utils/FormHelpers/CurrentDateTime';
+import { useCurrentUser } from '@/lib/hooks';
+import { formatDate } from '@/utils/FormHelpers/formatDate';
 
 const AttendanceSheetForm = () => {
+  const { user } = useCurrentUser();
   const [locationId, setLocationId] = useState('');
   const [locationName, setLocationName] = useState('');
 
@@ -102,7 +106,7 @@ const AttendanceSheetForm = () => {
                 Office ID
               </label>
               <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
+                {user?.id?.slice(0, 8)}
               </div>
             </div>
             <div>
@@ -118,7 +122,7 @@ const AttendanceSheetForm = () => {
                 Date
               </label>
               <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
+                {formatDate(getCurrentDate())}
               </div>
             </div>
             <div>
@@ -126,8 +130,8 @@ const AttendanceSheetForm = () => {
                 Time
               </label>
               <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
-              </div>
+                {getCurrentTime()}
+                </div>
             </div>
           </div>
 
@@ -176,13 +180,35 @@ const AttendanceSheetForm = () => {
             </div>
 
             {/* Submit Button for Location Selection */}
-            <div className="flex justify-start">
+            <div className="flex justify-between items-center">
               <button
                 type="button"
-                className="px-6 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-6 py-2 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Submit
               </button>
+
+              <aside className="flex gap-2">
+                <button className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </button>
+
+                <button className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                  <Send className="w-4 h-4" />
+                  Post
+                </button>
+
+                <button className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                  <PrinterCheck className="w-4 h-4" />
+                  Print
+                </button>
+
+                <button className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </aside>
             </div>
 
             {/* Monthly Attendance Table */}

@@ -1,68 +1,115 @@
 'use client';
-import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { Calendar, ChevronDown } from 'lucide-react';
+import { getCurrentDate, getCurrentTime } from '@/utils/FormHelpers/CurrentDateTime';
+import { formatDate, getCurrentDateISO } from '@/utils/FormHelpers/formatDate';
+import { useCurrentUser } from '@/lib/hooks';
+import { userRequest } from '@/lib/RequestMethods';
+import toast from 'react-hot-toast';
+import CustomDatePickerField from '@/utils/FormHelpers/CustomDatePickerField';
+
 
 const LocationAttendanceForm = () => {
-  const [locationId, setLocationId] = useState('');
-  const [locationName, setLocationName] = useState('');
+  const { user } = useCurrentUser();
+  const [locations, setLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [assignedGuards, setAssignedGuards] = useState([]);
+  const [attendanceData, setAttendanceData] = useState({});
 
-  // Mock data for the attendance table
-  const attendanceData = [
-    {
-      sNo: '01',
-      serviceNo: '00251',
-      guardName: 'Zaffar Khan',
-      shift: 'Morning',
-      attendance: 'P' // P, A, R, L
-    },
-    {
-      sNo: '02',
-      serviceNo: '00251',
-      guardName: 'Zaffar Khan',
-      shift: 'Morning',
-      attendance: 'P'
-    },
-    {
-      sNo: '03',
-      serviceNo: '00251',
-      guardName: 'Zaffar Khan',
-      shift: 'Morning',
-      attendance: 'P'
+  const validationSchema = Yup.object({
+    locationId: Yup.string().required('Location ID is required'),
+
+    // attenadanceDate: Yup.date().required('Attendance date is required'),
+
+  });
+
+  const initialValues = {
+    locationId: '',
+    // attenadanceDate: '',
+  };
+
+
+
+  useEffect(() => {
+    const getLocationsByOrganzation = async () => {
+      try {
+        const res = await userRequest.get('/location/by-organization');
+        setLocations(res.data.data);
+
+      } catch (error) {
+        console.log(error);
+        toast.error('Failed to fetch locations');
+      }
+    };
+
+
+    getLocationsByOrganzation();
+  }, []);
+
+  useEffect(() => {
+    const getAssignedGuardsByLocation = async () => {
+      try {
+        const res = await userRequest.get(`/location/assigned-guard/${selectedLocation.id}`)
+        // console.log("guards assigned to this location", res.data.data);
+        setAssignedGuards(res.data.data);
+        if (res.data.data.length === 0) {
+          toast.error("No guards assigned to this location");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
-  ];
+    selectedLocation && getAssignedGuardsByLocation();
+  }, [selectedLocation]);
 
-  const [attendanceStates, setAttendanceStates] = useState(
-    attendanceData.reduce((acc, item) => {
-      acc[item.sNo] = item.attendance;
-      return acc;
-    }, {})
-  );
-
-  const handleAttendanceChange = (sNo, value) => {
-    setAttendanceStates(prev => ({
-      ...prev,
-      [sNo]: value
-    }));
+  const handleLocationChange = (locationId) => {
+    const location = locations.find((loc) => loc.id === locationId);
+    setSelectedLocation(location);
   };
 
-  const handleRowSubmit = (sNo) => {
-    console.log(`Submitting attendance for row ${sNo}:`, attendanceStates[sNo]);
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      const currentDateISO = getCurrentDateISO();
+
+      if (!attendanceData || Object.keys(attendanceData).length === 0 || !assignedGuards || assignedGuards.length === 0) {
+        toast.error("Please select attendance for all guards");
+        return;
+      }
+
+      // Prepare attendance data for submission
+      const attendancePayload = assignedGuards.map((assignedGuard) => ({
+        locationId: selectedLocation.id,
+        guardId: assignedGuard.guard.id,
+        shiftId: assignedGuard.requestedGuard.Shift.id,
+        type: attendanceData[assignedGuard.guard.id] || "A", // default to "A" if not selected
+        date: currentDateISO,
+      }));
+
+
+      const res = await userRequest.post('/attendance/guard', attendancePayload);
+      console.log("attendance submitted", res.data.data);
+
+      toast.success('Attendance submitted successfully');
+
+      // Reset form and state
+      setSelectedLocation(null);
+      setAttendanceData({});
+      setSubmitting(false);
+      resetForm();
+    } catch (error) {
+      console.log(error);
+      const errMess = error?.response?.data?.message;
+      toast.error(errMess);
+      setSubmitting(false);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted with all attendance data:', attendanceStates);
-  };
-
-  const handleCancel = () => {
-    setLocationId('');
-    setLocationName('');
-    setAttendanceStates(
-      attendanceData.reduce((acc, item) => {
-        acc[item.sNo] = item.attendance;
-        return acc;
-      }, {})
-    );
+  const handleCancel = (resetForm) => {
+    setSelectedLocation(null);
+    setAttendanceData({});
+    resetForm();
   };
 
   return (
@@ -84,159 +131,203 @@ const LocationAttendanceForm = () => {
 
       {/* Form Card */}
       <div className="w-full max-w-7xl bg-white rounded-xl shadow-md mt-8 p-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Auto Fields Row */}
-          <div className="grid grid-cols-4 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Office ID
-              </label>
-              <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Supervisor ID
-              </label>
-              <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date
-              </label>
-              <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Time
-              </label>
-              <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                Auto
-              </div>
-            </div>
-          </div>
-
-          {/* Daily Location Attendance Section */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-medium text-gray-900">Daily Location Attendance</h2>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Location ID
-                </label>
-                <div className="relative">
-                  <select
-                    value={locationId}
-                    onChange={(e) => setLocationId(e.target.value)}
-                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                  >
-                    <option value="">Select</option>
-                    <option value="LOC001">LOC001</option>
-                    <option value="LOC002">LOC002</option>
-                    <option value="LOC003">LOC003</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ errors, touched, isSubmitting, resetForm, setFieldValue }) => (
+            <Form className="space-y-8">
+              {/* Auto Fields Row */}
+              <div className="grid grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Office ID
+                  </label>
+                  <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                    {user?.id?.slice(0, 8)}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Supervisor ID
+                  </label>
+                  <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                    Auto
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date
+                  </label>
+                  <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                    {formatDate(getCurrentDate())}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Time
+                  </label>
+                  <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                    {getCurrentTime()}
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Location Name
-                </label>
-                <div className="relative">
-                  <select
-                    value={locationName}
-                    onChange={(e) => setLocationName(e.target.value)}
-                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+              {/* Daily Location Attendance Section */}
+              <div className="space-y-6">
+                <h2 className="text-lg font-medium text-gray-900">Daily Location Attendance</h2>
+
+                <div className="grid grid-cols-3  gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Location ID
+                    </label>
+                    <div className="relative">
+                      <Field
+                        as="select"
+                        name="locationId"
+                        onChange={(e) => {
+                          const locationId = e.target.value;
+                          setFieldValue('locationId', locationId);
+                          handleLocationChange(locationId);
+                        }}
+                        className={`w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none ${errors.locationId && touched.locationId
+                          ? 'border-red-500'
+                          : 'border-gray-200'
+                          }`}
+                      >
+                        <option value="">Select</option>
+                        {locations.map((location) => (
+                          <option className='text-sm' key={location.id} value={location.id}>
+                            {location.createdLocationId} -({location.locationName} )
+                          </option>
+                        ))}
+                      </Field>
+                      <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                    </div>
+                    <ErrorMessage name="locationId" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Location Name
+                    </label>
+                    <div className="relative">
+                      <Field
+                        as="select"
+                        name="locationName"
+                        readOnly
+                        disabled
+                        className={`w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none disabled:opacity-100 disabled:text-black ${errors.locationName && touched.locationName
+                          ? 'border-red-500'
+                          : 'border-gray-200'
+                          }`}
+                      >
+
+                        {selectedLocation && (
+                          <option value={selectedLocation.locationName}>
+                            {selectedLocation.locationName || "No Location Selected"}
+                          </option>
+                        )}
+                      </Field>
+
+                    </div>
+                    <ErrorMessage name="locationName" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
+
+                  {/* Date Picker to mark the attendance */}
+
+                  <aside>
+
+                    <CustomDatePickerField name="attenadanceDate" />
+                    {/* <ErrorMessage name="attenadanceDate" component="div" className="text-red-500 text-sm mt-1" /> */}
+
+
+                  </aside>
+                </div>
+
+                {/* Attendance Table */}
+                {assignedGuards && assignedGuards.length > 0 && assignedGuards.map((assignedGuard, index) => (
+                  <div className="bg-formBGBlue rounded-2xl p-6">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="text-left py-3 px-4 font-medium text-gray-700">S.No.</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-700">Service No.</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-700">Guard Name</th>
+                            <th className="text-left py-3 px-4 font-medium text-gray-700">Shift</th>
+                            <th className="text-center py-3 px-4 font-medium text-gray-700">Attendance</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white">
+
+                          <tr className="border-b border-gray-100">
+                            <td className="py-3 px-4 text-gray-600">{index + 1}</td>
+                            <td className="py-3 px-4 text-gray-600">{assignedGuard.guard.serviceNumber}</td>
+                            <td className="py-3 px-4 text-gray-600">{assignedGuard.guard.fullName}</td>
+                            <td className="py-3 px-4 text-gray-600">{assignedGuard.requestedGuard.Shift.shiftName}</td>
+                            {/* //Send shift id to the payload */}
+                            <td className="py-3 px-4">
+                              <div className="flex justify-center space-x-4">
+                                {['P', 'A', 'R', 'L'].map((type) => (
+                                  <label key={type} className="flex items-center space-x-1">
+                                    <input
+                                      type="radio"
+                                      name={`attendance-${index}`}
+                                      value={type}
+                                      checked={attendanceData[assignedGuard.guard.id] === type}
+                                      onChange={() =>
+                                        setAttendanceData((prev) => ({
+                                          ...prev,
+                                          [assignedGuard.guard.id]: type,
+                                        }))
+                                      }
+                                      className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                    />
+                                    <span className="text-sm text-gray-600">{type}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+
+
+                {/* Buttons */}
+                <div className="flex justify-center space-x-4 pt-8">
+                  <button
+                    type="button"
+                    onClick={() => handleCancel(resetForm)}
+                    className="px-7 py-2 border-2 border-formButtonBlue text-formButtonBlue rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   >
-                    <option value="">Select</option>
-                    <option value="Main Gate">Main Gate</option>
-                    <option value="Back Gate">Back Gate</option>
-                    <option value="Parking Area">Parking Area</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-7 py-2 bg-formButtonBlue text-white rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button
+                    type="button"
+
+                    className="px-7 py-2 border-2 border-formButtonBlue text-formButtonBlue rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  >
+                    Request Approval
+                  </button>
                 </div>
               </div>
-            </div>
-
-            {/* Attendance Table */}
-            <div className="bg-formBGBlue rounded-2xl p-6">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-700">S.NO</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-700">SERVICE No.</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-700">Guard Name</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-700">Shift</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-700">Attendance</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-700">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white">
-                    {attendanceData.map((item) => (
-                      <tr key={item.sNo} className="border-b border-gray-100">
-                        <td className="py-3 px-4 text-gray-600">{item.sNo}</td>
-                        <td className="py-3 px-4 text-gray-600">{item.serviceNo}</td>
-                        <td className="py-3 px-4 text-gray-600">{item.guardName}</td>
-                        <td className="py-3 px-4 text-gray-600">{item.shift}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex justify-center space-x-4">
-                            {['P', 'A', 'R', 'L'].map((type) => (
-                              <label key={type} className="flex items-center space-x-1">
-                                <input
-                                  type="radio"
-                                  name={`attendance-${item.sNo}`}
-                                  value={type}
-                                  checked={attendanceStates[item.sNo] === type}
-                                  onChange={(e) => handleAttendanceChange(item.sNo, e.target.value)}
-                                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                />
-                                <span className="text-sm text-gray-600">{type}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleRowSubmit(item.sNo)}
-                            className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                          >
-                            SUBMIT
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-center space-x-4 pt-8">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </form>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

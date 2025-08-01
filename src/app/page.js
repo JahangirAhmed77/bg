@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white mt-16">
       <section className="relative overflow-hidden bg-gradient-to-br from-[#2a1525] via-[#0f1629] to-[#1a0f1a] min-h-screen flex items-center">
         {/* Animated gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-[#3d1f35]/30 via-black/40 to-[#2d1529]/40 animate-pulse"></div>

@@ -1,0 +1,60 @@
+
+{
+  "status": "success",
+  "message": "Guards fetched successfully",
+  "data": [
+    {
+      "requestedGuard": {
+        "Shift": {
+          "id": "521d3607-c27c-4cdd-bf92-5aafaae39fc7",
+          "shiftName": "Morning"
+        }
+      },
+      "deploymentDate": "2025-07-29T13:02:35.475Z",
+      "deploymentTill": null,
+      "guardCategory": {
+        "categoryName": "commando2"
+      },
+      "guard": {
+        "id": "fe534a24-4548-4884-a5b3-46c1dea2016d",
+        "organizationId": "29e740d9-d243-46f2-8a2a-c8b6222d5dbb",
+        "officeId": null,
+        "serviceNumber": 1,
+        "registrationDate": "2024-05-10T00:00:00.000Z",
+        "fullName": "Muhammad Kamram",
+        "fatherName": "Shabbir Hussain",
+        "dateOfBirth": "1990-08-15T00:00:00.000Z",
+        "cnicNumber": "42101-1234567-1",
+        "cnicIssueDate": "2010-08-15T00:00:00.000Z",
+        "cnicExpiryDate": null,
+        "contactNumber": "N/A",
+        "currentAddress": "House #123, Model Town, Lahore",
+        "permanentAddress": "Village Hujra Shah Muqeem, District Okara",
+        "currentAreaPoliceStation": "N/A",
+        "currentAreaPoliceContact": "N/A",
+        "permanentAreaPoliceStation": "N/A",
+        "permanentAreaPoliceContact": "N/A",
+        "weight": 75,
+        "height": 178,
+        "religion": "Islam",
+        "religionSect": "N/A",
+        "bloodGroup": "B+",
+        "bloodPressure": "120/80",
+        "heartBeat": "72 bpm",
+        "eyeColor": "Brown",
+        "disability": null,
+        "eobiNumber": "EOBI-11223344",
+        "sessiNumber": "SESSI-55667788",
+        "kinName": "Ahmed Raza",
+        "kinFatherName": "Shakir Raza",
+        "kinRelation": "N/A",
+        "kinCNIC": "42101-7654321-0",
+        "kinContactNumber": "N/A",
+        "createdAt": "2025-07-24T12:12:05.723Z",
+        "updatedAt": "2025-07-24T12:12:05.723Z",
+        "isActive": true
+      },
+      "totalWorkingDays": 2
+    }
+  ]
+}

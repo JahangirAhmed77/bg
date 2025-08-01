@@ -7,3 +7,8 @@ export const formatDate = (dateString) => {
         day: 'numeric'
     });
 };
+
+export const getCurrentDateISO = () => {
+    return new Date().toISOString();
+};
+
