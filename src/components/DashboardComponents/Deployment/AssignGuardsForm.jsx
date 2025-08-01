@@ -338,7 +338,7 @@ const AssignGuardsForm = () => {
                                                 <option value="">Select</option>
                                                 {selectedClient?.location?.map((location) => (
                                                     <option key={location.id} value={location.id}>
-                                                        {location.locationName}
+                                                        {location.locationName} -  ({location.createdLocationId})
                                                     </option>
                                                 ))}
                                             </Field>
