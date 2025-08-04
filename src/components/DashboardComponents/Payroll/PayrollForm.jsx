@@ -121,13 +121,6 @@ const PayRollForm = () => {
 
     };
 
-    const handleDownloadPayroll = () => {
-        console.log('Downloading payroll...');
-        toast.success('Payroll downloaded successfully');
-    };
-
-
-
     const getFirstDateOfMonth = (month) => {
         return `${currentYear}-${month.value}-01`;
     };
@@ -377,29 +370,35 @@ const PayRollForm = () => {
                                                             <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
                                                                 {employee.attendanceStats?.L || 0}
                                                             </td>
+                                                            {/* Overtime */}
                                                             <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
                                                                 0
                                                             </td>
+                                                            {/* Allowance */}
+                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
+                                                                {0}
+                                                            </td>
+                                                            {/* Gazetted Holiday */}
+                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
+                                                                {0}
+                                                            </td>
+                                                            {/* Net Salary */}
+                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
+                                                                {employee.netSalary.toFixed(2) || 0}
+                                                            </td>
+                                                            {/* Overtime Amount given by organizational admin */}
+                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
+                                                                {employee.guardFinances?.overtimePerHour || 0}
+                                                            </td>
+                                                            {/* Allowance Amount given by organizational admin */}
                                                             <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
                                                                 {employee.guardFinances?.allowance || 0}
                                                             </td>
                                                             <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
                                                                 {employee.guardFinances?.gazettedHoliday || 0}
                                                             </td>
-                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                {employee.guardFinances?.salaryPerMonth || 0}
-                                                            </td>
-                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                {payroll.overtimePay}
-                                                            </td>
-                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                {payroll.allowance}
-                                                            </td>
-                                                            <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                {payroll.gazettedHolidayAmount}
-                                                            </td>
                                                             <td className="px-2 py-2 text-xs font-semibold text-green-600 border border-gray-200 text-center bg-green-50">
-                                                                {payroll.netSalary}
+                                                                {0}
                                                             </td>
                                                         </tr>
                                                     );
