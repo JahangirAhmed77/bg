@@ -227,11 +227,18 @@ const Sidebar = () => {
                         {expandedSections.payroll && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
+                                    href="/dashboard/payroll/set-guard-allowance"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Guard Allowance
+                                </Link>
+                                <Link
                                     href="/dashboard/payroll/generate-pay-roll"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Generate Pay Roll
                                 </Link>
+                                
                             </div>
                         )}
                     </div>

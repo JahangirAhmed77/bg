@@ -6,27 +6,27 @@ import { ChevronDown } from 'lucide-react';
 
 const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        lastEducation: Yup.string().required('Last Education is required'),
-        institute: Yup.string().required('Institute/Institution is required'),
-        hasDrivingLicense: Yup.boolean().required('Please specify if you have a driving license'),
+        lastEducation: Yup.string(),
+        institute: Yup.string(),
+        hasDrivingLicense: Yup.boolean(),
         drivingLicenseNo: Yup.string().when('hasDrivingLicense', {
             is: true,
-            then: (schema) => schema.required('Driving License No. is required'),
+            then: (schema) => schema,
             otherwise: (schema) => schema.notRequired()
         }),
         drivingLicenseIssueDate: Yup.date().when('hasDrivingLicense', {
             is: true,
-            then: (schema) => schema.required('Issue Date is required'),
+            then: (schema) => schema,
             otherwise: (schema) => schema.notRequired()
         }),
         drivingLicenseExpiryDate: Yup.date().when('hasDrivingLicense', {
             is: true,
-            then: (schema) => schema.required('Expiry Date is required'),
+            then: (schema) => schema,
             otherwise: (schema) => schema.notRequired()
         }),
         licenseIssueCity: Yup.string().when('hasDrivingLicense', {
             is: true,
-            then: (schema) => schema.required('License Issue City is required'),
+            then: (schema) => schema,
             otherwise: (schema) => schema.notRequired()
         })
     });
@@ -104,7 +104,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Last Education */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Last Education <span className="text-red-500">*</span>
+                                    Last Education 
                                 </label>
                                 <div className="relative">
                                     <Field
@@ -125,7 +125,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Institute */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Institute/Institution <span className="text-red-500">*</span>
+                                    Institute/Institution 
                                 </label>
                                 <Field
                                     type="text"
@@ -139,7 +139,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Has Driving License */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Do you have a Driving License? <span className="text-red-500">*</span>
+                                    Do you have a Driving License? 
                                 </label>
                                 <div className="flex space-x-4">
                                     <label className="flex items-center">
@@ -172,7 +172,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                                     {/* Driving License Number */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Driving License No. <span className="text-red-500">*</span>
+                                            Driving License No. 
                                         </label>
                                         <Field
                                             type="text"
@@ -186,7 +186,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                                     {/* License Issue City */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            License Issue City <span className="text-red-500">*</span>
+                                            License Issue City 
                                         </label>
                                         <div className="relative">
                                             <Field
@@ -207,7 +207,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                                     {/* Issue Date */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Issue Date <span className="text-red-500">*</span>
+                                            Issue Date 
                                         </label>
                                         <Field
                                             type="date"
@@ -220,7 +220,7 @@ const EmployeeAcademics = ({ onNext, onPrevious, initialData = {} }) => {
                                     {/* Expiry Date */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Expiry Date <span className="text-red-500">*</span>
+                                            Expiry Date 
                                         </label>
                                         <Field
                                             type="date"

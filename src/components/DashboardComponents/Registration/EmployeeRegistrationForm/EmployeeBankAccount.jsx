@@ -6,19 +6,17 @@ import { ChevronDown } from 'lucide-react';
 
 const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
-        bankName: Yup.string().required('Bank Name is required'),
-        bankCode: Yup.string().required('Bank Code is required'),
+        bankName: Yup.string(),
+        bankCode: Yup.string(),
         accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
-            .min(8, 'Account number must be at least 8 digits')
-            .required('Account Number is required'),
+            .min(8, 'Account number must be at least 8 digits'),
         IBAN: Yup.string()
             .matches(/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/, 'Invalid IBAN format')
             .min(15, 'IBAN must be at least 15 characters')
-            .max(34, 'IBAN must not exceed 34 characters')
-            .required('IBAN is required'),
-        branchCode: Yup.string().required('Branch Code is required'),
-        branch: Yup.string().required('Branch Name is required')
+            .max(34, 'IBAN must not exceed 34 characters'),
+        branchCode: Yup.string(),
+        branch: Yup.string()
     });
 
     const initialValues = {
@@ -79,7 +77,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Name <span className="text-red-500">*</span>
+                                    Bank Name 
                                 </label>
                                 <div className="relative">
                                     <Field
@@ -109,7 +107,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Code <span className="text-red-500">*</span>
+                                    Bank Code 
                                 </label>
                                 <Field
                                     type="text"
@@ -124,7 +122,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Account Number */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Account Number <span className="text-red-500">*</span>
+                                    Account Number 
                                 </label>
                                 <Field
                                     type="text"
@@ -138,7 +136,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* IBAN */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    IBAN <span className="text-red-500">*</span>
+                                    IBAN 
                                 </label>
                                 <Field
                                     type="text"
@@ -153,7 +151,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Branch Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Branch Code <span className="text-red-500">*</span>
+                                    Branch Code 
                                 </label>
                                 <Field
                                     type="text"
@@ -167,7 +165,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Branch Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Branch Name <span className="text-red-500">*</span>
+                                    Branch Name 
                                 </label>
                                 <Field
                                     type="text"

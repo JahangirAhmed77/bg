@@ -42,6 +42,8 @@ const EmployeeRegistrationPage = () => {
             [currentStep]: data
         }));
 
+        console.log(formData)
+
         // Mark current step as completed
         if (!completedSteps.includes(currentStep)) {
             setCompletedSteps(prev => [...prev, currentStep]);
@@ -66,7 +68,31 @@ const EmployeeRegistrationPage = () => {
             ...prev,
             [currentStep]: data
         }));
-        console.log('Auto-saved:', currentStep, data);
+
+    };
+
+    // Utility to recursively clean payload by removing empty, null, or undefined values
+    const cleanPayload = (obj) => {
+        if (Array.isArray(obj)) {
+            return obj
+                .map(cleanPayload)
+                .filter(item => !(item == null || (typeof item === 'object' && Object.keys(item).length === 0)));
+        } else if (typeof obj === 'object' && obj !== null) {
+            const cleaned = {};
+            Object.entries(obj).forEach(([key, value]) => {
+                if (
+                    value !== null &&
+                    value !== undefined &&
+                    value !== '' &&
+                    !(Array.isArray(value) && value.length === 0) &&
+                    !(typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+                ) {
+                    cleaned[key] = cleanPayload(value);
+                }
+            });
+            return cleaned;
+        }
+        return obj;
     };
 
     const handleComplete = async () => {
@@ -74,6 +100,8 @@ const EmployeeRegistrationPage = () => {
         if (!completedSteps.includes(currentStep)) {
             setCompletedSteps(prev => [...prev, currentStep]);
         }
+
+
 
         // Structure data according to API format
         const personalInfo = formData['personal-info'] || {};
@@ -156,7 +184,8 @@ const EmployeeRegistrationPage = () => {
                 fullName: ref.fullName || null,
                 fatherName: ref.fatherName || null,
                 cnicNumber: ref.cnicNumber || null,
-                cnicDocument: ref.cnicDocument || null,
+                cnicFront: ref.cnicFront || null,
+                cnicBack: ref.cnicBack || null,
                 contactNumber: ref.contactNumber || null,
                 relationship: ref.relationship || null,
                 currentAddress: ref.currentAddress || null,
@@ -199,8 +228,12 @@ const EmployeeRegistrationPage = () => {
             }
         };
 
+        // Clean the payload by removing empty, null, or undefined values
+        const cleanedPayload = cleanPayload(apiPayload);
+        console.log("Final Cleaned Payload:", cleanedPayload);
+
         try {
-            const res = await userRequest.post('/employee', apiPayload);
+            const res = await userRequest.post('/employee', cleanedPayload);
 
             if (res) {
                 console.log('Employee Registration successful:', res.data);

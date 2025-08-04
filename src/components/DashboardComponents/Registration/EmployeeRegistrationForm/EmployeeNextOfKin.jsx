@@ -7,15 +7,13 @@ import CNICInput from '@/utils/FormHelpers/CNICField';
 
 const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
   const validationSchema = Yup.object({
-    kinName: Yup.string().required('Full Name is required'),
-    kinFatherName: Yup.string().required('Father Name is required'),
-    kinRelation: Yup.string().required('Relation is required'),
+    kinName: Yup.string(),
+    kinFatherName: Yup.string(),
+    kinRelation: Yup.string(),
     kinCNIC: Yup.string()
-      .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
-      .required('CNIC Number is required'),
+      .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1'),
     kinContactNumber: Yup.string()
       .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid phone number')
-      .required('Contact Number is required')
   });
 
   const initialValues = {
@@ -73,7 +71,7 @@ const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
               {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name <span className="text-red-500">*</span>
+                  Full Name 
                 </label>
                 <Field
                   type="text"
@@ -87,7 +85,7 @@ const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
               {/* Father Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Father Name <span className="text-red-500">*</span>
+                  Father Name 
                 </label>
                 <Field
                   type="text"
@@ -101,7 +99,7 @@ const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
               {/* Relation */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Relation <span className="text-red-500">*</span>
+                  Relation 
                 </label>
                 <div className="relative">
                   <Field
@@ -122,7 +120,7 @@ const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
               {/* CNIC Number with auto-dashing */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CNIC Number <span className="text-red-500">*</span>
+                  CNIC Number 
                 </label>
                 <CNICInput name="kinCNIC" />
               </div>
@@ -130,7 +128,7 @@ const EmployeeNextOfKin = ({ onNext, onPrevious, initialData = {} }) => {
               {/* Contact Number */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Number <span className="text-red-500">*</span>
+                  Contact Number 
                 </label>
                 <Field
                   type="tel"

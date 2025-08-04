@@ -25,10 +25,9 @@ const EmployeeExperience = ({ onNext, onPrevious, initialData = {} }) => {
         const schema = {};
         experiences.forEach((_, index) => {
             schema[`experience_${index}_totalYears`] = Yup.number()
-                .min(0, 'Years must be 0 or greater')
-                .required('Total Years is required');
-            schema[`experience_${index}_placeOfDuty`] = Yup.string().required('Place of Duty is required');
-            schema[`experience_${index}_recentCivilEmployment`] = Yup.string().required('Recent Civil Employment is required');
+                .min(0, 'Years must be 0 or greater');
+            schema[`experience_${index}_placeOfDuty`] = Yup.string();
+            schema[`experience_${index}_recentCivilEmployment`] = Yup.string();
         });
         return Yup.object(schema);
     };

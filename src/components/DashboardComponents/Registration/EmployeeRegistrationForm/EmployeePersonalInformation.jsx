@@ -11,7 +11,7 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
   const validationSchema = Yup.object({
     registrationDate: Yup.date().required('Registration Date is required'),
     fullName: Yup.string().required('Full Name is required'),
-    fatherName: Yup.string().required('Father Name is required'),
+    fatherName: Yup.string(),
     cnicNumber: Yup.string()
       .matches(/^\d{5}-\d{7}-\d{1}$/, 'CNIC format should be 12345-1234567-1')
       .required('CNIC Number is required'),
@@ -23,19 +23,19 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
     contactNumber: Yup.string()
       .matches(/^[\+]?[0-9]{10,15}$/, 'Invalid phone number')
       .required('Contact Number is required'),
-    currentAddress: Yup.string().required('Current Address is required'),
-    permanentAddress: Yup.string().required('Permanent Address is required'),
-    religion: Yup.string().required('Religion is required'),
-    religionSect: Yup.string().required('Religion Sect is required'),
-    weight: Yup.number().positive('Weight must be positive').required('Weight is required'),
+    currentAddress: Yup.string(),
+    permanentAddress: Yup.string(),
+    religion: Yup.string(),
+    religionSect: Yup.string(),
+    weight: Yup.number().positive('Weight must be positive'),
     height: Yup.number().positive('Height must be positive').required('Height is required'),
-    bloodGroup: Yup.string().required('Blood Group is required'),
-    bloodPressure: Yup.string().required('Blood Pressure is required'),
-    heartBeat: Yup.string().required('Heart Beat is required'),
-    eyeColor: Yup.string().required('Eye Color is required'),
-    disability: Yup.string().required('Disability status is required'),
-    eobiNumber: Yup.string().required('EOBI Number is required'),
-    sessiNumber: Yup.string().required('SESSI Number is required')
+    bloodGroup: Yup.string(),
+    bloodPressure: Yup.string(),
+    heartBeat: Yup.string(),
+    eyeColor: Yup.string(),
+    disability: Yup.string(),
+    eobiNumber: Yup.string(),
+    sessiNumber: Yup.string()
   });
 
   const initialValues = {
@@ -68,9 +68,6 @@ const EmployeePersonalInformation = ({ onNext, initialData = {} }) => {
       onNext(values);
     }
   };
-
-
-
 
   return (
     <div className="flex-1 bg-white p-8">
