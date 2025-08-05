@@ -197,7 +197,7 @@ const PayrollSetAllowances = () => {
                                 {/* Payroll Generation Section */}
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-medium text-gray-900">
-                                        Allowances Management - Location Pay Roll
+                                        Allowances Management - Location Wise
                                     </h2>
 
                                     {/* Selection Fields */}

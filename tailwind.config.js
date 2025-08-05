@@ -16,6 +16,7 @@ module.exports = {
         formBgLightGreen: "#f5fbf8",
         formButtonBlue: "#5570f1",
         formButtonBlueHover: "#435bf5",
+        tableBgGray: "#f2f4f5",
       },
     },
   },

@@ -1,12 +1,12 @@
 import React from 'react'
-import PayRollForm from '@/components/DashboardComponents/Payroll/PayrollForm'
 
-const GeneratePayRoll = () => {
+
+const GeneratePayRollPage = () => {
   return (
       <div>
-          <PayRollForm />
+       Generate Pay Roll - Location Wise (Coming Soon)
     </div>
   )
 }
 
-export default GeneratePayRoll
+export default GeneratePayRollPage

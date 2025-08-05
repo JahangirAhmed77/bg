@@ -9,7 +9,7 @@ import { useCurrentUser } from '@/lib/hooks';
 import { months } from '@/constants/FormConstantFields';
 import { getYearAndMonth, getDaysInMonth } from '@/utils/FormHelpers/dateHelpers';
 
-const PayRollForm = () => {
+const LocationGrossSalaryForm = () => {
     const [currentDate, setCurrentDate] = useState('');
     const [currentTime, setCurrentTime] = useState('');
     const [locations, setLocations] = useState([]);
@@ -128,7 +128,7 @@ const PayRollForm = () => {
                             <span>&gt;</span>
                             <span>Payroll</span>
                             <span>&gt;</span>
-                            <span className="text-gray-900 font-medium">Pay Roll</span>
+                            <span className="text-gray-900 font-medium">Location Gross Salary</span>
                         </div>
                     </div>
                 </aside>
@@ -183,7 +183,7 @@ const PayRollForm = () => {
                                 {/* Payroll Generation Section */}
                                 <div className="space-y-6">
                                     <h2 className="text-lg font-medium text-gray-900">
-                                        Generate Location Pay Roll
+                                        Location Gross Salary - Payable Calculation
                                     </h2>
 
                                     {/* Selection Fields */}
@@ -407,4 +407,4 @@ const PayRollForm = () => {
     );
 };
 
-export default PayRollForm; 
+export default LocationGrossSalaryForm; 

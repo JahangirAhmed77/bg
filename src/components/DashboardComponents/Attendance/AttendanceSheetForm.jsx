@@ -191,7 +191,7 @@ const AttendanceSheetForm = () => {
 
               {/* Monthly Attendance Sheet Section */}
               <div className="space-y-6">
-                <h2 className="text-lg font-medium text-gray-900">Monthly Attendance Sheet</h2>
+                <h2 className="text-lg font-medium text-gray-900">Location Attendance Sheet</h2>
 
                 <div className="grid grid-cols-3 gap-6">
                   <div>

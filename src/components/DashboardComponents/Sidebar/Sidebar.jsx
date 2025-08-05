@@ -230,7 +230,19 @@ const Sidebar = () => {
                                     href="/dashboard/payroll/set-guard-allowance"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
-                                    -Guard Allowance
+                                    -Allowance Management
+                                </Link>
+                                <Link
+                                    href="/dashboard/payroll/location-gross-salary"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Location Gross Salary
+                                </Link>
+                                <Link
+                                    href="/dashboard/payroll/advances-deductions"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Advances & Deductions
                                 </Link>
                                 <Link
                                     href="/dashboard/payroll/generate-pay-roll"
@@ -238,6 +250,7 @@ const Sidebar = () => {
                                 >
                                     -Generate Pay Roll
                                 </Link>
+                               
                                 
                             </div>
                         )}
@@ -485,13 +498,13 @@ const Sidebar = () => {
                         {expandedSections.reports && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
-                                    href="/dashboard/reports/reports"
+                                    href="/dashboard/reports/offices"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Offices
                                 </Link>
                                 <Link
-                                    href="/dashboard/reports/employee"
+                                    href="/dashboard/reports/employees"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
                                     -Employees
