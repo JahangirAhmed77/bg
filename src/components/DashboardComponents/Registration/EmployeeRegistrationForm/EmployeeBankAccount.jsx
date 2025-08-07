@@ -7,7 +7,7 @@ import { ChevronDown } from 'lucide-react';
 const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
         bankName: Yup.string(),
-        bankCode: Yup.string(),
+        bankCode: Yup.string().max(4, 'Bank Code must be at most 4 characters').matches(/^[A-Z]+$/, 'Bank Code must contain only capital letters'),
         accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
             .min(8, 'Account number must be at least 8 digits'),
@@ -86,9 +86,7 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                                         onChange={(e) => {
                                             const selectedBank = pakistaniBanks.find(bank => bank.name === e.target.value);
                                             setFieldValue('bankName', e.target.value);
-                                            if (selectedBank) {
-                                                setFieldValue('bankCode', selectedBank.code);
-                                            }
+                                           
                                         }}
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                                     >
@@ -107,14 +105,13 @@ const EmployeeBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Code 
+                                    Bank Identifier Code (BIC)
                                 </label>
                                 <Field
                                     type="text"
                                     name="bankCode"
-                                    placeholder="Bank code (auto-filled)"
-                                    readOnly
-                                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 cursor-not-allowed"
+                                    placeholder="Enter Bank Identifier Code (BIC)"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 <ErrorMessage name="bankCode" component="div" className="text-red-500 text-sm mt-1" />
                             </div>

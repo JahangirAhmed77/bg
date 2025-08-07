@@ -1,6 +1,8 @@
 'use client'
 import { userRequest } from '@/lib/RequestMethods'
+import { downloadBulkCSVTemplate, handleFileBulkUpload, handleSubmitBulkUpload, validateBulkUploadFile } from '@/services/GuardServices/GuardBulkUpload'
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 const GuardsListings = () => {
 
@@ -12,7 +14,8 @@ const GuardsListings = () => {
         serviceNo: '',
         cnic: '',
         locationId: ''
-    })
+    });
+    const [guardBulkUploadFile, setGuardBulkUploadFile] = useState(null)
 
     useEffect(() => {
 
@@ -72,9 +75,90 @@ const GuardsListings = () => {
         setCurrentPage(1);
     }
 
+    // Handle file upload using the service
+    const handleFileUpload = (e) => {
+        try {
+            handleFileBulkUpload(e, setGuardBulkUploadFile);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    // Handle bulk upload submission using the service
+    const handleBulkUploadSubmit = async () => {
+        try {
+            // Validate file before submission
+            const validation = validateBulkUploadFile(guardBulkUploadFile);
+            if (!validation.isValid) {
+                toast.error(validation.error);
+                return;
+            }
+
+            await handleSubmitBulkUpload(guardBulkUploadFile, setGuardBulkUploadFile);
+            toast.success('File uploaded successfully');
+
+            // Refresh the guards list after successful upload
+            const res = await userRequest.get("/guards/by-organization");
+            setGuardsByLocation(res.data.data);
+        } catch (error) {
+            const errMess = error?.response?.data?.message || error.message || 'Upload failed';
+            toast.error(errMess);
+        }
+    }
+
     return (
         <div className="w-full bg-white rounded-xl shadow-md mt-8 p-4">
-            <h1 className='text-xl p-4'>Search Guards</h1>
+
+
+            <aside className="flex justify-between items-center p-4 bg-white rounded-md">
+                <h1 className="text-xl font-semibold">Search Guards</h1>
+
+                <article className="relative flex items-center gap-3 flex-wrap">
+                    <input
+                        type="file"
+                        onChange={handleFileUpload}
+                        accept=".xlsx,.xls,.csv"
+                        className="hidden"
+                        id="bulkUpload"
+                    />
+
+                    <label
+                        htmlFor="bulkUpload"
+                        className="flex items-center gap-2 px-3 py-3 bg-green-100 hover:bg-green-200 text-green-800 font-medium rounded-md cursor-pointer transition"
+                    >
+                        <img
+                            src="https://img.icons8.com/?size=100&id=BEMhRoRy403e&format=png&color=000000"
+                            alt="Excel Upload"
+                            className="w-5 h-5"
+                        />
+                        <span className="text-sm">Upload CSV</span>
+                        {guardBulkUploadFile && (
+                            <span className="text-sm text-black font-normal">
+                                {guardBulkUploadFile.name}
+                            </span>
+                        )}
+                    </label>
+
+                    <button
+                        onClick={downloadBulkCSVTemplate}
+                        className="px-3 py-3 text-sm bg-white border font-[500] border-green-800 text-green-800 rounded-md"
+                    >
+                        Download Template
+                    </button>
+
+                    {guardBulkUploadFile && (
+                        <button
+                            onClick={handleBulkUploadSubmit}
+                            className="px-3 py-3 text-sm bg-green-800 text-white font-medium rounded-md"
+                        >
+                            Submit
+                        </button>
+                    )}
+                </article>
+
+            </aside>
+
+
 
             {/* Search Form */}
             <aside className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 p-4">

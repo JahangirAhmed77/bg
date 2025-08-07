@@ -11,3 +11,13 @@ export const getYearAndMonth = (dateString) => {
 export const getDaysInMonth = (year, month) => {
     return new Date(year, month, 0).getDate(); // Month is 1-based
 };
+
+export const DateInISOFormat = (date) => {
+    if (!date) return null;
+    try {
+        return new Date(date).toISOString(); // full ISO string
+    } catch (err) {
+        console.error('Invalid date input:', date);
+        return null;
+    }
+};

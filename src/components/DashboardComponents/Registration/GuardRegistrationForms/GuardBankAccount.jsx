@@ -7,7 +7,8 @@ import { ChevronDown } from 'lucide-react';
 const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
     const validationSchema = Yup.object({
         bankName: Yup.string(),
-        bankCode: Yup.string(),
+        //banlk code ax 4 capital only letters
+        bankCode: Yup.string().max(4, 'Bank Code must be at most 4 characters').matches(/^[A-Z]+$/, 'Bank Code must contain only capital letters'),
         accountTitle: Yup.string(),
         accountNumber: Yup.string()
             .matches(/^[0-9]+$/, 'Account number must contain only numbers')
@@ -127,12 +128,12 @@ const GuardBankAccount = ({ onNext, onPrevious, initialData = {} }) => {
                             {/* Bank Code */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bank Code
+                                    Bank Identifier Code (BIC)
                                 </label>
                                 <Field
                                     type="text"
                                     name="bankCode"
-                                    placeholder="Enter Bank Code"
+                                    placeholder="Enter Bank Identifier Code (BIC)"
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                                 <ErrorMessage name="bankCode" component="div" className="text-red-500 text-sm mt-1" />

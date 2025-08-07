@@ -237,32 +237,9 @@ const Sidebar = () => {
                                     href="/dashboard/payroll/location-attendance-sheet"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
-                                    -Location Attendance Sheet
+                                    -Generate Payroll
                                 </Link>
-                                <Link
-                                    href="/dashboard/payroll/set-guard-allowance"
-                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
-                                >
-                                    -Location Allowance Management
-                                </Link>
-                                <Link
-                                    href="/dashboard/payroll/location-gross-salary"
-                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
-                                >
-                                    -Location Gross Salary
-                                </Link>
-                                <Link
-                                    href="/dashboard/payroll/advances-deductions"
-                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
-                                >
-                                    -Advances & Deductions
-                                </Link>
-                                <Link
-                                    href="/dashboard/payroll/generate-pay-roll"
-                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
-                                >
-                                    -Location Payroll (Net Payable)
-                                </Link>
+                               
 
 
                             </div>

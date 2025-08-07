@@ -10,7 +10,7 @@ const PayrollSidebar = ({ currentStep, onStepChange, completedSteps = [], onNext
         { id: 'set-guard-allowance', label: 'Set Guard Allowance', step: 2, route: '/dashboard/payroll/set-guard-allowance' },
         { id: 'location-gross-salary', label: 'Location Gross Salary', step: 3, route: '/dashboard/payroll/location-gross-salary' },
         { id: 'advances-deductions', label: 'Advances & Deductions', step: 4, route: '/dashboard/payroll/advances-deductions' },
-        { id: 'generate-pay-roll', label: 'Generate Pay Roll', step: 5, route: '/dashboard/payroll/generate-pay-roll' },
+        { id: 'location-payroll', label: 'Location Payroll (Net Payable)', step: 5, route: '/dashboard/payroll/location-payroll' },
     ];
 
     const currentStepIndex = steps.findIndex(step => step.id === currentStep);
