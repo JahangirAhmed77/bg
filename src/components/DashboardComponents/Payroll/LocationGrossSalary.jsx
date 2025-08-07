@@ -118,9 +118,9 @@ const LocationGrossSalaryForm = () => {
 
 
     return (
-        <div className="min-h-screen bg-formBGBlue flex flex-col w-full px-4 pt-4">
+        <div className="min-h-screen bg-formBGBlue flex flex-col w-full">
             {/* Breadcrumb */}
-            <div className="w-full max-w-7xl">
+            {/* <div className="w-full max-w-7xl">
                 <aside className="bg-white border-b rounded-xl border-gray-200">
                     <div className="px-6 py-4">
                         <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -132,10 +132,10 @@ const LocationGrossSalaryForm = () => {
                         </div>
                     </div>
                 </aside>
-            </div>
+            </div> */}
 
             {/* Form Card */}
-            <div className="w-full max-w-7xl bg-white rounded-xl shadow-md mt-8 p-8">
+            <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}

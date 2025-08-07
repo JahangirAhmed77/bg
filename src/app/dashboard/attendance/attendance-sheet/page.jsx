@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import AttendanceSheetForm from '@/components/DashboardComponents/Attendance/AttendanceSheetForm';
 

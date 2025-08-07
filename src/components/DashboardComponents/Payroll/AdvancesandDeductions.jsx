@@ -150,7 +150,7 @@ const AdvancesandDeductions = () => {
     return (
         <div>
             {/* Form Card */}
-            <div className="w-full max-w-7xl bg-white rounded-xl shadow-md mt-8 p-8">
+            <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -187,11 +187,11 @@ const AdvancesandDeductions = () => {
                             </div>
 
                             {/* Main Title */}
-                            <div className="text-center">
-                                <h1 className="text-lg font-semibold text-gray-900">
+                            <aside >
+                                <h1 className="text-lg font-[500]  text-gray-800">
                                     Advances and Deduction Adjustment - Guard Wise
                                 </h1>
-                            </div>
+                            </aside>
 
                             {/* Form Fields */}
                             <div className="grid grid-cols-4 gap-6">

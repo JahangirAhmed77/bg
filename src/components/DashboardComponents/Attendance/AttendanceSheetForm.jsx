@@ -14,11 +14,35 @@ const AttendanceSheetForm = () => {
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [fetchedAttendance, setFetchedAttendance] = useState([]);
-  // Generate days of the month (1-31)
-  const daysInMonth = Array.from({ length: 31 }, (_, i) => i + 1);
+  const [dateRange, setDateRange] = useState(null);
 
   // Day labels for the header
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Generate dynamic date range based on API response
+  const generateDateRange = (fromDate, toDate) => {
+    const dates = [];
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+
+    const current = new Date(start);
+    while (current <= end) {
+      dates.push({
+        date: new Date(current),
+        day: current.getDate(),
+        dayName: dayLabels[current.getDay()],
+        month: current.getMonth() + 1,
+        year: current.getFullYear(),
+        fullDate: current.toISOString().split('T')[0]
+      });
+      current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+  };
+
+  // Get calendar days based on date range from API response
+  const calendarDays = dateRange ? generateDateRange(dateRange.from, dateRange.to) : [];
 
   // Use fetched attendance data instead of mock data
   const employees = fetchedAttendance || [];
@@ -44,32 +68,40 @@ const AttendanceSheetForm = () => {
 
   // Validation Schema
   const validationSchema = Yup.object({
-    date: Yup.string().required('Month is required'),
+
     locationId: Yup.string().required('Location ID is required'),
+    fromDate: Yup.string().required('From Date is required'),
+    toDate: Yup.string().required('To Date is required'),
 
   });
 
   // Initial Values
   const initialValues = {
-    date: '',
+    // date: '',
     locationId: '',
-
+    fromDate: '',
+    toDate: '',
   };
 
   const fetchAttendance = async (values, { setSubmitting }) => {
 
-    const { date, locationId } = values;
+    const { locationId, fromDate, toDate } = values;
     const fetchAttendancePayload = {
-      date: date,
       locationId: locationId,
+      fromDate: fromDate,
+      toDate: toDate,
       totalDays: 31
     }
 
     try {
-      const res = await userRequest.get(`/attendance/guard/${selectedLocation?.id}?date=${date}&totalDays=31`);
-      console.log(res.data.data);
-      setFetchedAttendance(res.data.data);
-      if (res.data.data.length > 0) {
+      //attendance/location/guard/5fe650ae-de2f-42e5-8642-bc1ef0199d48?from=2025-07-01&to=2025-07-30
+      const res = await userRequest.get(`/attendance/location/guard/${locationId}?from=${fromDate}&to=${toDate}`);
+      console.log(res.data);
+
+      // Store both attendance data and date range
+      if (res.data.data) {
+        setFetchedAttendance(res.data.data.result || []);
+        setDateRange(res.data.data.dateRange);
         toast.success('Attendance fetched successfully');
       } else {
         toast.error('No attendance found');
@@ -103,15 +135,16 @@ const AttendanceSheetForm = () => {
     }
   }, [fetchedAttendance]);
 
-  const renderAttendanceCell = (employee, day) => {
-    // Find attendance record for this specific day
+  const renderAttendanceCell = (employee, dayInfo) => {
+    // Find attendance record for this specific date
     const attendanceRecord = employee.guardAttendance?.find(record => {
       const recordDate = new Date(record.date);
-      return recordDate.getDate() === day;
+      const dayDate = new Date(dayInfo.fullDate);
+      return recordDate.toDateString() === dayDate.toDateString();
     });
 
     const value = attendanceRecord?.type || '';
-    const cellClass = `w-8 h-8 text-xs text-center border border-gray-200 rounded ${value === 'P' ? 'bg-green-100 text-green-800' :
+    const cellClass = `w-8 h-8 text-xs text-center flex items-center justify-center border border-gray-200 rounded ${value === 'P' ? 'bg-green-100 text-green-800' :
       value === 'A' ? 'bg-red-100 text-red-800' :
         value === 'L' ? 'bg-yellow-100 text-yellow-800' :
           value === 'R' ? 'bg-blue-100 text-blue-800' :
@@ -119,7 +152,7 @@ const AttendanceSheetForm = () => {
       }`;
 
     return (
-      <td key={day} className="p-1">
+      <td key={dayInfo.fullDate} className="p-1">
         <div className={cellClass}>
           {value}
         </div>
@@ -128,30 +161,30 @@ const AttendanceSheetForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-formBGBlue flex flex-col w-full px-4 pt-4">
+    <div className="min-h-screen bg-formBGBlue flex flex-col w-full">
       {/* Breadcrumb */}
-      <div className="w-full max-w-7xl">
+      {/* <div className="w-full max-w-7xl">
         <aside className="bg-white border-b rounded-xl border-gray-200">
           <div className="px-6 py-4">
             <article className="flex items-center space-x-2 text-sm text-gray-600">
               <span>Dashboard</span>
               <span>&gt;</span>
-              <span>Registration</span>
+              <span>Payroll</span>
               <span>&gt;</span>
-              <span className="text-gray-900 font-medium">Attendance Sheet</span>
+              <span className="text-gray-900 font-medium">Location Attendance Sheet</span>
             </article>
           </div>
         </aside>
-      </div>
+      </div> */}
 
       {/* Form Card */}
-      <div className="w-full max-w-7xl bg-white rounded-xl shadow-md mt-8 p-8">
+      <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={fetchAttendance}
         >
-          {({ values, setFieldValue, isSubmitting, errors, touched }) => (
+          {({ setFieldValue, isSubmitting, errors, touched }) => (
             <Form className="space-y-8">
               {/* Auto Fields Row */}
               <div className="grid grid-cols-4 gap-6">
@@ -193,8 +226,8 @@ const AttendanceSheetForm = () => {
               <div className="space-y-6">
                 <h2 className="text-lg font-medium text-gray-900">Location Attendance Sheet</h2>
 
-                <div className="grid grid-cols-3 gap-6">
-                  <div>
+                <div className="grid grid-cols-4 gap-6">
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Month
                     </label>
@@ -223,7 +256,9 @@ const AttendanceSheetForm = () => {
                       <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                     </div>
                     <ErrorMessage name="date" component="div" className="text-red-500 text-xs mt-1" />
-                  </div>
+                  </div> */}
+
+
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -251,6 +286,7 @@ const AttendanceSheetForm = () => {
                     <ErrorMessage name="locationId" component="div" className="text-red-500 text-xs mt-1" />
                   </div>
 
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Location Name
@@ -261,7 +297,42 @@ const AttendanceSheetForm = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* from date picker */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      From Date *
+                    </label>
+                    <div className="relative">
+                      <Field
+                        type="date"
+                        name="fromDate"
+                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                      />
+                    </div>
+                  </div>
+                  <ErrorMessage name="fromDate" component="div" className="text-red-500 text-sm mt-1" />
+
+                  {/* to date picker */}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      To Date *
+                    </label>
+                    <div className="relative">
+                      <Field
+                        type="date"
+                        name="toDate"
+                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                      />
+                    </div>
+                    <ErrorMessage name="toDate" component="div" className="text-red-500 text-sm mt-1" />
+                  </div>
+
                 </div>
+
+
+
 
                 {/* Submit Button for Location Selection */}
                 <div className="flex justify-between items-center">
@@ -297,6 +368,16 @@ const AttendanceSheetForm = () => {
                 </div>
 
                 {/* Monthly Attendance Table */}
+                {dateRange && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="text-sm font-medium text-blue-900 mb-2">Attendance Period</h3>
+                    <div className="text-sm text-blue-700">
+                      <span className="font-medium">From:</span> {formatDate(new Date(dateRange.from))}
+                      <span className="mx-3 font-medium">To:</span> {formatDate(new Date(dateRange.to))}
+                      <span className="mx-3 font-medium">Total Days:</span> {dateRange.totalDays}
+                    </div>
+                  </div>
+                )}
                 <div className="bg-formBGBlue rounded-2xl p-6">
                   <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
                     <table className="min-w-full bg-white rounded-lg">
@@ -310,12 +391,18 @@ const AttendanceSheetForm = () => {
                           <th className="px-2 py-2 text-xs font-medium text-gray-700 border border-gray-200">R</th>
                           <th className="px-2 py-2 text-xs font-medium text-gray-700 border border-gray-200">L</th>
 
-                          {/* Days of the month */}
-                          {daysInMonth.map((day, index) => (
-                            <th key={day} className="px-1 py-2 text-xs font-medium text-gray-700 border border-gray-200 w-10">
+                          {/* Dynamic date range days */}
+                          {calendarDays.map((dayInfo) => (
+                            <th key={dayInfo.fullDate} className="px-1 py-2 text-xs font-medium text-gray-700 border border-gray-200 w-10">
                               <div className="text-center">
-                                <div className="text-xs">{day}</div>
-                                <div className="text-xs text-gray-500">{dayLabels[index % 7]}</div>
+                                <div className="text-xs">{dayInfo.day}</div>
+                                <div className="text-xs text-gray-500">{dayInfo.dayName}</div>
+                                {/* Show month if it changes within the range */}
+                                {dayInfo.day === 1 && (
+                                  <div className="text-xs text-blue-600 font-medium">
+                                    {new Date(0, dayInfo.month - 1).toLocaleString('default', { month: 'short' })}
+                                  </div>
+                                )}
                               </div>
                             </th>
                           ))}
@@ -347,7 +434,7 @@ const AttendanceSheetForm = () => {
                             </td>
 
                             {/* Attendance cells for each day */}
-                            {daysInMonth.map(day => renderAttendanceCell(employee, day))}
+                            {calendarDays.map(dayInfo => renderAttendanceCell(employee, dayInfo))}
                           </tr>
                         ))}
                       </tbody>

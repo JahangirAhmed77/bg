@@ -1,10 +1,10 @@
-'use client'
-import LocationGrossSalaryForm from '@/components/DashboardComponents/Payroll/LocationGrossSalary'
+'use client';
+import React from 'react';
+import AttendanceSheetForm from '@/components/DashboardComponents/Attendance/AttendanceSheetForm';
 import PayrollSidebar from '@/components/DashboardComponents/Payroll/PayrollSidebar';
 import Breadcrumbs from '@/common/DashboardCommon/Breadcrumbs';
-import React from 'react'
 
-const LocationGrossSalaryPage = () => {
+const LocationAttendanceSheetPage = () => {
     return (
         <div className="min-h-screen bg-formBGBlue">
             {/* Header */}
@@ -12,25 +12,25 @@ const LocationGrossSalaryPage = () => {
                 <Breadcrumbs breadcrumbs={[
                     { label: 'Dashboard' },
                     { label: 'Payroll' },
-                    { label: 'Location Gross Salary' }
+                    { label: 'Location Attendance Sheet' }
                 ]} />
             </div> */}
 
             <div className="flex h-[calc(100vh-73px)] p-4 gap-5">
                 {/* Sidebar */}
                 <PayrollSidebar
-                    currentStep="location-gross-salary"
+                    currentStep="location-attendance-sheet"
                     completedSteps={[]}
                     showNavigation={true}
                 />
 
                 {/* Main Content */}
                 <div className="flex-1 overflow-y-auto rounded-xl">
-                    <LocationGrossSalaryForm />
+                    <AttendanceSheetForm />
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default LocationGrossSalaryPage
+export default LocationAttendanceSheetPage; 

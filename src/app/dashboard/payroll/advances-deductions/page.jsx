@@ -1,28 +1,36 @@
 'use client'
 import React from 'react'
 import AdvancesandDeductions from '@/components/DashboardComponents/Payroll/AdvancesandDeductions'
+import PayrollSidebar from '@/components/DashboardComponents/Payroll/PayrollSidebar';
+import Breadcrumbs from '@/common/DashboardCommon/Breadcrumbs';
 
 const AdvancesDeductionsPage = () => {
-  return (
-      <div className="min-h-screen bg-formBGBlue flex flex-col w-full px-4 pt-4">
-        {/* Breadcrumb */}
-        <div className="w-full max-w-7xl">
-            <aside className="bg-white border-b rounded-xl border-gray-200">
-                <div className="px-6 py-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <span>Dashboard</span>
-                        <span>&gt;</span>
-                        <span>Payroll</span>
-                        <span>&gt;</span>
-                        <span className="text-gray-900 font-medium">Advances and Deduction</span>
-                    </div>
-                </div>
-            </aside>
-        </div>
+    return (
+        <div className="min-h-screen bg-formBGBlue">
+            {/* Header */}
+            {/* <div className='px-4 pt-4'>
+                <Breadcrumbs breadcrumbs={[
+                    { label: 'Dashboard' },
+                    { label: 'Payroll' },
+                    { label: 'Advances & Deductions' }
+                ]} />
+            </div> */}
 
-        <AdvancesandDeductions />
-    </div>
-  )
+            <div className="flex h-[calc(100vh-73px)] p-4 gap-5">
+                {/* Sidebar */}
+                <PayrollSidebar
+                    currentStep="advances-deductions"
+                    completedSteps={[]}
+                    showNavigation={true}
+                />
+
+                {/* Main Content */}
+                <div className="flex-1 overflow-y-auto rounded-xl">
+                    <AdvancesandDeductions />
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default AdvancesDeductionsPage

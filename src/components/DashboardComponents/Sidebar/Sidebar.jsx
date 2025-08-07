@@ -1,13 +1,9 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useCurrentUser } from '@/lib/hooks';
-import { ChevronDown, ChevronRight, LayoutDashboard, FileText, Users, MapPin, Clock, DollarSign, Calculator, User } from 'lucide-react';
-
+import { ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const Sidebar = () => {
-
-
 
     const [expandedSections, setExpandedSections] = useState({
         setup: true,
@@ -24,6 +20,8 @@ const Sidebar = () => {
         reports: false
     });
 
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
             ...prev,
@@ -32,12 +30,26 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="w-[280px] h-screen bg-white border-r border-gray-200 overflow-y-auto">
-            <div className="p-4">
+        <div className={`transition-all duration-200 ${sidebarOpen ? 'w-[270px]' : 'w-[60px]'} h-screen bg-white border-r border-gray-200 overflow-y-auto`}>
+            <div className="p-3">
+                {/* Sidebar Toggle Arrow */}
+                <div className="flex items-center justify-end mb-2">
+                    <button
+                        onClick={() => setSidebarOpen((prev) => !prev)}
+                        className="p-1 rounded hover:bg-gray-100 focus:outline-none"
+                        aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+                    >
+                        {sidebarOpen ? (
+                            <ChevronLeft className="h-5 w-5 text-gray-500" />
+                        ) : (
+                            <ChevronRight className="h-5 w-5 text-gray-500" />
+                        )}
+                    </button>
+                </div>
 
                 {/* Dashboards Section */}
                 <div className="mb-6">
-                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+                    <h3 className={`text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 ${!sidebarOpen ? 'hidden' : ''}`}>
                         Dashboards
                     </h3>
                     <Link
@@ -45,12 +57,12 @@ const Sidebar = () => {
                         className="flex items-center px-3 py-2 text-[13px] font-medium text-gray-700 hover:bg-gray-100 rounded-md"
                     >
                         <img src='/icons/overview.png' className="mr-3 h-4 w-4" />
-                        Overview
+                        {sidebarOpen && 'Overview'}
                     </Link>
                 </div>
 
                 <div>
-                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+                    <h3 className={`text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 ${!sidebarOpen ? 'hidden' : ''}`}>
                         Pages
                     </h3>
 
@@ -62,15 +74,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/setup.png' className="mr-3 h-4 w-4" />
-                                Setup
+                                {sidebarOpen && 'Setup'}
                             </div>
-                            {expandedSections.setup ? (
+                            {sidebarOpen && (expandedSections.setup ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.setup && (
+                        {sidebarOpen && expandedSections.setup && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/setup/create-office"
@@ -102,15 +114,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/registration.png' className="mr-3 h-4 w-4" />
-                                Registration
+                                {sidebarOpen && 'Registration'}
                             </div>
-                            {expandedSections.registration ? (
+                            {sidebarOpen && (expandedSections.registration ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.registration && (
+                        {sidebarOpen && expandedSections.registration && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/registration/guards-registration"
@@ -148,15 +160,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/deployment.png' className="mr-3 h-4 w-4" />
-                                Deployment
+                                {sidebarOpen && 'Deployment'}
                             </div>
-                            {expandedSections.deployment ? (
+                            {sidebarOpen && (expandedSections.deployment ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.deployment && (
+                        {sidebarOpen && expandedSections.deployment && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/deployment/assign-guards"
@@ -182,15 +194,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/deployment.png' className="mr-3 h-4 w-4" />
-                                Attendance
+                                {sidebarOpen && 'Attendance'}
                             </div>
-                            {expandedSections.attendance ? (
+                            {sidebarOpen && (expandedSections.attendance ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.attendance && (
+                        {sidebarOpen && expandedSections.attendance && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/attendance/location-attendance"
@@ -198,12 +210,7 @@ const Sidebar = () => {
                                 >
                                     -Location Attendance
                                 </Link>
-                                <Link
-                                    href="/dashboard/attendance/attendance-sheet"
-                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
-                                >
-                                    -Attendance Sheet
-                                </Link>
+
                             </div>
                         )}
                     </div>
@@ -216,21 +223,27 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/payroll.png' className="mr-3 h-4 w-4" />
-                                Pay Roll
+                                {sidebarOpen && 'Pay Roll'}
                             </div>
-                            {expandedSections.payroll ? (
+                            {sidebarOpen && (expandedSections.payroll ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.payroll && (
+                        {sidebarOpen && expandedSections.payroll && (
                             <div className="ml-6 mt-1 space-y-1">
+                                <Link
+                                    href="/dashboard/payroll/location-attendance-sheet"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Location Attendance Sheet
+                                </Link>
                                 <Link
                                     href="/dashboard/payroll/set-guard-allowance"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
-                                    -Allowance Management
+                                    -Location Allowance Management
                                 </Link>
                                 <Link
                                     href="/dashboard/payroll/location-gross-salary"
@@ -248,10 +261,10 @@ const Sidebar = () => {
                                     href="/dashboard/payroll/generate-pay-roll"
                                     className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
                                 >
-                                    -Generate Pay Roll
+                                    -Location Payroll (Net Payable)
                                 </Link>
-                               
-                                
+
+
                             </div>
                         )}
                     </div>
@@ -264,15 +277,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Accounts & Finance
+                                {sidebarOpen && 'Accounts & Finance'}
                             </div>
-                            {expandedSections.accounts ? (
+                            {sidebarOpen && (expandedSections.accounts ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.accounts && (
+                        {sidebarOpen && expandedSections.accounts && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/accounts/petty-cash"
@@ -286,6 +299,18 @@ const Sidebar = () => {
                                 >
                                     -Payment Vouchers
                                 </Link>
+                                <Link
+                                    href="/dashboard/accounts/accounts-allowance"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Allowance & Deductions
+                                </Link>
+                                <Link
+                                    href="/dashboard/accounts/accounts-invoices"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -Invoices
+                                </Link>
                             </div>
                         )}
                     </div>
@@ -298,15 +323,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Sales Monitor
+                                {sidebarOpen && 'Sales Monitor'}
                             </div>
-                            {expandedSections.salesMonitor ? (
+                            {sidebarOpen && (expandedSections.salesMonitor ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.salesMonitor && (
+                        {sidebarOpen && expandedSections.salesMonitor && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/sales-monitor/leads"
@@ -356,15 +381,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Performance Manager
+                                {sidebarOpen && 'Performance Manager'}
                             </div>
-                            {expandedSections.performanceManager ? (
+                            {sidebarOpen && (expandedSections.performanceManager ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.performanceManager && (
+                        {sidebarOpen && expandedSections.performanceManager && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/performance-manager/initiate-event"
@@ -378,7 +403,7 @@ const Sidebar = () => {
                                 >
                                     -Profile Rating
                                 </Link>
-                               
+
                             </div>
                         )}
                     </div>
@@ -391,15 +416,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Inventory Management
+                                {sidebarOpen && 'Inventory Management'}
                             </div>
-                            {expandedSections.inventoryManagement ? (
+                            {sidebarOpen && (expandedSections.inventoryManagement ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.inventoryManagement && (
+                        {sidebarOpen && expandedSections.inventoryManagement && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/inventory-management/vendors"
@@ -425,15 +450,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Complaints
+                                {sidebarOpen && 'Complaints'}
                             </div>
-                            {expandedSections.complaints ? (
+                            {sidebarOpen && (expandedSections.complaints ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.complaints && (
+                        {sidebarOpen && expandedSections.complaints && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/complaints/complaints"
@@ -453,15 +478,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Notifications
+                                {sidebarOpen && 'Notifications'}
                             </div>
-                            {expandedSections.notifications ? (
+                            {sidebarOpen && (expandedSections.notifications ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.notifications && (
+                        {sidebarOpen && expandedSections.notifications && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/notifications-announcements/notifications"
@@ -487,15 +512,15 @@ const Sidebar = () => {
                         >
                             <div className="flex items-center">
                                 <img src='/icons/accounts.png' className="mr-3 h-4 w-4" />
-                                Reports
+                                {sidebarOpen && 'Reports'}
                             </div>
-                            {expandedSections.reports ? (
+                            {sidebarOpen && (expandedSections.reports ? (
                                 <ChevronDown className="h-4 w-4" />
                             ) : (
                                 <ChevronRight className="h-4 w-4" />
-                            )}
+                            ))}
                         </button>
-                        {expandedSections.reports && (
+                        {sidebarOpen && expandedSections.reports && (
                             <div className="ml-6 mt-1 space-y-1">
                                 <Link
                                     href="/dashboard/reports/offices"
@@ -527,7 +552,7 @@ const Sidebar = () => {
                                 >
                                     -Location
                                 </Link>
-                                
+
                             </div>
                         )}
                     </div>
