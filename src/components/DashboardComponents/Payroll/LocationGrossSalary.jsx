@@ -1,41 +1,47 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown, Download, FileText, Calculator } from 'lucide-react';
 import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { useCurrentUser } from '@/lib/hooks';
-import { months } from '@/constants/FormConstantFields';
-import { getYearAndMonth, getDaysInMonth } from '@/utils/FormHelpers/dateHelpers';
+import PayrollContext from '@/context/PayrollContext';
 
 const LocationGrossSalaryForm = () => {
     const [currentDate, setCurrentDate] = useState('');
     const [currentTime, setCurrentTime] = useState('');
     const [locations, setLocations] = useState([]);
     const [payrollData, setPayrollData] = useState([]);
+    const [offices, setOffices] = useState([]);
+    const [guards, setGuards] = useState([]);
     const { user } = useCurrentUser();
+    const { globalPayrollFilters } = useContext(PayrollContext);
+
     // Validation schema
     const validationSchema = Yup.object({
+        officeId: Yup.string(),
         locationId: Yup.string().required('Location ID is required'),
-        date: Yup.string().required('Date is required'),
-        totalDays: Yup.number().required('Total days is required')
+        fromDate: Yup.string().required('From date is required'),
+        toDate: Yup.string().required('To date is required'),
+        serviceNo: Yup.string(),
+        guardName: Yup.string()
     });
 
     // Initial values
     const initialValues = {
-        locationId: '',
-        date: '',
-        totalDays: 31,
+        officeId: globalPayrollFilters?.officeId || '',
+        locationId: globalPayrollFilters?.locationId || '',
+        fromDate: globalPayrollFilters?.fromDate || '',
+        toDate: globalPayrollFilters?.toDate || '',
+        serviceNo: globalPayrollFilters?.serviceNo || '',
+        guardName: globalPayrollFilters?.guardName || ''
     };
 
     // Get current year dynamically if needed
     const currentYear = new Date().getFullYear();
 
-    // Function to get number of days in a month
-    const getDaysInMonth = (year, month) => {
-        return new Date(year, month, 0).getDate();
-    };
+
 
     useEffect(() => {
         const now = new Date();
@@ -46,61 +52,59 @@ const LocationGrossSalaryForm = () => {
     }, []);
 
     // Use API response data instead of mock data
-    const guards = payrollData || [];
+    const payrollGuards = payrollData || [];
 
     useEffect(() => {
         const getLocationsByOrganzation = async () => {
             try {
                 const res = await userRequest.get('/location/by-organization');
                 setLocations(res.data.data);
-
             } catch (error) {
                 console.log(error);
                 toast.error('Failed to fetch locations');
             }
         };
 
+        // const getOffices = async () => {
+        //     try {
+        //         const res = await userRequest.get('/organizations/get-offices');
+        //         setOffices(res.data.data);
+        //     } catch (error) {
+        //         console.log(error);
+        //         toast.error('Failed to fetch offices');
+        //     }
+        // };
+
         getLocationsByOrganzation();
+        // getOffices();
     }, []);
 
-    const calculatePayroll = (employee) => {
-        // Handle missing data with fallbacks
-        const basicSalary = employee.guardFinances?.salaryPerMonth || 0;
-        const presentDays = employee.attendanceStats?.P || 0;
-        const allowance = employee.guardFinances?.allowance || 0;
-        const overtimeRate = employee.guardFinances?.overtimePerHour || 0;
-        const gazettedHoliday = employee.guardFinances?.gazettedHoliday || 0;
-
-        const workingDays = 30; // Standard month
-        const dailyRate = basicSalary / workingDays;
-        const earnedSalary = dailyRate * presentDays;
-
-        // Calculate overtime pay (assuming some overtime hours if not available)
-        const overtimeHours = 0; // Not available in API response
-        const overtimePay = overtimeHours * overtimeRate;
-
-        const grossSalary = earnedSalary + allowance + overtimePay + gazettedHoliday;
-        const netSalary = employee.netSalary || grossSalary; // Use API netSalary if available
-
-        return {
-            earnedSalary: Math.round(earnedSalary),
-            overtimePay: Math.round(overtimePay),
-            grossSalary: Math.round(grossSalary),
-            netSalary: Math.round(netSalary),
-            allowance: Math.round(allowance),
-            gazettedHolidayAmount: Math.round(gazettedHoliday)
+    // Fetch guards when location is selected
+    useEffect(() => {
+        const getGuardsByLocation = async () => {
+            const locationId = globalPayrollFilters?.locationId;
+            if (locationId) {
+                try {
+                    const res = await userRequest.get(`/location/assigned-guard/${locationId}`);
+                    setGuards(res.data.data || []);
+                } catch (error) {
+                    console.log(error);
+                    toast.error('Failed to fetch guards');
+                }
+            }
         };
-    };
+
+        getGuardsByLocation();
+    }, [globalPayrollFilters?.locationId]);
 
     const handleGeneratePayroll = async (values) => {
-
-
         try {
-            const res = await userRequest.get(`/attendance/guard/payroll/${values.locationId}?date=${values.date}&totalDays=${values.totalDays}`);
+            const res = await userRequest.get(`/payroll/location/gross-salary/${values.locationId}?from=${values.fromDate}&to=${values.toDate}`);
             console.log(res.data.data);
             if (res.data.data.length > 0) {
                 toast.success('Payroll generated successfully');
                 setPayrollData(res.data.data);
+                console.log(res.data.data);
             } else {
                 toast.error('No payroll data available');
             }
@@ -108,8 +112,20 @@ const LocationGrossSalaryForm = () => {
             console.log(error);
             toast.error('Failed to generate payroll');
         }
+    };
 
-
+    const handleLocationChange = async (locationId) => {
+        if (locationId) {
+            try {
+                const res = await userRequest.get(`/location/assigned-guard/${locationId}`);
+                setGuards(res.data.data || []);
+            } catch (error) {
+                console.log(error);
+                toast.error('Failed to fetch guards for this location');
+            }
+        } else {
+            setGuards([]);
+        }
     };
 
     const getFirstDateOfMonth = (month) => {
@@ -142,14 +158,6 @@ const LocationGrossSalaryForm = () => {
                     onSubmit={handleGeneratePayroll}
                 >
                     {({ values, isSubmitting, setFieldValue }) => {
-                        
-                        useEffect(() => {
-                            if (values.date) {
-                                const { year, month } = getYearAndMonth(values.date);
-                                const days = getDaysInMonth(year, month);
-                                setFieldValue('totalDays', days);
-                            }
-                        }, [values.date, setFieldValue]);
                         return (
                             <Form className="space-y-8">
                                 {/* Auto Fields Row */}
@@ -188,94 +196,150 @@ const LocationGrossSalaryForm = () => {
 
                                     {/* Selection Fields */}
                                     <div className="grid grid-cols-4 gap-6">
-
+                                        {/* Office/Branch */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Select Month *
+                                                Select Office/Branch *
                                             </label>
                                             <div className="relative">
                                                 <Field
                                                     as="select"
-                                                    name="date"
+                                                    name="officeId"
+                                                    disabled={true}
                                                     className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                                 >
                                                     <option value="">Select</option>
-                                                    {months.map((month, index) => {
-                                                        const firstDateOfMonth = getFirstDateOfMonth(month); // Format: YYYY-MM-01
-
-                                                        return (
-                                                            <option key={index} value={firstDateOfMonth}>
-                                                                {month.label}
-                                                            </option>
-                                                        );
-                                                    })}
+                                                    <option value="Office1">Office1</option>
+                                                    <option value="Office2">Office2</option>
+                                                    <option value="Office3">Office3</option>
+                                                    <option value="Office4">Office4</option>
+                                                    <option value="Office5">Office5</option>
+                                                    <option value="Office6">Office6</option>
+                                                    <option value="Office7">Office7</option>
                                                 </Field>
-
+                                                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                             </div>
-                                            <ErrorMessage name="date" component="div" className="text-red-500 text-sm mt-1" />
+                                            <ErrorMessage name="officeId" component="div" className="text-red-500 text-sm mt-1" />
                                         </div>
 
-
-
-
+                                        {/* Location */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Total No. of Days
+                                                Select Location *
                                             </label>
-                                            <Field
-                                                name="totalDays"
-                                                readOnly
-                                                className="w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500 cursor-not-allowed"
-                                                placeholder="Auto-calculated based on selected month"
-                                            />
+                                            <div className="relative">
+                                                <Field
+                                                    as="select"
+                                                    name="locationId"
+                                                    disabled={true}
+                                                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-100 focus:border-transparent appearance-none"
+                                                    onChange={(e) => {
+                                                        handleLocationChange(e.target.value);
+                                                    }}
+                                                >
+                                                    <option value="">Select</option>
+                                                    {locations.map((location) => (
+                                                        <option key={location.id} value={location.id}>
+                                                            {location.locationName} - ({location.createdLocationId})
+                                                        </option>
+                                                    ))}
+                                                </Field>
+                                                
+                                            </div>
+                                            <ErrorMessage name="locationId" component="div" className="text-red-500 text-sm mt-1" />
                                         </div>
-                                        <ErrorMessage name="totalDays" component="div" className="text-red-500 text-sm mt-1" />
+
+                                        {/* From Date */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                From Date *
+                                            </label>
+                                            <div className="relative">
+                                                <Field
+                                                    type="date"
+                                                    disabled={true}
+                                                    name="fromDate"
+                                                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                />
+                                            </div>
+                                            <ErrorMessage name="fromDate" component="div" className="text-red-500 text-sm mt-1" />
+                                        </div>
+
+                                        {/* To Date */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                To Date *
+                                            </label>
+                                            <div className="relative">
+                                                <Field
+                                                    type="date"
+                                                    disabled={true}
+                                                    name="toDate"
+                                                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                />
+                                            </div>
+                                            <ErrorMessage name="toDate" component="div" className="text-red-500 text-sm mt-1" />
+                                        </div>
                                     </div>
 
-                                    {/* Location Selection Section */}
+                                    {/* Service Number and Guard Name Section */}
                                     <div className="space-y-4">
-                                        {/* <p className="text-sm text-gray-700">
-                                        To Generate Specific Location Attendance Report<br />
-                                        Please select location
-                                    </p> */}
-                                        <div className="grid grid-cols-3 gap-6">
+                                        <div className="grid grid-cols-4 gap-6">
+                                            {/* Service Number */}
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Select Location *
+                                                    Select Service No. *
                                                 </label>
                                                 <div className="relative">
                                                     <Field
                                                         as="select"
-                                                        name="locationId"
+                                                        name="serviceNo"
                                                         className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                                     >
                                                         <option value="">Select</option>
-                                                        {locations.map((location) => (
-                                                            <option key={location.id} value={location.id}>{location.locationName} - ({location.createdLocationId}) </option>
+                                                        {guards.map((guard) => (
+                                                            <option key={guard.guard?.id || guard.id} value={guard.guard?.serviceNumber || guard.serviceNumber}>
+                                                                {guard.guard?.serviceNumber || guard.serviceNumber || 'NA'}
+                                                            </option>
                                                         ))}
                                                     </Field>
                                                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                                 </div>
-                                                <ErrorMessage name="locationId" component="div" className="text-red-500 text-sm mt-1" />
+                                                <ErrorMessage name="serviceNo" component="div" className="text-red-500 text-sm mt-1" />
                                             </div>
+
+                                            {/* Guard Name */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Select Guard Name *
+                                                </label>
+                                                <div className="relative">
+                                                    <Field
+                                                        as="select"
+                                                        name="guardName"
+                                                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {guards.map((guard) => (
+                                                            <option key={guard.guard?.id || guard.id} value={guard.guard?.id || guard.id}>
+                                                                {guard.guard?.fullName || guard.fullName || 'NA'}
+                                                            </option>
+                                                        ))}
+                                                    </Field>
+                                                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                                </div>
+                                                <ErrorMessage name="guardName" component="div" className="text-red-500 text-sm mt-1" />
+                                            </div>
+
                                             <div className="flex flex-col justify-end">
                                                 <button
                                                     type="submit"
                                                     disabled={isSubmitting}
-                                                    className="px-3 py-3 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="px-3 py-3 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-formButtonBlueHover disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     {isSubmitting ? 'Generating...' : 'Fetch Report'}
                                                 </button>
                                             </div>
-                                            {/* <div className="flex flex-col justify-end">
-                                            <button
-                                                type="button"
-                                                onClick={handleDownloadPayroll}
-                                                className="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                                            >
-                                                Calculate
-                                            </button>
-                                        </div> */}
                                         </div>
                                     </div>
 
@@ -305,8 +369,8 @@ const LocationGrossSalaryForm = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {guards.length > 0 ? guards.map((employee, index) => {
-                                                      
+                                                    {payrollGuards.length > 0 ? payrollGuards.map((employee, index) => {
+
                                                         return (
                                                             <tr key={employee.id} className="hover:bg-gray-50">
                                                                 <td className="sticky left-0 z-10 bg-white px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
@@ -345,10 +409,10 @@ const LocationGrossSalaryForm = () => {
                                                                 <td className="px-2 py-2 text-xs min-w-[45px] text-gray-600 border border-gray-200 text-center">
                                                                     {employee.attendanceStats?.L || 0}
                                                                 </td>
-                                                               
+
                                                                 {/* Net Salary */}
                                                                 <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                    {employee.netSalary.toFixed(2) || 0}
+                                                                    {employee.netSalary?.toFixed(2) || 0}
                                                                 </td>
                                                                 {/* Overtime Amount given by organizational admin */}
                                                                 <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
@@ -362,14 +426,14 @@ const LocationGrossSalaryForm = () => {
                                                                     {employee.guardFinances?.gazettedHoliday || 0}
                                                                 </td>
                                                                 <td className="px-2 py-2 text-xs min-w-[55px] font-semibold text-green-600 border border-gray-200 text-center bg-green-50">
-                                                                    {0}
+                                                                    {employee.totalGrossSalary}
                                                                 </td>
                                                             </tr>
                                                         );
                                                     }) : (
                                                         <tr>
                                                             <td colSpan="20" className="px-4 py-8 text-center text-gray-500">
-                                                                No payroll data available. Please select a location and month, then click "Fetch Report" to generate payroll data.
+                                                                No payroll data available. Please select a location, date range, and click "Fetch Report" to generate payroll data.
                                                             </td>
                                                         </tr>
                                                     )}

@@ -4,6 +4,7 @@
     "fullName": "Muhammad Kamram",
     "serviceNumber": 1,
     "fatherName": "Shabbir Hussain",
+    "assignedGuardId": "3920dfe2-8dcb-44c7-903d-77eac7f36961",
     "location": {
       "id": "6cb64d7d-a5e6-4068-ac7a-186c7f867536",
       "locationName": "Karachi Port",
@@ -14,12 +15,14 @@
         "contractNumber": 1
       }
     },
-    "netSalary": 0,
+    "guardCategory": "string",
+    "shift": "Morning",
+    "netSalary": 9000,
     "attendanceStats": {
-      "P": 0,
-      "R": 0,
+      "P": 3,
+      "R": 1,
       "L": 0,
-      "A": 31
+      "A": 1
     },
     "guardFinances": {
       "id": "e8e3117a-0062-4c9b-85c5-3c89317b726f",
@@ -29,18 +32,16 @@
       "overtimePerHour": 500,
       "allowance": 2000
     },
-    "guardAttendance": [
-      {
-        "id": "c47e867a-1fab-45c0-8a41-3a9e33f0941b",
-        "type": "A",
-        "locationId": "5fe650ae-de2f-42e5-8642-bc1ef0199d48",
-        "guardId": "fe534a24-4548-4884-a5b3-46c1dea2016d",
-        "shiftId": "521d3607-c27c-4cdd-bf92-5aafaae39fc7",
-        "date": "2025-07-31T13:34:58.726Z",
-        "isHoliday": false,
-        "createdAt": "2025-07-31T13:34:58.019Z",
-        "updatedAt": "2025-07-31T13:34:58.019Z"
-      }
-    ]
+    "allowance": {
+      "overTimeCount": 13,
+      "allowancePercentage": 30,
+      "holidayCount": 12
+    },
+    "providedAllowances": {
+      "overTimeAmount": 6500,
+      "gazettedHolidayAmount": 0,
+      "allowanceAmount": 60000
+    },
+    "totalGrossSalary": 75500
   }
 ]

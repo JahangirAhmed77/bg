@@ -1,28 +1,36 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ChevronDown } from 'lucide-react';
 import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { useCurrentUser } from '@/lib/hooks';
+import PayrollContext from '@/context/PayrollContext';
+import { formatDate } from '@/utils/FormHelpers/formatDate';
+
 
 
 const PayrollSetAllowances = () => {
+    //context
+    const { user } = useCurrentUser();
+    const { globalPayrollFilters, globalLockDate } = useContext(PayrollContext);
+
+    //states
     const [currentDate, setCurrentDate] = useState('');
     const [currentTime, setCurrentTime] = useState('');
     const [locations, setLocations] = useState([]);
     const [payrollData, setPayrollData] = useState([]);
     const [allowanceValues, setAllowanceValues] = useState({});
-    const { user } = useCurrentUser();
+    const [isExistingAllowance, setIsExistingAllowance] = useState(false);
 
     // Validation schema
     const validationSchema = Yup.object({
-        locationId: Yup.string().required('Location ID is required'),
+        locationId: Yup.string(),
         officeId: Yup.string(),
         serviceNo: Yup.string(),
-        fromDate: Yup.string().required('From date is required'),
-        toDate: Yup.string().required('To date is required')
+        fromDate: Yup.string(),
+        toDate: Yup.string()
     });
 
     // Initial values
@@ -60,16 +68,43 @@ const PayrollSetAllowances = () => {
         getLocationsByOrganization();
     }, []);
 
+    useEffect(() => {
+        //check if there is already allwoance set 
+        const checkExisitngAllowanceByLocation = async () => {
+            try {
+                const res = await userRequest.get(`/payroll/allowance/guard/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`)
+               
+                if (res.data.data.result.length > 0) {
+                    //if exsitign allwoance set we we will disable save button
+                    setIsExistingAllowance(true);
+                } else {
+                    setIsExistingAllowance(false);
+                }
+            } catch (error) {
+                console.error('Error fetching allowance:', error);
+                toast.error('Failed to fetch allowance');
+            }
+        }
+        checkExisitngAllowanceByLocation();
+    }, [globalLockDate])
 
-    const handleGetAllowanceData = async (values) => {
+        useEffect(() => {
+            console.log("selectedLocation", globalPayrollFilters?.locationId)
+            console.log("selectedFromDate", globalPayrollFilters?.fromDate)
+            console.log("selectedToDate", globalPayrollFilters?.toDate)
+            
+        }, [globalPayrollFilters])
+
+    const handleGetAllowanceData = async () => {
         try {
             setPayrollData([]);
             setAllowanceValues({});
-            const res = await userRequest.get(`/payroll/allowance/guard/${values.locationId}?from=${values.fromDate}&to=${values.toDate}`);
+            const res = await userRequest.get(`/payroll/allowance/guard/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`);
 
             if (res.data && res.data.data.result.length > 0) {
                 toast.success('Guard data loaded successfully');
                 setPayrollData(res.data.data.result);
+
 
 
                 // Initialize allowance values for each guard with existing values from API
@@ -107,6 +142,8 @@ const PayrollSetAllowances = () => {
         }));
     };
 
+
+
     const handleSaveAllowances = async () => {
         try {
             // Validate that we have guards to save
@@ -118,19 +155,18 @@ const PayrollSetAllowances = () => {
             // Prepare payload for each guard according to API specification
             const payload = payrollData.map((guard) => ({
                 guardId: guard.id,
-                assignedGuardId: guard.assignedGuardId,
+                requestedGuardId: guard.requestedGuardId,
+                locationPayrollDurationId: globalLockDate.id,
                 allowancePercentage: allowanceValues[guard.id]?.allowancePercentage || 0,
                 holidayCount: allowanceValues[guard.id]?.holidayCount || 0,
                 overTimeCount: allowanceValues[guard.id]?.overTimeCount || 0
             }));
 
             const res = await userRequest.post('/payroll/create/guard/allowance', payload);
+            console.log("allowances saved", res.data)
+            toast.success('Allowances saved successfully for all guards');
 
-            if (res.data && res.data.status === 'success') {
-                toast.success('Allowances saved successfully for all guards');
-            } else {
-                toast.error('Failed to save allowances');
-            }
+
         } catch (error) {
             console.error('Error saving allowances:', error);
             toast.error('Failed to save allowances');
@@ -143,6 +179,82 @@ const PayrollSetAllowances = () => {
 
             {/* Form Card */}
             <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
+                {/* Auto Fields Row */}
+                <div className="grid grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Office ID
+                        </label>
+                        <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                            {user?.id?.slice(0, 8)}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Date
+                        </label>
+                        <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                            {currentDate}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Time
+                        </label>
+                        <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
+                            {currentTime}
+                        </div>
+                    </div>
+                </div>
+
+                <aside className="bg-white py-6 rounded-xl flex justify-between items-center ">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Allowances Management - Location Wise
+                    </h2>
+
+                    {globalLockDate?.isLocked ? (
+                        <article className="flex flex-col items-end text-sm text-gray-600">
+                            <aside className="flex items-center gap-2 mb-1">
+                                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <span>
+                                    Attendance status: <strong className="text-red-600">Locked</strong>
+                                </span>
+                            </aside>
+                            <span className="text-xs text-gray-500 italic mb-1">
+                                Locked from {formatDate(globalLockDate.startDate)} to {formatDate(globalLockDate.endDate)}.
+                            </span>
+                            {isExistingAllowance && (
+                                <aside className="flex items-center gap-2 mb-1">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span>
+                                        Allowance status: <strong className="text-green-600">{isExistingAllowance ? 'Saved' : 'Not set'}</strong>
+                                    </span>
+                                </aside>
+                            )}
+                          
+                           
+                           
+                        </article>
+                    ) : globalLockDate === null || globalLockDate === undefined ? (
+                        <div className="flex items-center gap-2 text-sm text-orange-700 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                            <span>Please complete the previous section to proceed with allowances.</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-lg border border-yellow-200">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            <span>Please lock attendance to proceed with the allowance section.</span>
+                        </div>
+                    )}
+                </aside>
+
+
+
+
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -150,43 +262,15 @@ const PayrollSetAllowances = () => {
                 >
                     {({ isSubmitting }) => (
                         <Form className="space-y-8">
-                            {/* Auto Fields Row */}
-                            <div className="grid grid-cols-3 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Office ID
-                                    </label>
-                                    <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        {user?.id?.slice(0, 8)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Date
-                                    </label>
-                                    <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        {currentDate}
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Time
-                                    </label>
-                                    <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                                        {currentTime}
-                                    </div>
-                                </div>
-                            </div>
 
                             {/* Payroll Generation Section */}
                             <div className="space-y-6">
-                                <h2 className="text-lg font-medium text-gray-900">
-                                    Allowances Management - Location Wise
-                                </h2>
+
 
                                 {/* Selection Fields */}
                                 <div className="grid grid-cols-4 gap-6">
 
+                                    {/* Office/Branch */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Select Office/Branch *
@@ -201,20 +285,27 @@ const PayrollSetAllowances = () => {
                                         </div>
                                         <ErrorMessage name="officeId" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
-                                    <div>
+                                    <aside>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Select Service No. *
+                                            Select Location *
                                         </label>
                                         <div className="relative">
                                             <Field
-                                                type="text"
-                                                name="serviceNo"
-                                                className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                                                placeholder="Enter Service No."
-                                            />
+                                                as="select"
+                                                disabled={true}
+                                                name="locationId"
+                                                value={globalPayrollFilters?.locationId}
+                                                className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none disabled:opacity-100 disabled:cursor-not-allowed"
+                                            >
+                                                <option value="">Select</option>
+                                                {locations.map((location) => (
+                                                    <option key={location.id} value={location.id}>{location.locationName} - ({location.createdLocationId}) </option>
+                                                ))}
+                                            </Field>
+                                            
                                         </div>
-                                    </div>
-                                    <ErrorMessage name="serviceNo" component="div" className="text-red-500 text-sm mt-1" />
+                                        <ErrorMessage name="locationId" component="div" className="text-red-500 text-sm mt-1" />
+                                    </aside>
 
                                     {/* from date picker */}
                                     <div>
@@ -225,11 +316,14 @@ const PayrollSetAllowances = () => {
                                             <Field
                                                 type="date"
                                                 name="fromDate"
+                                                value={globalPayrollFilters?.fromDate}
+                                                disabled={true}
                                                 className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                             />
                                         </div>
+                                        <ErrorMessage name="fromDate" component="p" className="text-red-500 text-sm mt-1" />
                                     </div>
-                                    <ErrorMessage name="fromDate" component="div" className="text-red-500 text-sm mt-1" />
+
 
                                     {/* to date picker */}
 
@@ -241,7 +335,9 @@ const PayrollSetAllowances = () => {
                                             <Field
                                                 type="date"
                                                 name="toDate"
+                                                value={globalPayrollFilters?.toDate}
                                                 className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                disabled={true}
                                             />
                                         </div>
                                         <ErrorMessage name="toDate" component="div" className="text-red-500 text-sm mt-1" />
@@ -253,39 +349,64 @@ const PayrollSetAllowances = () => {
                                 {/* Location Selection Section */}
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-4 gap-6">
-                                        <aside>
+
+                                        {/* Service No. */}
+                                        <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Select Location *
+                                                Select Service No. *
+                                            </label>
+                                            <div className="relative">
+                                                <Field
+                                                    type="text"
+                                                    name="serviceNo"
+                                                    className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                    placeholder="Enter Service No."
+                                                />
+                                            </div>
+                                        </div>
+                                        <ErrorMessage name="serviceNo" component="div" className="text-red-500 text-sm mt-1" />
+
+                                        {/* Select guard name */}
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Select Guard Name *
                                             </label>
                                             <div className="relative">
                                                 <Field
                                                     as="select"
-                                                    name="locationId"
+                                                    name="guardName"
                                                     className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                                    placeholder="Enter Guard Name"
                                                 >
                                                     <option value="">Select</option>
-                                                    {locations.map((location) => (
-                                                        <option key={location.id} value={location.id}>{location.locationName} - ({location.createdLocationId}) </option>
-                                                    ))}
+                                                    <option value="1">Guard 1</option>
+                                                    <option value="2">Guard 2</option>
+                                                    <option value="3">Guard 3</option>
+                                                    <option value="4">Guard 4</option>
+                                                    <option value="5">Guard 5</option>
                                                 </Field>
+
                                                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                             </div>
-                                            <ErrorMessage name="locationId" component="div" className="text-red-500 text-sm mt-1" />
-                                        </aside>
+                                        </div>
+                                        <ErrorMessage name="guardName" component="div" className="text-red-500 text-sm mt-1" />
+
                                         <div className="flex flex-col justify-end">
                                             <button
                                                 type="submit"
                                                 disabled={isSubmitting}
                                                 className="px-2 py-3 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                {isSubmitting ? 'Loading...' : 'Load Guards'}
+                                                {isSubmitting ? 'Fetching...' : 'Fetch Report'}
                                             </button>
                                         </div>
                                         <div className="flex flex-col justify-end">
                                             <button
                                                 type="button"
                                                 onClick={handleSaveAllowances}
-                                                disabled={payrollData.length === 0}
+                                                disabled={payrollData.length === 0 || isExistingAllowance}
+                                                title={isExistingAllowance ? 'Allowance already set for this location' : ''}
                                                 className="px-2 py-3 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 Save
@@ -317,7 +438,7 @@ const PayrollSetAllowances = () => {
                                                     <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Allowance <br />% (Max 100)</th>
                                                     <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Holiday <br />Count</th>
 
-                                                    <th className="px-2 py-2 text-xs font-medium text-gray-700 border border-gray-200 bg-green-50">Total</th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -399,15 +520,7 @@ const PayrollSetAllowances = () => {
                                                             />
                                                         </td>
 
-                                                        {/* Total - Simple calculation showing base salary + current allowance values */}
-                                                        <td className="px-2 py-2 text-xs font-semibold text-green-600 border border-gray-200 text-center bg-green-50">
-                                                            {(
-                                                                (employee.netSalary || 0) +
-                                                                (allowanceValues[employee.id]?.overTimeCount || 0) +
-                                                                (allowanceValues[employee.id]?.allowancePercentage || 0) +
-                                                                (allowanceValues[employee.id]?.holidayCount || 0)
-                                                            ).toFixed(2)}
-                                                        </td>
+
                                                     </tr>
                                                 )) : (
                                                     <tr>

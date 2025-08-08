@@ -1,43 +1,33 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { CalendarDays, ChevronDown, Clock3, Download, Edit2, Lock, Printer, PrinterCheck, Send, Unlock } from 'lucide-react';
+import { CalendarDaysIcon, ChevronDown, Clock3, Download, Edit2, Lock, Printer, PrinterCheck, Send, Unlock } from 'lucide-react';
 import { getCurrentDate, getCurrentTime } from '@/utils/FormHelpers/CurrentDateTime';
 import { useCurrentUser } from '@/lib/hooks';
 import { formatDate } from '@/utils/FormHelpers/formatDate';
 import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { DateInISOFormat } from '@/utils/FormHelpers/dateHelpers';
+import PayrollContext from '@/context/PayrollContext';
+
 
 
 const AttendanceSheetForm = () => {
+  //context
   const { user } = useCurrentUser();
+  const { globalPayrollFilters, setGlobalPayrollFilters, globalLockDate, setGlobalLockDate } = useContext(PayrollContext);
+  //states
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedStartDate, setSelectedStartDate] = useState(null)
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [fetchedAttendance, setFetchedAttendance] = useState([]);
   const [dateRange, setDateRange] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
-  const [existingPayrollLockDate, setExistingPayrollLockDate] = useState(
-    {
-      status: "success",
-      message: "PayRoll lock fetched successfully",
-      data: {
-        id: "12349c79-f063-46d1-bf4c-3a19fd5b3bf1",
-        locationId: "da5e90a7-17b2-4b4e-b0de-c946e5141326",
-        startDate: "2025-07-01T00:00:00.000Z",
-        endDate: "2025-07-31T00:00:00.000Z",
-        totalDays: 30,
-        isLocked: true,
-        nextUnlockTime: "2025-08-31T00:00:00.000Z",
-        createdAt: "2025-08-07T10:37:39.716Z",
-        updatedAt: "2025-08-07T10:37:39.716Z"
-      }
-    }
-  );
-  const payrollData = existingPayrollLockDate?.data;
+  const [existingPayrollLockDate, setExistingPayrollLockDate] = useState(null);
+
   // Day labels for the header
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -94,28 +84,25 @@ const AttendanceSheetForm = () => {
 
   // Initial Values
   const initialValues = {
-    locationId: '',
-    startDate: '',
-    endDate: '',
+    locationId: globalPayrollFilters?.locationId || '',
+    startDate: globalPayrollFilters?.fromDate || '',
+    endDate: globalPayrollFilters?.toDate || '',
     serviceNo: '',
     officeId: '',
   };
 
   useEffect(() => {
     const getLockStatus = async () => {
-      
+
       const startDate = DateInISOFormat(selectedStartDate);
       try {
         const res = await userRequest.get(`/payroll/lock/status/${selectedLocation?.id}?startDate=${startDate}`);
         console.log(res.data);
         setIsLocked(res.data.data.isLocked);
-        // setExistingPayrollLockDate(res.data.data);
+        setExistingPayrollLockDate(res.data.data);
+        setGlobalLockDate(res.data.data);
         const toastMsg = res.data.data.isLocked ? 'Attendance is Locked' : 'Attendance is Open';
-        if (res.data.data.isLocked) {
-          toast.warning(toastMsg);
-        } else {
-          toast.success(toastMsg);
-        }
+        toast.success(toastMsg);
       } catch (error) {
         const errMsg = error?.response?.data?.message;
         toast.error(errMsg);
@@ -128,18 +115,47 @@ const AttendanceSheetForm = () => {
     }
   }, [selectedStartDate, selectedLocation])
 
+  useEffect(() => {
+    if (selectedLocation && selectedStartDate && selectedEndDate) {
+      console.log("selectedLocation", selectedLocation)
+      console.log("selectedStartDate", selectedStartDate)
+      console.log("selectedEndDate", selectedEndDate)
+      setGlobalPayrollFilters({
+        locationId: selectedLocation?.id,
+        fromDate: selectedStartDate,
+        toDate: selectedEndDate
+      })
+    }
+  }, [selectedLocation, selectedStartDate, selectedEndDate])
+
   const handleLockAttendance = async () => {
     try {
-      // const startDate = DateInISOFormat(selectedStartDate);
-      // const res = await userRequest.post(`/payroll/lock/${selectedLocation?.id}`, {
-      //   startDate: startDate
-      // });
+      if (!selectedEndDate) {
+        toast.error('Please select end date');
+        return;
+      }
+      if (!selectedStartDate) {
+        toast.error('Please select start date');
+        return;
+      }
+      if (!selectedLocation) {
+        toast.error('Please select a location');
+        return;
+      }
+      const startDate = DateInISOFormat(selectedStartDate);
+      const endDate = DateInISOFormat(selectedEndDate);
+      const res = await userRequest.post(`/payroll/lock/attendance-for-payroll`, {
+        locationId: selectedLocation?.id,
+        startDate: startDate,
+        endDate: endDate
+      });
+      console.log(res.data);
 
-      // if (res.data.success) {
+      if (res.data) {
         setIsLocked(true);
         setShowLockModal(false);
         toast.success('Attendance locked successfully');
-      // }
+      }
     } catch (error) {
       const errMsg = error?.response?.data?.message;
       toast.error(errMsg || 'Failed to lock attendance');
@@ -175,18 +191,32 @@ const AttendanceSheetForm = () => {
     setSelectedLocation(location);
   };
 
-  useEffect(() => {
-    if (selectedLocation) {
-      console.log(selectedLocation.id)
+  const getTotalDaysFromSelectedDateRange = () => {
+    if (!globalPayrollFilters?.fromDate || !globalPayrollFilters?.toDate) {
+      return 0;
     }
-  }, [selectedLocation]);
+    if (globalPayrollFilters?.fromDate > globalPayrollFilters?.toDate) {
+      return 0;
+    }
+    const startDate = new Date(globalPayrollFilters?.fromDate);
+    const endDate = new Date(globalPayrollFilters?.toDate);
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    return daysDifference;
+  }
+
+  // useEffect(() => {
+  //   if (selectedLocation) {
+  //     console.log(selectedLocation.id)
+  //   }
+  // }, [selectedLocation]);
 
   // Update attendance data when fetched attendance changes
-  useEffect(() => {
-    if (fetchedAttendance.length > 0) {
-      console.log('Fetched attendance updated:', fetchedAttendance);
-    }
-  }, [fetchedAttendance]);
+  // useEffect(() => {
+  //   if (fetchedAttendance.length > 0) {
+  //     console.log('Fetched attendance updated:', fetchedAttendance);
+  //   }
+  // }, [fetchedAttendance]);
 
   const renderAttendanceCell = (employee, dayInfo) => {
     // Find attendance record for this specific date
@@ -215,7 +245,7 @@ const AttendanceSheetForm = () => {
 
   return (
     <div className="min-h-screen bg-formBGBlue flex flex-col w-full">
- 
+
       <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
         {/* Auto Fields Row */}
         <div className="grid grid-cols-4 gap-6">
@@ -256,66 +286,69 @@ const AttendanceSheetForm = () => {
         {/* Monthly Attendance Sheet Section */}
         <div className="space-y-6">
           {/* Top-Section */}
-        
+
           <aside className="bg-white py-5 rounded-xl flex justify-between items-center">
             <h2 className="text-lg font-medium text-gray-900">Location Attendance Sheet</h2>
 
-            {selectedLocation &&selectedStartDate && (
-                          <article className="flex items-center gap-5">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                {isLocked ? (
-                  <>
-                    <Lock className="w-4 h-4 text-red-500" />
-                    <span>Lock status: <strong className="text-red-600">Locked</strong></span>
-                  </>
-                ) : (
-                  <>
-                    <Unlock className="w-4 h-4 text-green-500" />
-                    <span>Lock status: <strong className="text-green-600">Unlocked</strong></span>
-                  </>
+            {selectedLocation && selectedStartDate && (
+              <article className="flex items-center gap-5">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  {isLocked ? (
+                    <>
+                      <Lock className="w-4 h-4 text-red-500" />
+                      <span>Lock status: <strong className="text-red-600">Locked</strong></span>
+                    </>
+                  ) : (
+                    <>
+                      <Unlock className="w-4 h-4 text-green-500" />
+                      <span>Lock status: <strong className="text-green-600">Unlocked</strong></span>
+                    </>
+                  )}
+                </div>
+                {!isLocked && (
+                  <button
+                    onClick={() => setShowLockModal(true)}
+                    className="px-4 py-2 flex items-center gap-2 bg-red-500 border border-red-500 text-white text-sm rounded-lg hover:text-red-500 transition-all hover:bg-white hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Lock className="w-4 h-4" />
+                    Lock
+                  </button>
                 )}
-              </div>
-              {!isLocked && (
-                <button
-                  onClick={() => setShowLockModal(true)}
-                  className="px-4 py-2 flex items-center gap-2 bg-red-500 border border-red-500 text-white text-sm rounded-lg hover:text-red-500 transition-all hover:bg-white hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Lock className="w-4 h-4" />
-                  Lock
-                </button>
-              )}
-            </article>
+              </article>
             )}
 
           </aside>
 
-          <aside className="bg-white p-5 rounded-xl shadow-md border border-gray-200">
-           
+          {existingPayrollLockDate && (
+            <aside className="bg-white p-5 rounded-xl shadow-md border border-gray-200 text-center space-y-3">
 
-            <ul className="text-sm text-gray-700 space-y-2">
-              {payrollData?.startDate && (
-                <li className="flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-blue-500" />
-                  Start Date: {formatDate(payrollData.startDate)}
-                </li>
+              {/* Attendance Range */}
+              {existingPayrollLockDate?.startDate && existingPayrollLockDate?.endDate && (
+                <p className="flex items-center justify-center gap-2 text-gray-700 text-sm">
+                  <CalendarDaysIcon className="w-4 h-4 text-blue-500" />
+                  Attendance is locked from{" "}
+                  <span className="font-semibold text-gray-900">
+                    {formatDate(existingPayrollLockDate.startDate)}
+                  </span>
+                  to{" "}
+                  <span className="font-semibold text-gray-900">
+                    {formatDate(existingPayrollLockDate.endDate)}
+                  </span>
+                </p>
               )}
 
-              {payrollData?.endDate && (
-                <li className="flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-blue-500" />
-                  End Date: {formatDate(payrollData.endDate)}
-                </li>
-              )}
-
-              {payrollData?.nextUnlockTime && (
-                <li className="flex items-center gap-2">
+              {/* Next Unlock */}
+              {existingPayrollLockDate?.nextUnlockTime && (
+                <p className="flex items-center justify-center gap-2 text-gray-700 text-sm">
                   <Clock3 className="w-4 h-4 text-purple-500" />
-                  Next Unlock: {formatDate(payrollData.nextUnlockTime)}
-                </li>
+                  Next Unlock:{" "}
+                  <span className="font-semibold text-gray-900">
+                    {formatDate(existingPayrollLockDate.nextUnlockTime)}
+                  </span>
+                </p>
               )}
-            </ul>
-          </aside>
-
+            </aside>
+          )}
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -323,7 +356,7 @@ const AttendanceSheetForm = () => {
           >
             {({ setFieldValue, isSubmitting, errors, touched }) => (
               <Form className="space-y-8">
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-5 gap-6">
                   {/* Select Office/Branch */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -350,27 +383,7 @@ const AttendanceSheetForm = () => {
                     </div>
                   </div>
 
-                  {/* Select Service No. */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Select Service No.
-                    </label>
-                    <div className="relative">
-                      <Field
-                        as="select"
-                        name="serviceNo"
-                        className="w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                      >
-                        <option value="">Select</option>
-                        <option value="1">Service 1</option>
-                        <option value="2">Service 2</option>
-                        <option value="3">Service 3</option>
-                        <option value="4">Service 4</option>
-                        <option value="5">Service 5</option>
-                      </Field>
-                    </div>
-                  </div>
-
+                  {/* Select Location ID */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Location ID
@@ -396,18 +409,7 @@ const AttendanceSheetForm = () => {
                     <ErrorMessage name="locationId" component="div" className="text-red-500 text-xs mt-1" />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Location Name
-                    </label>
-                    <div className="relative">
-                      <div className="w-full px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">
-                        {selectedLocation ? selectedLocation.locationName : 'Select a location first'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* from date picker */}
+                  {/* Start Date picker */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Start Date
@@ -426,7 +428,7 @@ const AttendanceSheetForm = () => {
                     <ErrorMessage name="startDate" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
 
-                  {/* to date picker */}
+                  {/* End Date picker */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       End Date
@@ -435,45 +437,118 @@ const AttendanceSheetForm = () => {
                       <Field
                         type="date"
                         name="endDate"
+                        onChange={(e) => {
+                          setFieldValue('endDate', e.target.value);
+                          setSelectedEndDate(e.target.value);
+                        }}
                         className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                       />
                     </div>
                     <ErrorMessage name="endDate" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
+
+                  {/* Total Days */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Total Days
+                    </label>
+                    <div className="relative">
+                      <Field
+                        type="text"
+                        name="totalDays"
+                        disabled={true}
+                        value={getTotalDaysFromSelectedDateRange() || 0}
+                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                      />
+                    </div>
+
+                  </div>
                 </div>
 
-                {/* Submit Button for Location Selection */}
-                <div className="flex justify-between items-center">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-2 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Fetching...' : 'Get Attendance'}
-                  </button>
+                <div className="grid grid-cols-4 gap-6">
 
-                  <aside className="flex gap-2">
-                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                      <Edit2 className="w-4 h-4" />
-                      Edit
+
+                  {/* Select Service No. */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Service No.
+                    </label>
+                    <div className="relative">
+                      <Field
+                        as="select"
+                        name="serviceNo"
+                        className="w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                      >
+                        <option value="">Select</option>
+                        <option value="1">Service 1</option>
+                        <option value="2">Service 2</option>
+                        <option value="3">Service 3</option>
+                        <option value="4">Service 4</option>
+                        <option value="5">Service 5</option>
+                      </Field>
+                      <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Guard Name
+                    </label>
+                    <div className="relative">
+                      <Field
+                        as="select"
+                        className="w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                      >
+                        <option value="">Select</option>
+                        <option value="1">Guard  1</option>
+                        <option value="2">Guard 2</option>
+                        <option value="3">Guard 3</option>
+                        <option value="4">Guard 4</option>
+                        <option value="5">Guard 5</option>
+                      </Field>
+                      <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                    </div>
+
+
+                  </div>
+                  {/* Fetch Report and Edit buttons */}
+                  <div className="flex items-end justify-between gap-6 col-span-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-5 py-3 bg-formButtonBlue text-white text-sm rounded-lg hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? 'Fetching...' : 'Fetch Report'}
                     </button>
 
-                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                      <Send className="w-4 h-4" />
-                      Post
-                    </button>
+                    {/* Action buttons */}
+                    <div className="flex justify-end items-center">
+                      <aside className="flex gap-2">
+                        <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                          <Send className="w-4 h-4" />
+                          Post
+                        </button>
 
-                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                      <PrinterCheck className="w-4 h-4" />
-                      Print
-                    </button>
+                        <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                          <PrinterCheck className="w-4 h-4" />
+                          Print
+                        </button>
 
-                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                      <Download className="w-4 h-4" />
-                      Download
-                    </button>
-                  </aside>
+                        <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                          <Download className="w-4 h-4" />
+                          Download
+                        </button>
+                      </aside>
+                    </div>
+
+                  </div>
+
+
                 </div>
+
+
 
                 {/* Monthly Attendance Table */}
                 {dateRange && (
@@ -583,9 +658,11 @@ const AttendanceSheetForm = () => {
               <Lock className="w-6 h-6 text-red-500" />
               <h3 className="text-lg font-medium text-gray-900">Confirm Lock</h3>
             </div>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to lock the attendance for this location? This action cannot be undone and will prevent further modifications to the attendance data.
-            </p>
+
+            {selectedStartDate && selectedEndDate && selectedLocation &&
+              <p className='text-gray-600 mb-6'>You are locking attendance for the period of <br /> {formatDate(selectedStartDate)} to {formatDate(selectedEndDate)} for the location {selectedLocation.locationName}</p>
+            }
+
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowLockModal(false)}
