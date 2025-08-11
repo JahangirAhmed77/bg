@@ -1,9 +1,10 @@
 export const formatDate = (dateString) => {
     if (!dateString) return "—"; // fallback for null/empty
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
+    //jan 1, 2021
+    return date.toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric'
     });
 };

@@ -288,6 +288,12 @@ const Sidebar = () => {
                                 >
                                     -Invoices
                                 </Link>
+                                <Link
+                                    href="/dashboard/accounts/accounts-general-ledger"
+                                    className="block px-3 py-2 text-[13px] text-gray-700 hover:bg-gray-100 rounded-md"
+                                >
+                                    -General Ledger
+                                </Link>
                             </div>
                         )}
                     </div>

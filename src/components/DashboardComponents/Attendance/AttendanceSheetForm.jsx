@@ -113,7 +113,7 @@ const AttendanceSheetForm = () => {
     if (selectedLocation && selectedStartDate) {
       getLockStatus();
     }
-  }, [selectedStartDate, selectedLocation])
+  }, [selectedStartDate, selectedLocation]);
 
   useEffect(() => {
     if (selectedLocation && selectedStartDate && selectedEndDate) {
@@ -150,6 +150,8 @@ const AttendanceSheetForm = () => {
         endDate: endDate
       });
       console.log(res.data);
+      
+
 
       if (res.data) {
         setIsLocked(true);
@@ -397,7 +399,7 @@ const AttendanceSheetForm = () => {
                           setFieldValue('locationId', locationId);
                           handleLocationChange(locationId);
                         }}
-                        className={`w-full px-4 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none ${errors.locationId && touched.locationId ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`w-full px-5 py-3 bg-formBgLightBlue border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none ${errors.locationId && touched.locationId ? 'border-red-500' : 'border-gray-200'}`}
                       >
                         <option value="">Select</option>
                         {locations.map((location) => (

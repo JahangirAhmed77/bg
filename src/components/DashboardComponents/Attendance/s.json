@@ -1,47 +1,39 @@
-[
-  {
-    "id": "fe534a24-4548-4884-a5b3-46c1dea2016d",
-    "fullName": "Muhammad Kamram",
-    "serviceNumber": 1,
-    "fatherName": "Shabbir Hussain",
-    "assignedGuardId": "3920dfe2-8dcb-44c7-903d-77eac7f36961",
-    "location": {
-      "id": "6cb64d7d-a5e6-4068-ac7a-186c7f867536",
-      "locationName": "Karachi Port",
-      "createdLocationId": "LOC12345",
-      "client": {
-        "id": "73cc240c-79ac-4fd4-9eb4-a9a52934b031",
-        "companyName": "string",
-        "contractNumber": 1
-      }
-    },
-    "guardCategory": "string",
-    "shift": "Morning",
-    "netSalary": 9000,
-    "attendanceStats": {
-      "P": 3,
-      "R": 1,
-      "L": 0,
-      "A": 1
-    },
-    "guardFinances": {
-      "id": "e8e3117a-0062-4c9b-85c5-3c89317b726f",
-      "requestedGuardId": "8e91b9ac-5100-4340-be9d-f49f483319e8",
-      "salaryPerMonth": 90000,
-      "gazettedHoliday": null,
-      "overtimePerHour": 500,
-      "allowance": 2000
-    },
-    "allowance": {
-      "overTimeCount": 13,
-      "allowancePercentage": 30,
-      "holidayCount": 12
-    },
-    "providedAllowances": {
-      "overTimeAmount": 6500,
-      "gazettedHolidayAmount": 0,
-      "allowanceAmount": 60000
-    },
-    "totalGrossSalary": 75500
-  }
-]
+{
+    "status": "success",
+    "message": "Location Net Payable Payroll fetched successfully",
+    "data": [
+        {
+            "id": "2c73270b-27bf-405b-b096-576a90b3d528",
+            "fullName": "hassan",
+            "serviceNumber": 8,
+            "fatherName": "asas",
+            "assignedGuardId": "8e5f004f-8217-4abd-b4a0-3cb8e02adedd",
+            "location": {
+                "id": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
+                "locationName": "ADDA 62",
+                "createdLocationId": "81195",
+                "client": {
+                    "id": "e2ce7e88-58c1-4e28-9380-a4485a21b51a",
+                    "companyName": "MAERSK",
+                    "contractNumber": 55643
+                }
+            },
+            "attendanceStats": {
+                "P": 1,
+                "R": 0,
+                "L": 0,
+                "A": 0
+            },
+            "providedAllowances": {
+                "overTimeAmount": 0,
+                "gazettedHolidayAmount": 0,
+                "allowanceAmount": 0
+            },
+            "deductions": [],
+            "netDeductions": null,
+            "netSalary": 1233.3333333333333,
+            "grossSalary": 1233.3333333333333,
+            "netPayableSalary": 1233.3333333333333
+        }
+    ]
+}

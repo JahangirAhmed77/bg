@@ -412,7 +412,7 @@ const LocationGrossSalaryForm = () => {
 
                                                                 {/* Net Salary */}
                                                                 <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
-                                                                    {employee.netSalary?.toFixed(2) || 0}
+                                                                    {employee.netSalary?.toFixed(1) || 0}
                                                                 </td>
                                                                 {/* Overtime Amount given by organizational admin */}
                                                                 <td className="px-2 py-2 text-xs text-gray-600 border border-gray-200 text-center">
@@ -426,7 +426,7 @@ const LocationGrossSalaryForm = () => {
                                                                     {employee.guardFinances?.gazettedHoliday || 0}
                                                                 </td>
                                                                 <td className="px-2 py-2 text-xs min-w-[55px] font-semibold text-green-600 border border-gray-200 text-center bg-green-50">
-                                                                    {employee.totalGrossSalary}
+                                                                    {employee.totalGrossSalary.toFixed(1)}
                                                                 </td>
                                                             </tr>
                                                         );

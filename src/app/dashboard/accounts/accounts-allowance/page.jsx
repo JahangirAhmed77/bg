@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import Breadcrumbs from '@/common/DashboardCommon/Breadcrumbs'
-import AccountsAllowance from '@/components/DashboardComponents/Accounts/AccountsAllowance'
+import AccountsAllowance from '@/components/DashboardComponents/Accounts/AccountsAllowances/AccountsAllowance'
 
 const AccountsAllowanceDeductions = () => {
     return (

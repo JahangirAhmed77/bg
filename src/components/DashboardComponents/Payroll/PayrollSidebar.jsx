@@ -11,6 +11,7 @@ const PayrollSidebar = ({ currentStep, onStepChange, completedSteps = [], onNext
         { id: 'location-gross-salary', label: 'Location Gross Salary', step: 3, route: '/dashboard/payroll/location-gross-salary' },
         { id: 'advances-deductions', label: 'Advances & Deductions', step: 4, route: '/dashboard/payroll/advances-deductions' },
         { id: 'location-payroll', label: 'Location Payroll (Net Payable)', step: 5, route: '/dashboard/payroll/location-payroll' },
+        { id: 'payroll-process-transfer', label: 'Process Bank Transfer', step: 6, route: '/dashboard/payroll/payroll-process-transfer' },
     ];
 
     const currentStepIndex = steps.findIndex(step => step.id === currentStep);

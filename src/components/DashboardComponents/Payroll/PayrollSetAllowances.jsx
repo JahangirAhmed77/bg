@@ -8,14 +8,14 @@ import toast from 'react-hot-toast';
 import { useCurrentUser } from '@/lib/hooks';
 import PayrollContext from '@/context/PayrollContext';
 import { formatDate } from '@/utils/FormHelpers/formatDate';
-
+import { DateInISOFormat } from '@/utils/FormHelpers/dateHelpers';
 
 
 const PayrollSetAllowances = () => {
     //context
     const { user } = useCurrentUser();
-    const { globalPayrollFilters, globalLockDate } = useContext(PayrollContext);
-
+    const { globalPayrollFilters } = useContext(PayrollContext);
+    console.log(globalPayrollFilters)
     //states
     const [currentDate, setCurrentDate] = useState('');
     const [currentTime, setCurrentTime] = useState('');
@@ -23,6 +23,7 @@ const PayrollSetAllowances = () => {
     const [payrollData, setPayrollData] = useState([]);
     const [allowanceValues, setAllowanceValues] = useState({});
     const [isExistingAllowance, setIsExistingAllowance] = useState(false);
+    const [lockDate, setLockDate] = useState(null);
 
     // Validation schema
     const validationSchema = Yup.object({
@@ -42,8 +43,6 @@ const PayrollSetAllowances = () => {
         toDate: ''
     };
 
-
-
     useEffect(() => {
         const now = new Date();
         const date = now.toLocaleDateString('en-GB');
@@ -51,6 +50,27 @@ const PayrollSetAllowances = () => {
         setCurrentDate(date);
         setCurrentTime(time);
     }, []);
+
+    useEffect(() => {
+        const getLockStatus = async () => {
+
+            const startDate = DateInISOFormat(globalPayrollFilters?.fromDate);
+            try {
+                const res = await userRequest.get(`/payroll/lock/status/${globalPayrollFilters?.locationId}?startDate=${startDate}`);
+                
+                setLockDate(res.data.data);
+               
+            } catch (error) {
+                const errMsg = error?.response?.data?.message;
+                toast.error(errMsg);
+                console.log(error)
+            }
+        }
+
+        if (globalPayrollFilters?.locationId && globalPayrollFilters?.fromDate) {
+            getLockStatus();
+        }
+    }, [globalPayrollFilters?.locationId, globalPayrollFilters?.fromDate]);
 
 
     useEffect(() => {
@@ -73,10 +93,13 @@ const PayrollSetAllowances = () => {
         const checkExisitngAllowanceByLocation = async () => {
             try {
                 const res = await userRequest.get(`/payroll/allowance/guard/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`)
+                console.log("res.data", res.data)
+
                
                 if (res.data.data.result.length > 0) {
                     //if exsitign allwoance set we we will disable save button
                     setIsExistingAllowance(true);
+
                 } else {
                     setIsExistingAllowance(false);
                 }
@@ -86,14 +109,14 @@ const PayrollSetAllowances = () => {
             }
         }
         checkExisitngAllowanceByLocation();
-    }, [globalLockDate])
+    }, [lockDate])
 
-        useEffect(() => {
-            console.log("selectedLocation", globalPayrollFilters?.locationId)
-            console.log("selectedFromDate", globalPayrollFilters?.fromDate)
-            console.log("selectedToDate", globalPayrollFilters?.toDate)
+        // useEffect(() => {
+        //     console.log("selectedLocation", globalPayrollFilters?.locationId)
+        //     console.log("selectedFromDate", globalPayrollFilters?.fromDate)
+        //     console.log("selectedToDate", globalPayrollFilters?.toDate)
             
-        }, [globalPayrollFilters])
+        // }, [globalPayrollFilters])
 
     const handleGetAllowanceData = async () => {
         try {
@@ -104,8 +127,6 @@ const PayrollSetAllowances = () => {
             if (res.data && res.data.data.result.length > 0) {
                 toast.success('Guard data loaded successfully');
                 setPayrollData(res.data.data.result);
-
-
 
                 // Initialize allowance values for each guard with existing values from API
                 const initialValues = {};
@@ -142,8 +163,6 @@ const PayrollSetAllowances = () => {
         }));
     };
 
-
-
     const handleSaveAllowances = async () => {
         try {
             // Validate that we have guards to save
@@ -151,12 +170,11 @@ const PayrollSetAllowances = () => {
                 toast.error('No guard data to save. Please load guards first.');
                 return;
             }
-
             // Prepare payload for each guard according to API specification
             const payload = payrollData.map((guard) => ({
                 guardId: guard.id,
                 requestedGuardId: guard.requestedGuardId,
-                locationPayrollDurationId: globalLockDate.id,
+                locationPayrollDurationId: lockDate.id,
                 allowancePercentage: allowanceValues[guard.id]?.allowancePercentage || 0,
                 holidayCount: allowanceValues[guard.id]?.holidayCount || 0,
                 overTimeCount: allowanceValues[guard.id]?.overTimeCount || 0
@@ -212,7 +230,7 @@ const PayrollSetAllowances = () => {
                         Allowances Management - Location Wise
                     </h2>
 
-                    {globalLockDate?.isLocked ? (
+                    {lockDate?.isLocked ? (
                         <article className="flex flex-col items-end text-sm text-gray-600">
                             <aside className="flex items-center gap-2 mb-1">
                                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -221,7 +239,7 @@ const PayrollSetAllowances = () => {
                                 </span>
                             </aside>
                             <span className="text-xs text-gray-500 italic mb-1">
-                                Locked from {formatDate(globalLockDate.startDate)} to {formatDate(globalLockDate.endDate)}.
+                                Locked from {formatDate(lockDate.startDate)} to {formatDate(lockDate.endDate)}.
                             </span>
                             {isExistingAllowance && (
                                 <aside className="flex items-center gap-2 mb-1">
@@ -235,7 +253,7 @@ const PayrollSetAllowances = () => {
                            
                            
                         </article>
-                    ) : globalLockDate === null || globalLockDate === undefined ? (
+                    ) : lockDate === null || lockDate === undefined ? (
                         <div className="flex items-center gap-2 text-sm text-orange-700 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -436,7 +454,7 @@ const PayrollSetAllowances = () => {
 
                                                     <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Over Time <br />Count</th>
                                                     <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Allowance <br />% (Max 100)</th>
-                                                    <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Holiday <br />Count</th>
+                                                    <th className="px-2 py-2 text-xs font-medium text-blue-700 border border-gray-200 bg-blue-50">Gazetted <br />Holiday</th>
 
 
                                                 </tr>
@@ -507,7 +525,7 @@ const PayrollSetAllowances = () => {
                                                                 placeholder="0"
                                                             />
                                                         </td>
-                                                        {/* Holiday Count Input */}
+                                                        {/* % Input */}
                                                         <td className="px-2 py-2 border min-w-32 border-gray-200 bg-blue-50">
                                                             <input
                                                                 type="number"

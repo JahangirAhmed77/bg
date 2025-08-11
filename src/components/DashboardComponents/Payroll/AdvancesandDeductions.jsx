@@ -206,11 +206,9 @@ const AdvancesandDeductions = () => {
                                             className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                                         >
                                             <option value="">Lock for Office / Branch for Org. Admin</option>
-                                            {locations.map((location) => (
-                                                <option key={location.id} value={location.id}>
-                                                    {location.locationName} - ({location.createdLocationId})
-                                                </option>
-                                            ))}
+                                            <option value="MEZB">Office 1</option>
+                                            <option value="MEZC">Office 2</option>
+                                            <option value="MEZD">Office 3</option>
                                         </Field>
                                         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                                     </div>
