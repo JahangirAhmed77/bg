@@ -62,21 +62,21 @@ export const eyeColors = [
 ];
 
 export const relationships = [
-        'Father',
-        'Mother',
-        'Brother',
-        'Sister',
-        'Uncle',
-        'Aunt',
-        'Cousin',
-        'Friend',
-        'Colleague',
-        'Neighbor',
-        'Teacher',
-        'Employer',
-        'Other'
+    'Father',
+    'Mother',
+    'Brother',
+    'Sister',
+    'Uncle',
+    'Aunt',
+    'Cousin',
+    'Friend',
+    'Colleague',
+    'Neighbor',
+    'Teacher',
+    'Employer',
+    'Other'
 ];
-    
+
 export const months = [
     { label: 'January', value: '01' },
     { label: 'February', value: '02' },
@@ -91,4 +91,12 @@ export const months = [
     { label: 'November', value: '11' },
     { label: 'December', value: '12' },
 ];
-
+export const deductionTypes = [
+    { value: "sessiPessiFund", label: "SESSI/PESSI Fund" },
+    { value: "eobiFund", label: "EOBI Fund" },
+    { value: "insurance", label: "Insurance" },
+    { value: "advances", label: "Advances" },
+    { value: "loanRepayment", label: "Loan Repayment" },
+    { value: "penalty", label: "Penalty" },
+    { value: "miscCharges", label: "Misc. Charges" },
+];

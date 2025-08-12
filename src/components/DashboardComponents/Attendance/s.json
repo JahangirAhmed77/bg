@@ -29,11 +29,33 @@
         "gazettedHolidayAmount": 0,
         "allowanceAmount": 0
       },
-      "deductions": [],
-      "netDeductions": null,
+      "deductions": [
+        {
+          "amount": 20,
+          "date": "2025-08-12T11:17:39.796Z",
+          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
+          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
+          "deductionType": "penalty"
+        },
+        {
+          "amount": 5,
+          "date": "2025-08-12T11:32:02.744Z",
+          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
+          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
+          "deductionType": "insurance"
+        },
+        {
+          "amount": 40,
+          "date": "2025-08-12T11:45:57.753Z",
+          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
+          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
+          "deductionType": "sessiPessiFund"
+        }
+      ],
+      "netDeductions": 65,
       "netSalary": 2466.6666666666665,
       "grossSalary": 2466.6666666666665,
-      "netPayableSalary": 2466.6666666666665
+      "netPayableSalary": 2401.6666666666665
     }
   ]
 }

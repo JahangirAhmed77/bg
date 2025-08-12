@@ -7,6 +7,8 @@ import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import PayrollContext from '@/context/PayrollContext';
+import { transformDeductionData } from '@/utils/FormHelpers/deductionHelpers';
+import Button from '@/common/DashboardCommon/Button';
 
 
 const LocationPayroll = () => {
@@ -50,41 +52,34 @@ const LocationPayroll = () => {
     const getFinalPayrollData = async () => {
         setIsLoading(true);
 
-        if (globalPayrollFilters?.locationId && globalPayrollFilters?.fromDate && globalPayrollFilters?.toDate) {
-            try {
-                const res = await userRequest.get(`/payroll/location/net-payable/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`);
-                console.log("res.data", res.data);
-                setPayrollData(res.data.data || []);
-                toast.success('Payroll data loaded successfully');
-            } catch (error) {
-                console.log(error);
-                toast.error('Failed to fetch payroll data');
-                setPayrollData([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+        if (!globalPayrollFilters?.locationId || !globalPayrollFilters?.fromDate || !globalPayrollFilters?.toDate) { return toast.error('Please select a location and date range'); }
 
-    };
-
-    const handleFetchReport = async (values) => {
-        setIsLoading(true);
         try {
-            const res = await userRequest.get(`/payroll/location/net-payable/${values.locationId}?from=${values.dateFrom}&to=${values.dateTo}`);
+            if (!globalPayrollFilters?.locationId || !globalPayrollFilters?.fromDate || !globalPayrollFilters?.toDate) {
+                toast.error('Please select a location and date range');
+                return;
+            }
+            const res = await userRequest.get(`/payroll/location/net-payable/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`);
             console.log("res.data", res.data);
-            setPayrollData(res.data.data || []);
-            toast.success('Payroll report fetched successfully');
+
+            // Transform data using deduction helper
+            const rawData = res.data.data || [];
+            const transformedData = transformDeductionData(rawData);
+
+            setPayrollData(transformedData);
+            toast.success('Payroll data loaded successfully');
         } catch (error) {
             console.log(error);
-            toast.error('Failed to fetch payroll report');
+            toast.error('Failed to fetch payroll data');
             setPayrollData([]);
         } finally {
             setIsLoading(false);
         }
     };
 
+
     const handleSave = () => {
-        toast.success('Payroll data saved successfully');
+        toast.success('Payroll for the month of ' + globalPayrollFilters?.fromDate + ' to ' + globalPayrollFilters?.toDate + ' locked successfully');
     };
 
 
@@ -95,7 +90,7 @@ const LocationPayroll = () => {
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                    onSubmit={handleFetchReport}
+
                 >
                     {({ isSubmitting }) => (
                         <Form className="space-y-8">
@@ -222,7 +217,7 @@ const LocationPayroll = () => {
                                 </div>
                             </div>
 
-                        
+
 
                             <div className="grid grid-cols-5 gap-6">
                                 <aside>
@@ -252,21 +247,13 @@ const LocationPayroll = () => {
                                 <aside className="flex gap-4 justify-between col-span-3 items-end">
                                     <article className='flex gap-2 items-center'>
 
-                                        <button
-                                            type="button"
-                                            onClick={getFinalPayrollData}
-                                            className="px-6 py-2 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlue/80 focus:outline-none focus:ring-2"
-                                        >
+                                        <Button variant="blue" onClick={getFinalPayrollData} disabled={isLoading} isLoading={isLoading} loadingText="Fetching..." type="button">
                                             Fetch Report
-                                        </button>
+                                        </Button>
 
-                                        <button
-                                            type="button"
-                                            onClick={handleSave}
-                                            className="px-6 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        >
-                                            Save
-                                        </button>
+                                        <Button variant="red" onClick={handleSave} disabled={isLoading} isLoading={isLoading} loadingText="Saving..." type="button">
+                                            Lock Payroll
+                                        </Button>
                                     </article>
 
                                     <aside className="flex gap-2 items-center">
@@ -284,7 +271,7 @@ const LocationPayroll = () => {
 
                             </div>
 
-                        
+
                             {/* Data Table */}
                             <div className="bg-formBGBlue rounded-2xl p-6">
                                 {isLoading ? (
@@ -321,6 +308,7 @@ const LocationPayroll = () => {
                                                     </th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Penalty</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Misc Charges</th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Net Deductions</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Net Salary</th>
 
 
@@ -357,27 +345,29 @@ const LocationPayroll = () => {
                                                             {row.attendanceStats?.L || 0}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.sessionFundAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.sessiPessiFund || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.eobiAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.eobiFund || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.insuranceAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.insurance || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.advanceAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.advances || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.loanRepaymentAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.loanRepayment || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.penaltyAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.penalty || 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            {parseFloat(row.providedAllowances?.miscChargesAmount || 0).toFixed(2)}
+                                                            {parseFloat(row.deductionTotals?.miscCharges || 0).toFixed(2)}
                                                         </td>
-
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.netDeductions).toFixed(2)}
+                                                        </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-28">
                                                             <span className="font-medium">{parseFloat(row.netSalary).toFixed(2)}</span>
                                                         </td>

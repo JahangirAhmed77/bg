@@ -6,21 +6,14 @@ import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import AccountsLocationAllowance from './AccountsLocationAllowance';
 import AccountsOfficeAllowance from './AccountsOfficeAllowance';
+import DeductionsForm from './AccountsDeductionsForm';
 
 const allowanceTypes = [
   { value: 'relief', label: 'Relief' },
   { value: 'leave', label: 'Leave' },
   { value: 'misc', label: 'Misc.' },
 ];
-const deductionTypes = [
-  { value: 'provident_fund', label: 'Provident Fund' },
-  { value: 'eobi', label: 'EOBI' },
-  { value: 'advance', label: 'Advance' },
-  { value: 'insurance', label: 'Insurance' },
-  { value: 'loan_repay', label: 'Loan Repay' },
-  { value: 'penalty', label: 'Penalty' },
-  { value: 'misc_charges', label: 'Misc. Charges' },
-];
+
 const serviceNumbers = [
   { value: '001', label: '001' },
   { value: '002', label: '002' },
@@ -32,11 +25,7 @@ const allowanceSchema = Yup.object({
   allowanceType: Yup.string().required('Allowance Type is required'),
   amount: Yup.number().min(1, 'Amount must be greater than 0').required('Amount is required'),
 });
-const deductionSchema = Yup.object({
-  serviceNo: Yup.string().required('Service Number is required'),
-  deductionType: Yup.string().required('Deduction Type is required'),
-  amount: Yup.number().min(1, 'Amount must be greater than 0').required('Amount is required'),
-});
+
 
 // Guard Wise Allowance Component
 const GuardWiseAllowance = () => {
@@ -119,86 +108,7 @@ const GuardWiseAllowance = () => {
   );
 };
 
-// Deductions Form Component
-const DeductionsForm = () => {
-  const initialValues = {
-    serviceNo: '',
-    deductionType: '',
-    amount: 0,
-  };
 
-  const handleSubmit = (values, { resetForm }) => {
-    console.log('Deduction:', values);
-    resetForm();
-    toast.success('Deduction Saved Successfully');
-  };
-
-  return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={deductionSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ isSubmitting, resetForm }) => (
-        <Form className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            {/* Service Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Service Number</label>
-              <Field as="select" name="serviceNo" className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md">
-                <option value="">Select</option>
-                {serviceNumbers.map((sn) => (
-                  <option key={sn.value} value={sn.value}>{sn.label}</option>
-                ))}
-              </Field>
-              <ErrorMessage name="serviceNo" component="div" className="text-red-500 text-sm mt-1" />
-            </div>
-            {/* Guard/Employee Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Guard / Employee Name</label>
-              <div className="px-4 py-3 bg-formBgLightGreen border border-gray-200 rounded-md text-gray-500">Auto</div>
-            </div>
-            {/* Deduction Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Deduction Type</label>
-              <Field as="select" name="deductionType" className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md">
-                <option value="">Provident Fund, EOBI, Advance, Insurance, Loan Repay, Penalty, Misc. Charges</option>
-                {deductionTypes.map((type) => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </Field>
-              <ErrorMessage name="deductionType" component="div" className="text-red-500 text-sm mt-1" />
-            </div>
-            {/* Amount */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-              <Field type="number" name="amount" className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md" min={0} />
-              <ErrorMessage name="amount" component="div" className="text-red-500 text-sm mt-1" />
-            </div>
-          </div>
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-8 justify-center">
-            <button
-              type="button"
-              className="px-8 py-2 border border-formButtonBlue text-formButtonBlue rounded-md hover:bg-blue-50"
-              onClick={() => resetForm()}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-8 py-2 bg-formButtonBlue text-white rounded-md hover:bg-formButtonBlueHover disabled:opacity-50"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Saving...' : 'Save'}
-            </button>
-          </div>
-        </Form>
-      )}
-    </Formik>
-  );
-};
 
 const AccountsAllowance = () => {
   const { user } = useCurrentUser();

@@ -39,19 +39,6 @@ const AssignGuardsForm = () => {
     const [selectedRequestedGuard, setSelectedRequestedGuard] = useState(null);
     const [assignedGuardForLocation, setAssignedGuardForLocation] = useState([]);
 
-    // Mock data for the table
-    const assignments = [
-        {
-            clientId: '001',
-            locationId: 'K001-001',
-            deploymentDate: '1/1/2025',
-            deployedTill: 'Till Date',
-            totalWorkingDays: '164'
-        },
-
-    ];
-
-
 
     useEffect(() => {
         const getGuardsByOrganization = async () => {

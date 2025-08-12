@@ -7,6 +7,7 @@ import { userRequest } from '@/lib/RequestMethods';
 import toast from 'react-hot-toast';
 import { useCurrentUser } from '@/lib/hooks';
 import PayrollContext from '@/context/PayrollContext';
+import Button from '@/common/DashboardCommon/Button';
 
 const LocationGrossSalaryForm = () => {
     const [currentDate, setCurrentDate] = useState('');
@@ -17,7 +18,7 @@ const LocationGrossSalaryForm = () => {
     const [guards, setGuards] = useState([]);
     const { user } = useCurrentUser();
     const { globalPayrollFilters } = useContext(PayrollContext);
-
+    const [isLoading, setIsLoading] = useState(false);
     // Validation schema
     const validationSchema = Yup.object({
         officeId: Yup.string(),
@@ -98,6 +99,7 @@ const LocationGrossSalaryForm = () => {
     }, [globalPayrollFilters?.locationId]);
 
     const handleGeneratePayroll = async (values) => {
+        setIsLoading(true);
         try {
             const res = await userRequest.get(`/payroll/location/gross-salary/${values.locationId}?from=${values.fromDate}&to=${values.toDate}`);
             console.log(res.data.data);
@@ -111,7 +113,9 @@ const LocationGrossSalaryForm = () => {
         } catch (error) {
             console.log(error);
             toast.error('Failed to generate payroll');
-        }
+        } finally {
+            setIsLoading(false);
+            }
     };
 
     const handleLocationChange = async (locationId) => {
@@ -331,15 +335,14 @@ const LocationGrossSalaryForm = () => {
                                                 <ErrorMessage name="guardName" component="div" className="text-red-500 text-sm mt-1" />
                                             </div>
 
-                                            <div className="flex flex-col justify-end">
-                                                <button
-                                                    type="submit"
-                                                    disabled={isSubmitting}
-                                                    className="px-3 py-3 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlueHover focus:outline-none focus:ring-2 focus:ring-formButtonBlueHover disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    {isSubmitting ? 'Generating...' : 'Fetch Report'}
-                                                </button>
-                                            </div>
+                                            <aside className="flex items-end col-span-2">
+                                                <Button variant="blue" isLoading={isLoading} loadingText="Generating..." type="submit">
+                                                    Fetch Report
+                                                </Button>
+                                            
+                                            </aside>
+
+                                           
                                         </div>
                                     </div>
 
