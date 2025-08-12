@@ -24,7 +24,7 @@ const PayrollSetAllowances = () => {
     const [allowanceValues, setAllowanceValues] = useState({});
     const [isExistingAllowance, setIsExistingAllowance] = useState(false);
     const [lockDate, setLockDate] = useState(null);
-
+    const [loading, setLoading] = useState(false);
     // Validation schema
     const validationSchema = Yup.object({
         locationId: Yup.string(),
@@ -53,7 +53,8 @@ const PayrollSetAllowances = () => {
 
     useEffect(() => {
         const getLockStatus = async () => {
-
+            setLoading(true);
+        
             const startDate = DateInISOFormat(globalPayrollFilters?.fromDate);
             try {
                 const res = await userRequest.get(`/payroll/lock/status/${globalPayrollFilters?.locationId}?startDate=${startDate}`);
@@ -64,7 +65,10 @@ const PayrollSetAllowances = () => {
                 const errMsg = error?.response?.data?.message;
                 toast.error(errMsg);
                 console.log(error)
+            } finally {
+                setLoading(false);
             }
+
         }
 
         if (globalPayrollFilters?.locationId && globalPayrollFilters?.fromDate) {
@@ -197,6 +201,7 @@ const PayrollSetAllowances = () => {
 
             {/* Form Card */}
             <div className="w-full max-w-7xl bg-white rounded-xl shadow-md p-8">
+              
                 {/* Auto Fields Row */}
                 <div className="grid grid-cols-3 gap-6">
                     <div>
@@ -229,7 +234,7 @@ const PayrollSetAllowances = () => {
                     <h2 className="text-lg font-medium text-gray-900">
                         Allowances Management - Location Wise
                     </h2>
-
+                   
                     {lockDate?.isLocked ? (
                         <article className="flex flex-col items-end text-sm text-gray-600">
                             <aside className="flex items-center gap-2 mb-1">
@@ -257,8 +262,16 @@ const PayrollSetAllowances = () => {
                         <div className="flex items-center gap-2 text-sm text-orange-700 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                            </svg>
-                            <span>Please complete the previous section to proceed with allowances.</span>
+                                </svg>
+                                {loading ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="w-4 h-4 border-t-2 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+                            <span>Loading...</span>
+                        </div>
+                    ) : (
+                        <span>Please complete the previous section to proceed with allowances.</span>
+                    )}
+                            
                         </div>
                     ) : (
                         <div className="flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-4 py-2 rounded-lg border border-yellow-200">

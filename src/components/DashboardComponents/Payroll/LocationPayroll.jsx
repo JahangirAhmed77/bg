@@ -11,7 +11,6 @@ import PayrollContext from '@/context/PayrollContext';
 
 const LocationPayroll = () => {
     const { globalPayrollFilters } = useContext(PayrollContext);
-    console.log("globalPayrollFilters", globalPayrollFilters)
 
     const [payrollData, setPayrollData] = useState([]);
     const [locations, setLocations] = useState([]);
@@ -47,26 +46,26 @@ const LocationPayroll = () => {
         getLocationsByOrganization();
     }, []);
 
-    useEffect(() => {
+
+    const getFinalPayrollData = async () => {
+        setIsLoading(true);
+
         if (globalPayrollFilters?.locationId && globalPayrollFilters?.fromDate && globalPayrollFilters?.toDate) {
-            const getFinalPayrollData = async () => {
-                setIsLoading(true);
-                try {
-                    const res = await userRequest.get(`/payroll/location/net-payable/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`);
-                    console.log("res.data", res.data);
-                    setPayrollData(res.data.data || []);
-                    toast.success('Payroll data loaded successfully');
-                } catch (error) {
-                    console.log(error);
-                    toast.error('Failed to fetch payroll data');
-                    setPayrollData([]);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            getFinalPayrollData();
-        }
-    }, [globalPayrollFilters]);
+            try {
+                const res = await userRequest.get(`/payroll/location/net-payable/${globalPayrollFilters?.locationId}?from=${globalPayrollFilters?.fromDate}&to=${globalPayrollFilters?.toDate}`);
+                console.log("res.data", res.data);
+                setPayrollData(res.data.data || []);
+                toast.success('Payroll data loaded successfully');
+            } catch (error) {
+                console.log(error);
+                toast.error('Failed to fetch payroll data');
+                setPayrollData([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+    };
 
     const handleFetchReport = async (values) => {
         setIsLoading(true);
@@ -87,6 +86,7 @@ const LocationPayroll = () => {
     const handleSave = () => {
         toast.success('Payroll data saved successfully');
     };
+
 
     return (
         <div>
@@ -135,7 +135,7 @@ const LocationPayroll = () => {
                             </aside>
 
                             {/* Form Fields */}
-                            <div className="grid grid-cols-4 gap-6">
+                            <div className="grid grid-cols-5 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Select Office/Branch
@@ -222,32 +222,69 @@ const LocationPayroll = () => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
-                            <aside className="flex gap-4 justify-between">
-                                <article className='flex gap-2 items-center'>
+                        
 
-                                    <button
-                                        type="button"
-                                        onClick={handleSave}
-                                        className="px-6 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    >
-                                        Save
-                                    </button>
-                                </article>
-
-                                <aside className="flex gap-2 items-center">
-                                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                                        <PrinterCheck className="w-4 h-4" />
-                                        Print
-                                    </button>
-
-                                    <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
-                                        <Download className="w-4 h-4" />
-                                        Download
-                                    </button>
+                            <div className="grid grid-cols-5 gap-6">
+                                <aside>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Service No.
+                                    </label>
+                                    <Field
+                                        type="text"
+                                        name="serviceNo"
+                                        placeholder="Service No."
+                                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                 </aside>
-                            </aside>
+                                <aside>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Guard Name
+                                    </label>
+                                    <Field
+                                        type="text"
+                                        name="guardName"
+                                        placeholder="Guard Name"
+                                        className="w-full px-4 py-3 bg-formBgLightBlue border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </aside>
 
+                                {/* Action Buttons */}
+                                <aside className="flex gap-4 justify-between col-span-3 items-end">
+                                    <article className='flex gap-2 items-center'>
+
+                                        <button
+                                            type="button"
+                                            onClick={getFinalPayrollData}
+                                            className="px-6 py-2 bg-formButtonBlue text-white text-sm rounded-md hover:bg-formButtonBlue/80 focus:outline-none focus:ring-2"
+                                        >
+                                            Fetch Report
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleSave}
+                                            className="px-6 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        >
+                                            Save
+                                        </button>
+                                    </article>
+
+                                    <aside className="flex gap-2 items-center">
+                                        <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                                            <PrinterCheck className="w-4 h-4" />
+                                            Print
+                                        </button>
+
+                                        <button type="button" className="flex items-center gap-2 px-3 py-[5px] font-[500] text-[12px] border border-gray-300 rounded-2xl hover:bg-gray-50">
+                                            <Download className="w-4 h-4" />
+                                            Download
+                                        </button>
+                                    </aside>
+                                </aside>
+
+                            </div>
+
+                        
                             {/* Data Table */}
                             <div className="bg-formBGBlue rounded-2xl p-6">
                                 {isLoading ? (
@@ -260,26 +297,39 @@ const LocationPayroll = () => {
                                         <table className="min-w-full bg-white rounded-lg">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    <th className="sticky left-0 z-10 bg-gray-50 px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-16">S.No</th>
-                                                    <th className="sticky left-16 z-10 bg-gray-50 px-4 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-40">Name</th>
+                                                    <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">S.No</th>
+                                                    <th className="sticky left-10 z-10 bg-gray-50 px-4 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-40">Name</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-24">SERVICE No.</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-16">P</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-16">A</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-16">R</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-16">L</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">
-                                                        Deductions
+                                                        Sessi/Pessi Fund
                                                     </th>
-                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-28">
-                                                        Gross Salary
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">
+                                                        EOBI
                                                     </th>
-                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-28">
-                                                        Net Salary
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">
+                                                        Insurance
                                                     </th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">
+                                                        Advances
+                                                    </th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">
+                                                        Loan Repayment
+                                                    </th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Penalty</th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Misc Charges</th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Net Salary</th>
+
+
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-24">Over Time</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-24">Allowance</th>
                                                     <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 w-32">Gazetted Holiday</th>
-                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 bg-green-50 w-32">Net Payable</th>
+                                                    <th className="px-3 py-3 text-xs font-medium text-gray-700 border border-gray-200 bg-green-50 w-32">
+                                                        Net Payable
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -288,7 +338,7 @@ const LocationPayroll = () => {
                                                         <td className="sticky left-0 z-10 bg-white px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-16">
                                                             {index + 1}
                                                         </td>
-                                                        <td className="sticky left-16 z-10 bg-white px-4 py-3 text-xs text-gray-600 border border-gray-200 w-40">
+                                                        <td className="sticky left-10 z-10 bg-white px-4 py-3 text-xs text-gray-600 border border-gray-200 w-40">
                                                             {row.fullName}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-24">
@@ -307,17 +357,27 @@ const LocationPayroll = () => {
                                                             {row.attendanceStats?.L || 0}
                                                         </td>
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
-                                                            <div className="text-center">
-                                                                {row.netDeductions ? (
-                                                                    <span className="font-medium">{parseFloat(row.netDeductions).toFixed(2)}</span>
-                                                                ) : (
-                                                                    <span className="text-gray-400">0.00</span>
-                                                                )}
-                                                            </div>
+                                                            {parseFloat(row.providedAllowances?.sessionFundAmount || 0).toFixed(2)}
                                                         </td>
-                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-28">
-                                                            <span className="font-medium">{parseFloat(row.grossSalary).toFixed(2)}</span>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.eobiAmount || 0).toFixed(2)}
                                                         </td>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.insuranceAmount || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.advanceAmount || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.loanRepaymentAmount || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.penaltyAmount || 0).toFixed(2)}
+                                                        </td>
+                                                        <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-32">
+                                                            {parseFloat(row.providedAllowances?.miscChargesAmount || 0).toFixed(2)}
+                                                        </td>
+
                                                         <td className="px-3 py-3 text-xs text-gray-600 border border-gray-200 text-center w-28">
                                                             <span className="font-medium">{parseFloat(row.netSalary).toFixed(2)}</span>
                                                         </td>
