@@ -94,7 +94,7 @@ const GuardsListings = () => {
                 return;
             }
 
-            await handleSubmitBulkUpload(guardBulkUploadFile, setGuardBulkUploadFile);
+            await handleSubmitBulkUpload(guardBulkUploadFile, setGuardBulkUploadFile, "bba9bc6d-70d2-4d83-aa80-03e1f6c454f2");
             toast.success('File uploaded successfully');
 
             // Refresh the guards list after successful upload

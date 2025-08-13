@@ -31,8 +31,10 @@ const validationSchema = Yup.object({
 const AssignGuardsForm = () => {
     const { user } = useCurrentUser();
     const [guards, setGuards] = useState([]);
+    console.log(guards)
     const [selectedGuardId, setSelectedGuardId] = useState(null);
     const [clients, setClients] = useState([]);
+    console.log(clients)
     const [selectedClient, setSelectedClient] = useState(null);
     const [selectedLocationId, setSelectedLocationId] = useState(null);
     const [requestedGuards, setRequestedGuards] = useState([]);
@@ -76,10 +78,6 @@ const AssignGuardsForm = () => {
         getGuardsByOrganization();
         getClients();
     }, [selectedGuardId]);
-
-
-
-
 
     useEffect(() => {
 
@@ -290,10 +288,10 @@ const AssignGuardsForm = () => {
                                                     : 'border-gray-200'
                                                     }`}
                                             >
-                                                <option value="">Select</option>
+                                                <option value="" disabled>Select</option>
                                                 {clients?.map((client) => (
-                                                    <option key={client.id} value={client.id}>
-                                                        {client.contractNumber}
+                                                    <option key={client.id} value={client.id} className='text-sm'>
+                                                        {client.contractNumber} ({client.companyName})
                                                     </option>
                                                 ))}
                                             </Field>

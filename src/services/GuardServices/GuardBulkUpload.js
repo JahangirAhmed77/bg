@@ -67,6 +67,7 @@ export const handleSubmitBulkUpload = async (guardBulkUploadFile, setGuardBulkUp
                 'Content-Type': 'multipart/form-data',
             },
         });
+        console.log("bulk upload response", response);
 
         // Clear the file after successful upload
         setGuardBulkUploadFile(null);

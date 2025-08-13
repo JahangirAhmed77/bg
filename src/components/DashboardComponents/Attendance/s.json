@@ -1,61 +1,67 @@
 {
-  "status": "success",
-  "message": "Location Net Payable Payroll fetched successfully",
-  "data": [
-    {
-      "id": "2c73270b-27bf-405b-b096-576a90b3d528",
-      "fullName": "hassan",
-      "serviceNumber": 8,
-      "fatherName": "asas",
-      "assignedGuardId": "8e5f004f-8217-4abd-b4a0-3cb8e02adedd",
-      "location": {
-        "id": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
-        "locationName": "ADDA 62",
-        "createdLocationId": "81195",
-        "client": {
-          "id": "e2ce7e88-58c1-4e28-9380-a4485a21b51a",
-          "companyName": "MAERSK",
-          "contractNumber": 55643
+  "data": {
+    "status": "success",
+    "message": "Request successful",
+    "data": {
+      "success": false,
+      "errors": [
+        {
+          "row": 1,
+          "errors": [
+            {
+              "property": "dateOfBirth",
+              "constraints": {
+                "isDateString": "dateOfBirth must be a valid ISO 8601 date string"
+              }
+            },
+            {
+              "property": "cnicIssueDate",
+              "constraints": {
+                "isDateString": "cnicIssueDate must be a valid ISO 8601 date string"
+              }
+            },
+            {
+              "property": "cnicExpiryDate",
+              "constraints": {
+                "isDateString": "cnicExpiryDate must be a valid ISO 8601 date string"
+              }
+            }
+          ]
         }
-      },
-      "attendanceStats": {
-        "P": 2,
-        "R": 0,
-        "L": 0,
-        "A": 0
-      },
-      "providedAllowances": {
-        "overTimeAmount": 0,
-        "gazettedHolidayAmount": 0,
-        "allowanceAmount": 0
-      },
-      "deductions": [
-        {
-          "amount": 20,
-          "date": "2025-08-12T11:17:39.796Z",
-          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
-          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
-          "deductionType": "penalty"
-        },
-        {
-          "amount": 5,
-          "date": "2025-08-12T11:32:02.744Z",
-          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
-          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
-          "deductionType": "insurance"
-        },
-        {
-          "amount": 40,
-          "date": "2025-08-12T11:45:57.753Z",
-          "guardId": "2c73270b-27bf-405b-b096-576a90b3d528",
-          "locationId": "2a1dbd0e-d910-48a4-9b2c-7f82c0f528b6",
-          "deductionType": "sessiPessiFund"
-        }
-      ],
-      "netDeductions": 65,
-      "netSalary": 2466.6666666666665,
-      "grossSalary": 2466.6666666666665,
-      "netPayableSalary": 2401.6666666666665
+      ]
     }
-  ]
+  },
+  "status": 201,
+  "statusText": "Created",
+  "headers": {
+    "content-length": "445",
+    "content-type": "application/json; charset=utf-8"
+  },
+  "config": {
+    "transitional": {
+      "silentJSONParsing": true,
+      "forcedJSONParsing": true,
+      "clarifyTimeoutError": false
+    },
+    "adapter": ["xhr", "http", "fetch"],
+    "transformRequest": [null],
+    "transformResponse": [null],
+    "timeout": 0,
+    "xsrfCookieName": "XSRF-TOKEN",
+    "xsrfHeaderName": "X-XSRF-TOKEN",
+    "maxContentLength": -1,
+    "maxBodyLength": -1,
+    "env": {},
+    "headers": {
+      "Accept": "application/json, text/plain, */*",
+      "Content-Type": "multipart/form-data",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMmUyNDY2YS03NTgwLTQ4ODgtYTI0OS1mYjE5ZDlkMzYzNWQiLCJlbWFpbCI6Im1hcmxib3Jvc2VjdXJpdHlAZ21haWwuY29tIiwicm9sZUlkIjoiMDQwZmZlNjEtMjJmYi00YTFhLTkwYTMtODllNmU3NTYxNzMxIiwib3JnYW5pemF0aW9uSWQiOiIyOWU3NDBkOS1kMjQzLTQ2ZjItOGEyYS1jOGI2MjIyZDVkYmIiLCJpYXQiOjE3NTUwODA1NDIsImV4cCI6MTc1NTE2Njk0Mn0.DFQ3dDbmBr38KG_kbg-I7_w_tywRpH_wIvT-C0cxnjs"
+    },
+    "baseURL": "https://api.guardsos.com",
+    "method": "post",
+    "url": "/file/upload/guards",
+    "data": {},
+    "allowAbsoluteUrls": true
+  },
+  "request": {}
 }
